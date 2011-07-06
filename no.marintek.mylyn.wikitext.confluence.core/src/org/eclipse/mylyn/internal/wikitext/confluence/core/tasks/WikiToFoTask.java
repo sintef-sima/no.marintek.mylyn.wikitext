@@ -30,7 +30,6 @@ import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Configuration;
-import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Margins;
 import org.eclipse.mylyn.wikitext.core.parser.markup.IdGenerationStrategy;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
@@ -72,6 +71,8 @@ public class WikiToFoTask extends WikiConversionTask {
 	 */
 	class NewBuilder extends XslfoDocumentBuilder {
 
+		private final String foNamespaceUri = "http://www.w3.org/1999/XSL/Format"; //$NON-NLS-1$
+
 		public NewBuilder(Writer out) {
 			super(out);
 		}
@@ -81,7 +82,8 @@ public class WikiToFoTask extends WikiConversionTask {
 			// <fo:external-graphic src="url(<path>/images/editor-command-help.png)" width="auto" height="auto" content-width="auto" content-height="auto"/>
 			writer.writeEmptyElement(foNamespaceUri, "external-graphic"); //$NON-NLS-1$
 			writer.writeAttribute("src", String.format("url(%s)", makeImageUrl(url))); //$NON-NLS-1$//$NON-NLS-2$
-			applyImageAttributes(attributes);
+			// TODO: Put back when Eclipse bugs have been applied
+			// applyImageAttributes(attributes);
 		}
 
 		private String makeImageUrl(String url) {
@@ -221,11 +223,12 @@ public class WikiToFoTask extends WikiConversionTask {
 			NewBuilder builder = new NewBuilder(writer);
 			if (configuration != null) {
 				builder.setConfiguration(configuration);
-				configuration.setCopyright("© Copyright 2011 MARINTEK"); //$NON-NLS-1$
 			}
-			builder.getConfiguration().setPageMargins(new Margins(3f, 1f, 3f, 3f));
+			// TODO: Put back when Eclipse bugs have been applied
+			// builder.getConfiguration().setPageMargins(new Margins(3f, 1f, 3f,
+			// 3f));
 			builder.getConfiguration().setDate(DateFormat.getDateInstance().format(new Date()));
-			builder.setRootItem(rootItem);
+			// builder.setRootItem(rootItem);
 			//MarkupLanguage markupLanguageClone = markupLanguage.clone();
 			MarkupParser parser = new MarkupParser();
 			//parser.setMarkupLanguage(markupLanguageClone);

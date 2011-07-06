@@ -76,7 +76,8 @@ public class TableBlock extends Block {
 			boolean header = headerIndicator != null && "|".equals(headerIndicator); //$NON-NLS-1$
 
 			TableCellAttributes attributes = new TableCellAttributes();
-			attributes.setBorder("1px solid #DDD"); // from confluenceTd //$NON-NLS-1$
+			// TODO: Put back when Eclipse bugs have been applied
+			//attributes.setBorder("1px solid #DDD"); // from confluenceTd //$NON-NLS-1$
 			if (header) {
 				attributes.setBgcolor("#F0F0F0"); // from confluenceTh //$NON-NLS-1$
 			}
