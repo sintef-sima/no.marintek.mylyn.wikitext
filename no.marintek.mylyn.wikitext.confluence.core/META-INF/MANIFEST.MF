@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.mylyn.wikitext.core;bundle-version="[1.4.0,2.0.0)",
  javax.xml.soap;bundle-version="[1.2.0,2.0.0)",
  javax.wsdl;bundle-version="[1.6.2,2.0.0)",
  org.apache.commons.logging;bundle-version="[1.0.4,2.0.0)",
- org.eclipse.ant.core;bundle-version="[3.2.200,4.0.0)"
+ org.eclipse.ant.core;bundle-version="[3.2.200,4.0.0)",
+ org.scilab.forge.jlatexmath;bundle-version="0.9.5"
 Export-Package: org.eclipse.mylyn.internal.wikitext.confluence.core.block;x-internal:=true,
  org.eclipse.mylyn.internal.wikitext.confluence.core.phrase;x-internal:=true,
  org.eclipse.mylyn.internal.wikitext.confluence.core.token;x-internal:=true,
@@ -21,5 +22,4 @@ Export-Package: org.eclipse.mylyn.internal.wikitext.confluence.core.block;x-inte
  org.eclipse.mylyn.internal.wikitext.confluence.validation;x-internal:=true,
  org.eclipse.mylyn.wikitext.confluence.core
 Bundle-Localization: plugin
-Bundle-ClassPath: lib/jlatexmath-0.9.5.jar,
- .
+Bundle-ClassPath: .

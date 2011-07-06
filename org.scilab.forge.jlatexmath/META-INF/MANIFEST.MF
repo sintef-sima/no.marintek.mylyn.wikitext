@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JLaTeXMath
+Bundle-SymbolicName: org.scilab.forge.jlatexmath
+Bundle-Version: 0.9.5
+Bundle-Vendor: DENIZET Calixte and others
+Export-Package: org.scilab.forge.jlatexmath,
+ org.scilab.forge.jlatexmath.cache,
+ org.scilab.forge.jlatexmath.cyrillic,
+ org.scilab.forge.jlatexmath.dynamic,
+ org.scilab.forge.jlatexmath.fop,
+ org.scilab.forge.jlatexmath.fop.image,
+ org.scilab.forge.jlatexmath.fop.image.loader,
+ org.scilab.forge.jlatexmath.greek
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
