@@ -5,7 +5,7 @@ but this could not be done due to the fact that integration with commercial
 products does not fit well within the [Mylyn charter](http://wiki.eclipse.org/Mylyn/Charter).
 The related discussion can be found in [Eclipse bug 335280](https://bugs.eclipse.org/bugs/show_bug.cgi?id=335280).
 
-This code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html)(EPL). 
+This code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html) (EPL). 
 and is thus freely available. 
 
 The enhanced Confluence integration features include:
@@ -23,6 +23,7 @@ The enhanced Confluence integration features include:
 Note that the current version of the plug-in is somewhat limited as certain
 issues and improvements must be done in Mylyn Docs in order for the new features
 to work. Hopefully these can be resolved soon. The Eclipse bug reports are as follows:
+
 * [336592](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336592): XslfoDocumentBuilder should be able to generate a bookmark tree
 * [336683](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336683): XslFoDocumentBuilder should allow for basic page styling
 * [336905](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336905): Confluence markup parser should handle table attributes, sub/super-script and escaped characters]
