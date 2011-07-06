@@ -41,7 +41,6 @@ import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.SpanType;
 import org.eclipse.mylyn.wikitext.core.parser.markup.AbstractMarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.markup.Block;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
-import org.eclipse.mylyn.wikitext.core.parser.markup.PageMapping;
 import org.eclipse.mylyn.wikitext.core.parser.markup.token.EntityReferenceReplacementToken;
 import org.eclipse.mylyn.wikitext.core.parser.markup.token.ImpliedHyperlinkReplacementToken;
 import org.eclipse.mylyn.wikitext.core.parser.markup.token.PatternEntityReferenceReplacementToken;
