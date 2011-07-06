@@ -13,8 +13,17 @@ The enhanced Confluence integration features include:
 * Two ANT tasks that can be used to produce Eclipse Help and XSL:FO (for further
   transformation into PDF) from a Confluence wiki. 
 * In addition to the simple rendering of markup code we've also added support 
-  for rendering equations expressed in [LaTeX](http://www.latex-project.org/). 
-* There is a plug-in for Confluence that allows you to do everything LateX so 
-  the ANT tasks will attempt to use the markup from that. Note that our support 
-  is limited to math expressions, utilizing [JLaTeXMath](http://forge.scilab.org/index.php/p/jlatexmath/)
-  math to do the actual job.
+  for rendering equations expressed in [LaTeX](http://www.latex-project.org/).
+  This is done utilizing [JLaTeXMath](http://forge.scilab.org/index.php/p/jlatexmath/)
+  math to do the actual rendering.
+* The document outline is used to generate PDF bookmarks which works similar to
+  a table of contents.
+* Various improvements to rendering of tables and images.
+
+Note that the current version of the plug-in is somewhat limited as certain
+issues and improvements must be done in Mylyn Docs in order for the new features
+to work. Hopefully these can be resolved soon. The Eclipse bug reports are as follows:
+* [336592](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336592): XslfoDocumentBuilder should be able to generate a bookmark tree
+* [336683](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336683): XslFoDocumentBuilder should allow for basic page styling
+* [336905](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336905): Confluence markup parser should handle table attributes, sub/super-script and escaped characters]
+* [336813](https://bugs.eclipse.org/bugs/show_bug.cgi?id=336813): XslFoDocumentBuilder should apply table attributes
