@@ -1,15 +1,12 @@
-This repository contains certain enhancements to the Confluence support in Mylyn
-WikiText that could not be committed to the [Eclipse](http://www.eclipse.org) 
-repository due to it's integration with a commercial product namely 
-[Atlassials Confluence](http://www.atlassian.com/software/confluence/). 
+This repository contains certain enhancements to the [Atlassian Confluence](http://www.atlassian.com/software/confluence/)
+support in Mylyn WikiText. It was originally intended to be contributed to the 
+[Eclipse](http://www.eclipse.org) [Mylyn](http://www.eclipse.org/mylyn) project
+but this could not be done due to the fact that integration with commercial 
+products does not fit well within the [Mylyn charter](http://wiki.eclipse.org/Mylyn/Charter).
+The related discussion can be found in [Eclipse bug 335280](https://bugs.eclipse.org/bugs/show_bug.cgi?id=335280).
 
-It was originally intended to be contributed to the Mylyn project but this could
-not be done due to the fact that integration with commercial products does not 
-fit well within the [Mylyn charter](http://wiki.eclipse.org/Mylyn/Charter). The
-discussion can be found in [Eclipse bug 335280](https://bugs.eclipse.org/bugs/show_bug.cgi?id=335280).
-
-However this code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html)(EPL). 
-and is thus freely available.
+This code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html)(EPL). 
+and is thus freely available. 
 
 The enhanced Confluence integration features include:
  
