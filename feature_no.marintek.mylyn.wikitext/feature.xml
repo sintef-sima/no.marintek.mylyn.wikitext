@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="no.marintek.mylyn.wikitext"
+      label="MARINTEK Mylyn Wikitext"
+      version="0.5.0.qualifier"
+      provider-name="MARINTEK"
+      license-feature="org.eclipse.platform"
+      license-feature-version="3.7.0.v20110530-9gF7UHNFFt4cwE-pkZDJ7oz-mj4OSEIlu9SEv0f">
+
+   <description>
+      Confluence support for Mylyn WikiText.
+   </description>
+
+   <copyright>
+      Copyright 2011 MARINTEK and others.
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <plugin
+         id="no.marintek.mylyn.wikitext.confluence.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
