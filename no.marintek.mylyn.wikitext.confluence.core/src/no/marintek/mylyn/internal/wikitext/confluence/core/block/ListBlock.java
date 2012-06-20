@@ -8,7 +8,7 @@
  * Contributors:
  *     David Green - initial API and implementation
  *******************************************************************************/
-package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
+package no.marintek.mylyn.internal.wikitext.confluence.core.block;
 
 import java.util.Stack;
 import java.util.regex.Matcher;

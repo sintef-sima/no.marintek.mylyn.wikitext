@@ -8,7 +8,7 @@
  * Contributors:
  *     David Green - initial API and implementation
  *******************************************************************************/
-package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
+package no.marintek.mylyn.internal.wikitext.confluence.core.block;
 
 import org.eclipse.mylyn.internal.wikitext.confluence.core.util.Options;
 import org.eclipse.mylyn.wikitext.core.parser.markup.Block;

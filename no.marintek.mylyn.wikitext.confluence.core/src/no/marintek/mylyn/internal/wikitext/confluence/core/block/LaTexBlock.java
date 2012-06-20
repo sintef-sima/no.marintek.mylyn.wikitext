@@ -8,7 +8,7 @@
  * Contributors:
  *     Torkild U. Resheim - initial API and implementation
  *******************************************************************************/
-package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
+package no.marintek.mylyn.internal.wikitext.confluence.core.block;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 
 import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
 
+import org.eclipse.mylyn.internal.wikitext.confluence.core.block.AbstractConfluenceDelimitedBlock;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.ImageAttributes;

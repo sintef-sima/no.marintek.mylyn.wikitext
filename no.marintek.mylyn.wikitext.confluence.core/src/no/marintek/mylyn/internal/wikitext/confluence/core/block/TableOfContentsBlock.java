@@ -8,13 +8,14 @@
  * Contributors:
  *     David Green - initial API and implementation
  *******************************************************************************/
-package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
+package no.marintek.mylyn.internal.wikitext.confluence.core.block;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
 
+import org.eclipse.mylyn.internal.wikitext.confluence.core.block.ParameterizedBlock;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;

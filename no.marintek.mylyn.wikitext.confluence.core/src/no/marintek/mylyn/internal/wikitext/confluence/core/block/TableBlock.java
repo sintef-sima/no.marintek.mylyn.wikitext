@@ -9,7 +9,7 @@
  *     David Green - initial API and implementation
  *     Torkild U. Resheim - Added table styling attributes, bug 336905
  *******************************************************************************/
-package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
+package no.marintek.mylyn.internal.wikitext.confluence.core.block;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
