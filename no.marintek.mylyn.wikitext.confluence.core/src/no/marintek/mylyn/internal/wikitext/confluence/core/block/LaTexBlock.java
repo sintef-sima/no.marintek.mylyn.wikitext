@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 David Green and others.
+ * Copyright (c) 2011, 2012 MARINTEK and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ import org.scilab.forge.jlatexmath.TeXIcon;
 /**
  * @author Torkild U. Resheim
  */
+@SuppressWarnings("restriction")
 public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 
 	private static final double INCH_2_CM = 2.54;
@@ -110,7 +111,7 @@ public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 		}
 		TeXFormula formula = new TeXFormula(content);
 
-		// 16pt font (?) @ 72 DPI > 300dpi 
+		// 16pt font (?) @ 72 DPI > 300dpi
 		TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, (float) (16.0 * (dpi / 72)));
 		icon.setInsets(new Insets(5, 5, 5, 5));
 		BufferedImage image = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -123,8 +124,8 @@ public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 		String id = UUID.randomUUID().toString();
 		File file = new File(root, id + ".png"); //$NON-NLS-1$
 		ImageAttributes img = new ImageAttributes();
-		//img.setWidthPercentage(true);
-		//img.setWidth(50);
+		// img.setWidthPercentage(true);
+		// img.setWidth(50);
 		builder.image(img, file.getName());
 		try {
 			saveGridImage(image, file);
@@ -189,7 +190,7 @@ public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 	protected void endBlock() {
 		writeImage(cleanedLatex.toString());
 		if (title != null) {
-			builder.endBlock(); // panel	
+			builder.endBlock(); // panel
 		}
 		builder.endBlock(); // latex
 	}
@@ -203,9 +204,9 @@ public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 
 	@Override
 	protected void setOption(String key, String value) {
-//		if (key.equals("title")) { //$NON-NLS-1$
-//			title = value;
-//		}
+		//		if (key.equals("title")) { //$NON-NLS-1$
+		// title = value;
+		// }
 	}
 
 }
