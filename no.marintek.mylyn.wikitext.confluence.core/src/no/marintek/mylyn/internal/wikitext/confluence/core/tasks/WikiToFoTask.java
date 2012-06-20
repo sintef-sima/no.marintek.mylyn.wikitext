@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 MARINTEK and others.
+ * Copyright (c) 2011, 2012 MARINTEK and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     MARINTEK - Initial API and implementation
+ *     Torkild U. Resheim - initial API and implementation
  *******************************************************************************/
 
 package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
@@ -79,7 +79,8 @@ public class WikiToFoTask extends WikiConversionTask {
 
 		@Override
 		public void image(Attributes attributes, String url) {
-			// <fo:external-graphic src="url(<path>/images/editor-command-help.png)" width="auto" height="auto" content-width="auto" content-height="auto"/>
+			// <fo:external-graphic src="url(<path>/images/editor-command-help.png)" width="auto" height="auto"
+			// content-width="auto" content-height="auto"/>
 			writer.writeEmptyElement(foNamespaceUri, "external-graphic"); //$NON-NLS-1$
 			writer.writeAttribute("src", String.format("url(%s)", makeImageUrl(url))); //$NON-NLS-1$//$NON-NLS-2$
 			// TODO: Put back when Eclipse bugs have been applied
@@ -201,12 +202,11 @@ public class WikiToFoTask extends WikiConversionTask {
 		File pathDir = dest;
 		if (!pathDir.exists()) {
 			if (!pathDir.mkdirs()) {
-				throw new BuildException(MessageFormat.format(
-						Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
 						pathDir.getAbsolutePath()));
 			}
 		}
-		//String fileName = computeFilename(page.getTitle());
+		// String fileName = computeFilename(page.getTitle());
 		if (foFile == null) {
 			foFile = new File(pathDir, "document.fo"); //$NON-NLS-1$
 		}
@@ -214,8 +214,7 @@ public class WikiToFoTask extends WikiConversionTask {
 		try {
 			writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(foFile)), FILE_ENCODING);
 		} catch (Exception e) {
-			throw new BuildException(MessageFormat.format(
-					Messages.getString("WikiToDocTask.CannotCreateOutputFile"), foFile, //$NON-NLS-1$
+			throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateOutputFile"), foFile, //$NON-NLS-1$
 					e.getMessage()), e);
 		}
 		try {
@@ -229,9 +228,9 @@ public class WikiToFoTask extends WikiConversionTask {
 			// 3f));
 			builder.getConfiguration().setDate(DateFormat.getDateInstance().format(new Date()));
 			// builder.setRootItem(rootItem);
-			//MarkupLanguage markupLanguageClone = markupLanguage.clone();
+			// MarkupLanguage markupLanguageClone = markupLanguage.clone();
 			MarkupParser parser = new MarkupParser();
-			//parser.setMarkupLanguage(markupLanguageClone);
+			// parser.setMarkupLanguage(markupLanguageClone);
 			parser.setMarkupLanguage(createMarkupLanguage());
 			parser.setBuilder(builder);
 			parser.parse(sb.toString());
@@ -251,8 +250,7 @@ public class WikiToFoTask extends WikiConversionTask {
 			try {
 				writer.close();
 			} catch (Exception e) {
-				throw new BuildException(MessageFormat.format(
-						Messages.getString("WikiToDocTask.CannotWriteOutputFile"), foFile, //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotWriteOutputFile"), foFile, //$NON-NLS-1$
 						e.getMessage()), e);
 			}
 		}

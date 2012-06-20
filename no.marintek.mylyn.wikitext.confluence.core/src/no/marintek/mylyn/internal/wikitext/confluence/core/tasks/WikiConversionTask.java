@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011 MARINTEK and others.
+ * Copyright (c) 2011, 2012 MARINTEK and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     MARINTEK - Initial API and implementation
+ *     Torkild U. Resheim - initial API and implementation
  *******************************************************************************/
 
 package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
@@ -433,7 +433,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 	}
 
 	@Override
-	public void execute() throws ConfigurationException {
+	public void execute() {
 
 		validateSettings();
 		((ExtendedConfluenceLanguage) markupLanguage).setResourcesPath(attachmentDestination);
@@ -655,13 +655,13 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected void validateSettings() {
 		if (dest == null) {
-			throw new ConfigurationException(Messages.getString("WikiToDocTask.SpecifyDestination")); //$NON-NLS-1$
+			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyDestination")); //$NON-NLS-1$
 		}
 		if (wikiBaseUrl == null) {
-			throw new ConfigurationException(Messages.getString("WikiToDocTask.SpecifyBaseURL")); //$NON-NLS-1$
+			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyBaseURL")); //$NON-NLS-1$
 		}
 		if (pages.isEmpty()) {
-			throw new ConfigurationException(Messages.getString("WikiToDocTask.SpecifyPagePaths")); //$NON-NLS-1$
+			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyPagePaths")); //$NON-NLS-1$
 		}
 		for (Stylesheet stylesheet : stylesheets) {
 			if (stylesheet.url == null && stylesheet.file == null) {
