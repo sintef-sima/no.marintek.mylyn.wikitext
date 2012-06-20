@@ -10,14 +10,13 @@
  *******************************************************************************/
 package no.marintek.mylyn.internal.wikitext.confluence.core.phrase;
 
-
 import org.eclipse.mylyn.internal.wikitext.confluence.core.util.Options;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.util.Options.Handler;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
-import org.eclipse.mylyn.wikitext.core.parser.VideoAttributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.ImageAttributes;
 import org.eclipse.mylyn.wikitext.core.parser.ImageAttributes.Align;
+import org.eclipse.mylyn.wikitext.core.parser.VideoAttributes;
 import org.eclipse.mylyn.wikitext.core.parser.builder.ExtendedHtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.markup.PatternBasedElement;
 import org.eclipse.mylyn.wikitext.core.parser.markup.PatternBasedElementProcessor;
@@ -62,8 +61,9 @@ public class AttachmentPhraseModifier extends PatternBasedElement {
 			final VideoAttributes attributes = new VideoAttributes();
 			attributes.setAutoplay(false);
 			attributes.setControls(true);
+			// Always fill the width of the page
 			attributes.setWidth(100);
-			attributes.setHeightPercentage(true);
+			attributes.setWidthPercentage(true);
 			((ExtendedHtmlDocumentBuilder) builder).video(attributes, imageUrl);
 		}
 
