@@ -9,7 +9,7 @@
  *     MARINTEK - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.mylyn.internal.wikitext.confluence.core.tasks;
+package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

@@ -10,7 +10,7 @@
  *     MARINTEK - Added Ant task for Eclipse Help generation - bug 335280
  *******************************************************************************/
 
-package org.eclipse.mylyn.internal.wikitext.confluence.core.tasks;
+package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
 
 import org.apache.tools.ant.BuildException;
 

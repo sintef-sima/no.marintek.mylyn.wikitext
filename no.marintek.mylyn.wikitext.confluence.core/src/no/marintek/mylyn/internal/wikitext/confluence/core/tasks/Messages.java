@@ -9,13 +9,13 @@
  *     MARINTEK - Added Ant task for Eclipse Help generation - bug 335280
  *******************************************************************************/
 
-package org.eclipse.mylyn.internal.wikitext.confluence.core.tasks;
+package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
-	private static final String BUNDLE_NAME = "org.eclipse.mylyn.internal.wikitext.confluence.core.tasks.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "no.marintek.mylyn.internal.wikitext.confluence.core.tasks.messages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 

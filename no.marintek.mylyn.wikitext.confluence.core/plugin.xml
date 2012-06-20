@@ -48,7 +48,7 @@
  <extension
        point="org.eclipse.ant.core.antTasks">
     <antTask
-          class="org.eclipse.mylyn.internal.wikitext.confluence.core.tasks.WikiToDocTask"
+          class="no.marintek.mylyn.internal.wikitext.confluence.core.tasks.WikiToDocTask"
           library="bin/"
           name="confluence-to-eclipse-help">
     </antTask>
