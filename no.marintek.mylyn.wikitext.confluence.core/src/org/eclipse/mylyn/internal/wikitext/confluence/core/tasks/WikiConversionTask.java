@@ -44,8 +44,7 @@ import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
 import org.eclipse.mylyn.wikitext.core.util.anttask.MarkupTask;
 
 /**
- * Generates Eclipse Help from a Confluence Wiki. The layout of the resulting documentation is similar to what you get
- * in Confluence. This type was based on {@link org.eclipse.mylyn.internal.wikitext.mediawiki.core.tasks.WikiToDocTask}.
+ * Generates from a Confluence Wiki. The layout of the resulting documentation is similar to what you get in Confluence.
  * 
  * @author Torkild U. Resheim, MARINTEK
  */
@@ -99,12 +98,16 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 		protected boolean exclude = false;
 
+		/** The generated item */
 		protected OutlineItem outline;
 
+		/** Path on Confluence */
 		protected String path;
 
+		/** Namespace on Confluence */
 		protected String space;
 
+		/** Page title */
 		protected String title;
 
 		public Page() {
@@ -231,6 +234,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected String defaultAbsoluteLinkTarget;
 
+	/** The destination directory */
 	protected File dest;
 
 	protected boolean emitDoctype = true;
@@ -241,7 +245,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected String helpPrefix;
 
-	protected final String htmlDoctype = null;
+	protected String htmlDoctype = null;
 
 	protected String httpPassword;
 
@@ -253,6 +257,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected PageAppendum pageAppendum;
 
+	/** The list of pages encountered in Confluence */
 	protected final ArrayList<Page> pages = new ArrayList<Page>();
 
 	protected String attachmentPrefix;
@@ -329,11 +334,11 @@ public abstract class WikiConversionTask extends MarkupTask {
 		outlineParser.setMarkupLanguage(createMarkupLanguage());
 		OutlineItem item = outlineParser.parse(markupContent);
 		item.setLabel(page.getTitle());
-		item.setResourcePath(computeTocRelativeFile(item));
+		item.setResourcePath(computeRelativeFile(item));
 		return item;
 	}
 
-	protected String computeTocRelativeFile(OutlineItem item) {
+	protected String computeRelativeFile(OutlineItem item) {
 		return null;
 	}
 
@@ -369,8 +374,10 @@ public abstract class WikiConversionTask extends MarkupTask {
 					get.setProject(getProject());
 					get.setLocation(getLocation());
 					get.setSrc(attachurl);
-					get.setDest(new File(attachmentDestination, attachment.getFileName()));
+					File file = new File(attachmentDestination, attachment.getFileName());
+					get.setDest(file);
 					get.execute();
+					processAttachment(file);
 
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
@@ -379,6 +386,10 @@ public abstract class WikiConversionTask extends MarkupTask {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	/** Implement to handle additional processing of attachments */
+	protected void processAttachment(File file) {
 	}
 
 	/**
@@ -393,10 +404,8 @@ public abstract class WikiConversionTask extends MarkupTask {
 	 * @throws RemoteException
 	 * @throws java.rmi.RemoteException
 	 */
-	protected void downloadPage(Page parent, Page page) throws InvalidSessionException, RemoteException,
-			java.rmi.RemoteException {
-		getProject().log(
-				MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
+	protected void downloadPage(Page parent, Page page) throws InvalidSessionException, RemoteException, java.rmi.RemoteException {
+		getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
 		RemotePage rpage = binding.getPage(sessionToken, page.getSpace(), page.getPath());
 		markupToDoc(rpage);
 		downloadAttachments(rpage);
@@ -545,7 +554,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 			ConfluenceSoapServiceServiceLocator locator = new ConfluenceSoapServiceServiceLocator();
 			locator.setConfluenceserviceV1EndpointAddress(getWikiBaseUrl() + "rpc/soap-axis/confluenceservice-v1"); //$NON-NLS-1$
 			binding = (ConfluenceserviceV1SoapBindingStub) locator.getConfluenceserviceV1();
-			binding.setTimeout(30000);
+			binding.setTimeout(300000);
 			sessionToken = binding.login(getHttpUsername(), getHttpPassword());
 		} catch (AuthenticationFailedException e) {
 			e.printStackTrace();
@@ -573,15 +582,23 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected abstract void postProcess();
 
-	protected String postProcessMarkup(RemotePage page, String content) {
+	/**
+	 * Do post processing of the markup page.
+	 * 
+	 * @param page
+	 *            the remote page
+	 * @param content
+	 *            the content of the page.
+	 * @return
+	 */
+	protected String postProcessPage(RemotePage page, String content) {
 		if (pageAppendum != null) {
-			String pageAppendum = this.pageAppendum.text;
-			String appendum = pageAppendum.replace("{url}", page.getUrl()); //$NON-NLS-1$
+			String text = this.pageAppendum.text;
+			String appendum = text.replace("{url}", page.getUrl()); //$NON-NLS-1$
 			appendum = appendum.replace("{title}", page.getTitle()); //$NON-NLS-1$
 			content += appendum;
 			content += "\n"; //$NON-NLS-1$
-			getProject().log(
-					MessageFormat.format(Messages.getString("WikiToDocTask.AppendingMarkup"), page.getTitle(), appendum), //$NON-NLS-1$
+			getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.AppendingMarkup"), page.getTitle(), appendum), //$NON-NLS-1$
 					Project.MSG_VERBOSE);
 
 		}
@@ -655,18 +672,15 @@ public abstract class WikiConversionTask extends MarkupTask {
 			}
 			if (stylesheet.file != null) {
 				if (!stylesheet.file.exists()) {
-					throw new BuildException(MessageFormat.format(
-							Messages.getString("WikiToDocTask.StylesheetFileDoesNotExist"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.StylesheetFileDoesNotExist"), //$NON-NLS-1$
 							stylesheet.file));
 				}
 				if (!stylesheet.file.isFile()) {
-					throw new BuildException(MessageFormat.format(
-							Messages.getString("WikiToDocTask.StyleSheetFileIsNotAFile"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.StyleSheetFileIsNotAFile"), //$NON-NLS-1$
 							stylesheet.file));
 				}
 				if (!stylesheet.file.canRead()) {
-					throw new BuildException(MessageFormat.format(
-							Messages.getString("WikiToDocTask.CannotReadStyleSheetFile"), stylesheet.file)); //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotReadStyleSheetFile"), stylesheet.file)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -676,8 +690,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 			attachmentDestination = new File(attachmentDestination, attachmentPrefix);
 			if (!attachmentDestination.exists()) {
 				if (!attachmentDestination.mkdirs()) {
-					throw new BuildException(MessageFormat.format(
-							Messages.getString("WikiToDocTask.CannotCreateAttachmentsFolder"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateAttachmentsFolder"), //$NON-NLS-1$
 							dest.getAbsolutePath()));
 				}
 			}
@@ -685,8 +698,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 		if (!dest.exists()) {
 			if (!dest.mkdirs()) {
-				throw new BuildException(MessageFormat.format(
-						Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
 						dest.getAbsolutePath()));
 			}
 		}

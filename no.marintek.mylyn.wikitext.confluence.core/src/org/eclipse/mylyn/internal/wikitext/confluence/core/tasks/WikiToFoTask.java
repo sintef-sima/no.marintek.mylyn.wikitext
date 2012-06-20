@@ -192,7 +192,7 @@ public class WikiToFoTask extends WikiConversionTask {
 			// Note a nice hack but we need to get the title in as a header
 			markupContent = "\n\nh1. " + page.getTitle() + "\n" + markupContent; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		markupContent = postProcessMarkup(page, markupContent);
+		markupContent = postProcessPage(page, markupContent);
 		sb.append(markupContent);
 	}
 

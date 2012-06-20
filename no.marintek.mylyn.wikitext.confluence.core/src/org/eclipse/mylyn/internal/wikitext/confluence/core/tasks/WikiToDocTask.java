@@ -59,8 +59,7 @@ public class WikiToDocTask extends WikiConversionTask {
 		File pathDir = dest;
 		if (!pathDir.exists()) {
 			if (!pathDir.mkdirs()) {
-				throw new BuildException(MessageFormat.format(
-						Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
 						pathDir.getAbsolutePath()));
 			}
 		}
@@ -68,11 +67,9 @@ public class WikiToDocTask extends WikiConversionTask {
 		File htmlOutputFile = new File(pathDir, fileName);
 		Writer writer;
 		try {
-			writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(htmlOutputFile)),
-					FILE_ENCODING);
+			writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(htmlOutputFile)), FILE_ENCODING);
 		} catch (Exception e) {
-			throw new BuildException(MessageFormat.format(
-					Messages.getString("WikiToDocTask.CannotCreateOutputFile"), htmlOutputFile, //$NON-NLS-1$
+			throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateOutputFile"), htmlOutputFile, //$NON-NLS-1$
 					e.getMessage()), e);
 		}
 		try {
@@ -125,15 +122,14 @@ public class WikiToDocTask extends WikiConversionTask {
 				// Note a nice hack but we need to get the title in as a header
 				markupContent = "h1. " + page.getTitle() + "\n" + markupContent; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			markupContent = postProcessMarkup(page, markupContent);
+			markupContent = postProcessPage(page, markupContent);
 			parser.parse(markupContent);
 
 		} finally {
 			try {
 				writer.close();
 			} catch (Exception e) {
-				throw new BuildException(MessageFormat.format(
-						Messages.getString("WikiToDocTask.CannotWriteOutputFile"), htmlOutputFile, //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotWriteOutputFile"), htmlOutputFile, //$NON-NLS-1$
 						e.getMessage()), e);
 			}
 		}
@@ -162,7 +158,7 @@ public class WikiToDocTask extends WikiConversionTask {
 				if (currentPath.equals(name)) {
 					return hashId == null ? "#" : hashId; //$NON-NLS-1$
 				}
-				//FIXME: This is incorrect!
+				// FIXME: This is incorrect!
 				name = createMarkupLanguage().getIdGenerationStrategy().generateId(name);
 				File destDir = dest;
 				File currentDest = dest;
@@ -212,7 +208,7 @@ public class WikiToDocTask extends WikiConversionTask {
 	 * @return a path
 	 */
 	@Override
-	protected String computeTocRelativeFile(OutlineItem item) {
+	protected String computeRelativeFile(OutlineItem item) {
 		File pathDestDir = dest;
 		File tocParentFile = tocFile.getParentFile();
 		String prefix = computePrefixPath(pathDestDir, tocParentFile);
@@ -234,8 +230,7 @@ public class WikiToDocTask extends WikiConversionTask {
 		if (tocFile == null) {
 			tocFile = new File(dest, "toc.xml"); //$NON-NLS-1$
 		}
-		getProject().log(
-				MessageFormat.format(Messages.getString("WikiToDocTask.WritingTOC"), tocFile), Project.MSG_INFO); //$NON-NLS-1$
+		getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.WritingTOC"), tocFile), Project.MSG_INFO); //$NON-NLS-1$
 
 		// Make sure we get the correct path to the item.
 		MarkupToEclipseToc markupToEclipseToc = new MarkupToEclipseToc() {
@@ -257,8 +252,7 @@ public class WikiToDocTask extends WikiConversionTask {
 				writer.close();
 			}
 		} catch (IOException e) {
-			String message = MessageFormat.format(
-					Messages.getString("WikiToDocTask.CannotWrite"), tocFile, e.getMessage()); //$NON-NLS-1$
+			String message = MessageFormat.format(Messages.getString("WikiToDocTask.CannotWrite"), tocFile, e.getMessage()); //$NON-NLS-1$
 			throw new BuildException(message, e);
 		}
 	}
