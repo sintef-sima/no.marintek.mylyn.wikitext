@@ -33,11 +33,11 @@ import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.beans.RemotePage
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.beans.RemotePageSummary;
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.confluenceservice_v1.ConfluenceSoapServiceServiceLocator;
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.confluenceservice_v1.ConfluenceserviceV1SoapBindingStub;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Get;
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
@@ -253,7 +253,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected String linkRel;
 
-	private final MarkupLanguage markupLanguage = new ConfluenceLanguage();
+	private final MarkupLanguage markupLanguage = new ExtendedConfluenceLanguage();
 
 	protected PageAppendum pageAppendum;
 
@@ -436,7 +436,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 	public void execute() throws ConfigurationException {
 
 		validateSettings();
-		((ConfluenceLanguage) markupLanguage).setResourcesPath(attachmentDestination);
+		((ExtendedConfluenceLanguage) markupLanguage).setResourcesPath(attachmentDestination);
 
 		if (httpPassword != null && httpUsername != null) {
 			Authenticator.setDefault(new BasicAuthenticator(httpUsername, httpPassword));

@@ -9,7 +9,7 @@
  *     David Green - initial API and implementation
  *     MARINTEK - Added Ant task for Eclipse Help generation - bug 335280
  *******************************************************************************/
-package org.eclipse.mylyn.wikitext.confluence.core;
+package no.marintek.mylyn.wikitext.confluence.core;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -56,7 +56,7 @@ import org.eclipse.mylyn.wikitext.core.parser.markup.token.PatternLiteralReplace
  * @see <a href="http://confluence.atlassian.com/display/DOC/Confluence+Notation+Guide+Overview">Confluence Notation
  *      Guide Overview</a>
  */
-public class ConfluenceLanguage extends AbstractMarkupLanguage {
+public class ExtendedConfluenceLanguage extends AbstractMarkupLanguage {
 	/**
 	 * blocks that may be nested in side a quote block
 	 * 
@@ -66,11 +66,11 @@ public class ConfluenceLanguage extends AbstractMarkupLanguage {
 
 	private int latexDpi = 72;
 
-	public ConfluenceLanguage() {
-		setName("Confluence"); //$NON-NLS-1$
+	public ExtendedConfluenceLanguage() {
+		setName("ExtendedConfluence"); //$NON-NLS-1$
 	}
 
-	public ConfluenceLanguage(int latexDpi) {
+	public ExtendedConfluenceLanguage(int latexDpi) {
 		this.latexDpi = latexDpi;
 	}
 
@@ -86,7 +86,7 @@ public class ConfluenceLanguage extends AbstractMarkupLanguage {
 
 	@Override
 	protected void addStandardBlocks(List<Block> blocks, List<Block> paragraphBreakingBlocks) {
-		// IMPORTANT NOTE: Most items below have order dependencies.  DO NOT REORDER ITEMS BELOW!!
+		// IMPORTANT NOTE: Most items below have order dependencies. DO NOT REORDER ITEMS BELOW!!
 
 		HeadingBlock headingBlock = new HeadingBlock();
 		blocks.add(headingBlock);

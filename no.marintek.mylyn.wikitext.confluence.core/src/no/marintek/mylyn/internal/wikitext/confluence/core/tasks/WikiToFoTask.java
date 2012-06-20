@@ -23,9 +23,9 @@ import java.text.MessageFormat;
 import java.util.Date;
 
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.beans.RemotePage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
 
 import org.apache.tools.ant.BuildException;
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder;
@@ -122,7 +122,7 @@ public class WikiToFoTask extends WikiConversionTask {
 	/**
 	 * @author Torkild U. Resheim
 	 */
-	public class SpecialConfluenceLanguage extends ConfluenceLanguage implements Cloneable {
+	public class SpecialConfluenceLanguage extends ExtendedConfluenceLanguage implements Cloneable {
 
 		public SpecialConfluenceLanguage(int i) {
 			super(i);

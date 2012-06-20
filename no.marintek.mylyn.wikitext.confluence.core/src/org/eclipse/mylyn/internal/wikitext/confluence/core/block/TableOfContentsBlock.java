@@ -13,7 +13,8 @@ package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
@@ -45,7 +46,7 @@ public class TableOfContentsBlock extends ParameterizedBlock {
 			String options = matcher.group(1);
 			setOptions(options);
 
-			OutlineParser outlineParser = new OutlineParser(new ConfluenceLanguage());
+			OutlineParser outlineParser = new OutlineParser(new ExtendedConfluenceLanguage());
 			OutlineItem rootItem = outlineParser.parse(state.getMarkupContent());
 			emitToc(rootItem);
 		}

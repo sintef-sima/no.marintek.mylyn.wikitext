@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.beans.RemotePage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.PageMapping;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
-import org.eclipse.mylyn.wikitext.confluence.core.PageMapping;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
@@ -110,8 +110,8 @@ public class WikiToDocTask extends WikiConversionTask {
 			builder.setXhtmlStrict(xhtmlStrict);
 
 			MarkupLanguage markupLanguageClone = createMarkupLanguage().clone();
-			if (markupLanguageClone instanceof ConfluenceLanguage) {
-				((ConfluenceLanguage) markupLanguageClone).setPageMapping(new PathPageMapping(page.getTitle(), pages));
+			if (markupLanguageClone instanceof ExtendedConfluenceLanguage) {
+				((ExtendedConfluenceLanguage) markupLanguageClone).setPageMapping(new PathPageMapping(page.getTitle(), pages));
 			}
 
 			MarkupParser parser = new MarkupParser();

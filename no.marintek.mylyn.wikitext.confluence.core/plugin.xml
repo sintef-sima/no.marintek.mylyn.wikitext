@@ -15,7 +15,7 @@
    <extension
          point="org.eclipse.mylyn.wikitext.core.markupLanguage">
       <language
-            class="org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage"
+            class="no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage"
             name="Confluence" fileExtensions="confluence">
       </language>
    </extension>

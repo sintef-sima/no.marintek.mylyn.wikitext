@@ -13,7 +13,8 @@ package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.markup.Block;
@@ -47,7 +48,7 @@ public class ParagraphBlock extends Block {
 
 		++blockLineCount;
 
-		ConfluenceLanguage markupLanguage = (ConfluenceLanguage) getMarkupLanguage();
+		ExtendedConfluenceLanguage markupLanguage = (ExtendedConfluenceLanguage) getMarkupLanguage();
 
 		// NOTE: in Confluence paragraphs can have nested lists and other things, however
 		//       the resulting XHTML is invalid -- so here we allow for similar constructs

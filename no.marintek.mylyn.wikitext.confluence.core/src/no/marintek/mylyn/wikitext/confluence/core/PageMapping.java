@@ -1,4 +1,4 @@
-package org.eclipse.mylyn.wikitext.confluence.core;
+package no.marintek.mylyn.wikitext.confluence.core;
 
 public interface PageMapping {
 	/**

@@ -32,7 +32,8 @@ import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JLabel;
 
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.ImageAttributes;
@@ -97,7 +98,7 @@ public class LaTexBlock extends AbstractConfluenceDelimitedBlock {
 		if (imageWritten) {
 			return;
 		}
-		File root = ((ConfluenceLanguage) getMarkupLanguage()).getResourcesPath();
+		File root = ((ExtendedConfluenceLanguage) getMarkupLanguage()).getResourcesPath();
 		if (root == null) {
 			throw new IllegalArgumentException("No folder for LaTeX images has been specified"); //$NON-NLS-1$
 		}

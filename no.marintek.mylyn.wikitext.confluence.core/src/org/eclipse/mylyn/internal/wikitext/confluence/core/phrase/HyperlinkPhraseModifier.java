@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.mylyn.internal.wikitext.confluence.core.phrase;
 
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.SpanType;
 import org.eclipse.mylyn.wikitext.core.parser.LinkAttributes;
@@ -58,7 +59,7 @@ public class HyperlinkPhraseModifier extends PatternBasedElement {
 					tip = tip.trim();
 				}
 				if (href != null && !href.startsWith("http")) { //$NON-NLS-1$
-					String pageRef = ((ConfluenceLanguage) getMarkupLanguage()).toInternalHref(href);
+					String pageRef = ((ExtendedConfluenceLanguage) getMarkupLanguage()).toInternalHref(href);
 					if (pageRef != null) {
 						// We don't have an alias so we need to use the HREF for
 						// link label.

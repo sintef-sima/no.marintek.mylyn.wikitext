@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.mylyn.internal.wikitext.confluence.core.block;
 
-import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
+import no.marintek.mylyn.wikitext.confluence.core.ExtendedConfluenceLanguage;
+
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder.BlockType;
 import org.eclipse.mylyn.wikitext.core.parser.markup.Block;
@@ -64,7 +65,7 @@ public class ExtendedQuoteBlock extends AbstractConfluenceDelimitedBlock {
 	@Override
 	protected void handleBlockContent(String content) {
 		if (nestedBlock == null) {
-			ConfluenceLanguage markupLanguage = (ConfluenceLanguage) getMarkupLanguage();
+			ExtendedConfluenceLanguage markupLanguage = (ExtendedConfluenceLanguage) getMarkupLanguage();
 			for (Block block : markupLanguage.getNestedBlocks()) {
 				if (block.canStart(content, 0)) {
 					nestedBlock = block.clone();

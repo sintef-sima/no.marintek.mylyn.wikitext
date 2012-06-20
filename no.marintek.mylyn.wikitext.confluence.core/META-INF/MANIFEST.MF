@@ -17,12 +17,13 @@ Require-Bundle: org.eclipse.mylyn.wikitext.core;bundle-version="[1.4.0,2.0.0)",
  org.scilab.forge.jlatexmath;bundle-version="0.9.5",
  org.apache.ant;bundle-version="1.8.3",
  org.eclipse.mylyn.docs.epub.core;bundle-version="1.0.0",
- org.eclipse.mylyn.docs.epub.ant.core;bundle-version="1.0.0"
-Export-Package: org.eclipse.mylyn.internal.wikitext.confluence.core.block;x-internal:=true,
+ org.eclipse.mylyn.docs.epub.ant.core;bundle-version="1.0.0",
+ org.eclipse.mylyn.wikitext.confluence.core;bundle-version="1.7.0"
+Export-Package: no.marintek.mylyn.wikitext.confluence.core,
+ org.eclipse.mylyn.internal.wikitext.confluence.core.block;x-internal:=true,
  org.eclipse.mylyn.internal.wikitext.confluence.core.phrase;x-internal:=true,
  org.eclipse.mylyn.internal.wikitext.confluence.core.token;x-internal:=true,
  org.eclipse.mylyn.internal.wikitext.confluence.core.util;x-internal:=true,
- org.eclipse.mylyn.internal.wikitext.confluence.validation;x-internal:=true,
- org.eclipse.mylyn.wikitext.confluence.core
+ org.eclipse.mylyn.internal.wikitext.confluence.validation;x-internal:=true
 Bundle-Localization: plugin
 Bundle-ClassPath: .
