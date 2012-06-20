@@ -30,6 +30,7 @@ import no.marintek.mylyn.wikitext.confluence.core.PageMapping;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
+import org.eclipse.mylyn.wikitext.core.parser.builder.ExtendedHtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 import org.eclipse.mylyn.wikitext.core.parser.util.MarkupToEclipseToc;
@@ -72,7 +73,7 @@ public class WikiToDocTask extends WikiConversionTask {
 					e.getMessage()), e);
 		}
 		try {
-			HtmlDocumentBuilder builder = new HtmlDocumentBuilder(writer, formatOutput);
+			ExtendedHtmlDocumentBuilder builder = new ExtendedHtmlDocumentBuilder(writer, formatOutput);
 			for (Stylesheet stylesheet : stylesheets) {
 				HtmlDocumentBuilder.Stylesheet builderStylesheet;
 
@@ -148,7 +149,6 @@ public class WikiToDocTask extends WikiConversionTask {
 		@Override
 		public String mapPageNameToHref(String pageName) {
 			Matcher matcher = PAGE_NAME_PATTERN.matcher(pageName);
-			System.out.println("WikiToDocTask.PathPageMapping.mapPageNameToHref()" + pageName);
 			if (matcher.matches()) {
 				String name = matcher.group(1);
 				String hashId = matcher.group(2);

@@ -29,7 +29,6 @@ public class MappingHyperlinkPhraseModifier extends HyperlinkPhraseModifier {
 	private static class HyperlinkPhraseModifierProcessor extends PatternBasedElementProcessor {
 		@Override
 		public void emit() {
-			System.err.println("--------");
 			String text = group(1);
 			String linkComposite = group(2);
 			String[] parts = linkComposite.split("\\s*\\|\\s*"); //$NON-NLS-1$

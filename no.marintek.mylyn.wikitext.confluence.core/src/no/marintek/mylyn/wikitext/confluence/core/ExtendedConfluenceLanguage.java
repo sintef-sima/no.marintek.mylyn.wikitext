@@ -15,12 +15,12 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import no.marintek.mylyn.internal.wikitext.confluence.core.block.LaTexBlock;
+import no.marintek.mylyn.internal.wikitext.confluence.core.phrase.AttachmentPhraseModifier;
 import no.marintek.mylyn.internal.wikitext.confluence.core.phrase.MappingHyperlinkPhraseModifier;
 
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.ColorPhraseModifier;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.ConfluenceWrappedPhraseModifier;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.EmphasisPhraseModifier;
-import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.ImagePhraseModifier;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.SimplePhraseModifier;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.SimpleWrappedPhraseModifier;
 import org.eclipse.mylyn.wikitext.confluence.core.ConfluenceLanguage;
@@ -44,41 +44,7 @@ public class ExtendedConfluenceLanguage extends ConfluenceLanguage {
 	@Override
 	protected void addStandardBlocks(List<Block> blocks, List<Block> paragraphBreakingBlocks) {
 		super.addStandardBlocks(blocks, paragraphBreakingBlocks);
-		// // IMPORTANT NOTE: Most items below have order dependencies. DO NOT REORDER ITEMS BELOW!!
-		//
-		// HeadingBlock headingBlock = new HeadingBlock();
-		// blocks.add(headingBlock);
-		// paragraphBreakingBlocks.add(headingBlock);
-		// getNestedBlocks().add(headingBlock);
-		// ListBlock listBlock = new ListBlock();
-		// blocks.add(listBlock);
-		// paragraphBreakingBlocks.add(listBlock);
-		// getNestedBlocks().add(listBlock);
-		// blocks.add(new QuoteBlock());
-		// TableBlock tableBlock = new TableBlock();
-		// blocks.add(tableBlock);
-		// paragraphBreakingBlocks.add(tableBlock);
-		// getNestedBlocks().add(tableBlock);
-		// ExtendedQuoteBlock quoteBlock = new ExtendedQuoteBlock();
-		// blocks.add(quoteBlock);
-		// paragraphBreakingBlocks.add(quoteBlock);
-		// ExtendedPreformattedBlock noformatBlock = new ExtendedPreformattedBlock();
-		// blocks.add(noformatBlock);
-		// paragraphBreakingBlocks.add(noformatBlock);
 		blocks.add(new LaTexBlock(latexDpi));
-
-		//		blocks.add(new TextBoxBlock(BlockType.PANEL, "panel")); //$NON-NLS-1$
-		//		blocks.add(new TextBoxBlock(BlockType.NOTE, "note")); //$NON-NLS-1$
-		//		blocks.add(new TextBoxBlock(BlockType.INFORMATION, "info")); //$NON-NLS-1$
-		//		blocks.add(new TextBoxBlock(BlockType.WARNING, "warning")); //$NON-NLS-1$
-		//		blocks.add(new TextBoxBlock(BlockType.TIP, "tip")); //$NON-NLS-1$
-		// CodeBlock codeBlock = new CodeBlock();
-		// blocks.add(codeBlock);
-		// paragraphBreakingBlocks.add(codeBlock);
-		// blocks.add(new TableOfContentsBlock());
-		// ColorBlock colorBlock = new ColorBlock();
-		// blocks.add(colorBlock);
-		// paragraphBreakingBlocks.add(colorBlock);
 	}
 
 	private PageMapping pageMapping;
@@ -98,7 +64,7 @@ public class ExtendedConfluenceLanguage extends ConfluenceLanguage {
 		syntax.add(new SimpleWrappedPhraseModifier("{{", "}}", SpanType.MONOSPACE, false)); //$NON-NLS-1$ //$NON-NLS-2$
 		syntax.add(new ConfluenceWrappedPhraseModifier("{quote}", SpanType.QUOTE, true)); //$NON-NLS-1$ 
 		syntax.add(new ColorPhraseModifier());
-		syntax.add(new ImagePhraseModifier());
+		syntax.add(new AttachmentPhraseModifier());
 		syntax.endGroup(")(?=\\W|$)", 0); //$NON-NLS-1$
 	}
 

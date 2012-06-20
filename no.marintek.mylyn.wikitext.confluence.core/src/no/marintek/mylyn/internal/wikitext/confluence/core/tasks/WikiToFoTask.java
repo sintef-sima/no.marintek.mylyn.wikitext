@@ -258,7 +258,6 @@ public class WikiToFoTask extends WikiConversionTask {
 
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
-		System.out.println("WikiToFoTask.setConfiguration()");
 	}
 
 	public void setFoFile(File foFile) {

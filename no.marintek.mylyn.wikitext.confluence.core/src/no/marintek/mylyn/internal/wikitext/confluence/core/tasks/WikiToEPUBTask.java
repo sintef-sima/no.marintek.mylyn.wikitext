@@ -96,12 +96,12 @@ public class WikiToEPUBTask extends WikiToDocTask {
 
 			@Override
 			public void log(String message) {
-				System.out.println(message);
+				// System.out.println(message);
 			}
 
 			@Override
 			public void log(String message, Severity severity) {
-				System.out.println(message);
+				// System.out.println(message);
 			}
 		});
 
