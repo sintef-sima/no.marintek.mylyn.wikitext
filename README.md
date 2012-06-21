@@ -6,22 +6,22 @@ This repository contains Ant tasks for culling an [Atlassian Confluence](http://
 
 The EPUB task is a little special. It also supports all features of the Mylyn Docs EPUB task. The syntax is also the same for the EPUB related parts.
 
-Note that version 1.1.0 of Mylyn Docs EPUB is required. This is currently only available in [weekly builds](http://download.eclipse.org/mylyn/snapshots/weekly/).
+Note that version 1.1.0 of Mylyn Docs EPUB is required. This is currently only available in [weekly builds](http://download.eclipse.org/mylyn/snapshots/weekly/). The most recent release (with Eclipse Juno) is 1.0.0.
 
 Features
 --------
-* Automatically downloads pages and attachments from a Confluence wiki.
-* Pages (or chapters) are assembled in the order specified in Confluence.
-* Authentication for logging in to the wki.
+* Downloads pages and attachments from a Confluence wiki using it's [SOAP](http://en.wikipedia.org/wiki/SOAP) [API](https://developer.atlassian.com/display/CONFDEV/Confluence+XML-RPC+and+SOAP+APIs).
+* Pages (or chapters) are assembled in the order specified in Confluence and are downloaded recursivly.
+* Authentication for logging in tothe wki.
 * Support for LaTeX math expressions. These are converted to PNG images and included into the final result.
 * Support for video files; attachments with the *.mp4* suffix are treated as video files and inserted into HTML results using the HTML5 video tag.
 
 Copyright
 ---------
-Where not otherwise noted, this code is Copyright © 2011, 2012 [MARINTEK](http://www.sintef.no/Home/MARINTEK/), The Norwegian Marine Technology Research Institute.
+The development of code was funded by [MARINTEK](http://www.sintef.no/Home/MARINTEK/) – The Norwegian Marine Technology Research Institute. Consequently; where not otherwise noted, this code is Copyright © 2011, 2012 MARINTEK.
 
 License
 -------
 This code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html) (EPL). Note
-that the [LaTeX](http://en.wikipedia.org/wiki/LaTeX) support is distributed under the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html).
+that the [LaTeX](http://en.wikipedia.org/wiki/LaTeX) support is not developed by MARINTEK and is distributed under the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html), see the [license file](blob/master/org.scilab.forge.jlatexmath/META-INF/LICENSE) for details.
 
