@@ -23,5 +23,4 @@ The development of code was funded by [MARINTEK](http://www.sintef.no/Home/MARIN
 License
 -------
 This code is published under the [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html) (EPL). Note
-that the [LaTeX](http://en.wikipedia.org/wiki/LaTeX) support is not developed by MARINTEK and is distributed under the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html), see the [license file](blob/master/org.scilab.forge.jlatexmath/META-INF/LICENSE) for details.
-
+that the [LaTeX](http://en.wikipedia.org/wiki/LaTeX) support is not developed by MARINTEK and is distributed under the [GNU General Public License](http://www.gnu.org/licenses/gpl-2.0.html), see the [license file](no.marintek.mylyn.wikitext/blob/master/org.scilab.forge.jlatexmath/META-INF/LICENSE) for details.
