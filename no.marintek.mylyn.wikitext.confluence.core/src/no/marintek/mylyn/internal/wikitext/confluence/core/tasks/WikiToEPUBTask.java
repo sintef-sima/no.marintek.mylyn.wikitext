@@ -15,8 +15,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.mylyn.docs.epub.ant.core.AntLogger;
 import org.eclipse.mylyn.docs.epub.core.EPUB;
-import org.eclipse.mylyn.docs.epub.core.ILogger;
 import org.eclipse.mylyn.docs.epub.core.OPS2Publication;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 
@@ -33,12 +33,17 @@ public class WikiToEPUBTask extends WikiToDocTask {
 		useInlineCssStyles = true;
 		suppressBuiltInCssStyles = false;
 		title = "<unspecified>";
+		ops = new OPS2Publication(new AntLogger(this));
 	}
+
+	// public void addConfiguredIdentifier(IdentifierType identifier) {
+	// ops.addIdentifier(identifier.id, identifier.scheme, identifier.value);
+	// }
 
 	@Override
 	protected String computeRelativeFile(OutlineItem item) {
-		File pathDestDir = dest;
-		File tocParentFile = dest;
+		File pathDestDir = pageDestination;
+		File tocParentFile = pageDestination;
 		String prefix = computePrefixPath(pathDestDir, tocParentFile);
 		String relativePath = prefix + '/' + computeFilename(item.getLabel());
 		relativePath = relativePath.replace('\\', '/');
@@ -68,7 +73,7 @@ public class WikiToEPUBTask extends WikiToDocTask {
 		// once.
 		List<OutlineItem> items = item.getChildren();
 		for (OutlineItem outlineItem : items) {
-			File itemFile = new File(dest.getAbsolutePath() + File.separator + outlineItem.getResourcePath());
+			File itemFile = new File(pageDestination.getAbsolutePath() + File.separator + outlineItem.getResourcePath());
 			// Some top level items may have level 0
 			if (outlineItem.getLevel() <= 1) {
 				oebps.addItem(itemFile);
@@ -83,6 +88,7 @@ public class WikiToEPUBTask extends WikiToDocTask {
 	}
 
 	ArrayList<File> attachments = new ArrayList<File>();
+	private OPS2Publication ops;
 
 	@Override
 	protected void processAttachment(File file) {
@@ -91,36 +97,26 @@ public class WikiToEPUBTask extends WikiToDocTask {
 
 	@Override
 	protected void postProcess() {
+		// EpubTask task = new EpubTask();
+		// task.addConfiguredTitle(new TitleType());
 		EPUB epub = new EPUB();
-		OPS2Publication oebps = new OPS2Publication(new ILogger() {
 
-			@Override
-			public void log(String message) {
-				// System.out.println(message);
-			}
+		ops.addTitle(null, null, getTitle());
 
-			@Override
-			public void log(String message, Severity severity) {
-				// System.out.println(message);
-			}
-		});
-
-		oebps.addTitle(null, null, getTitle());
-
-		addItems(oebps, rootItem);
+		addItems(ops, rootItem);
 		for (File attachment : attachments) {
 			if (!attachment.getName().endsWith(".xls")) {
 				String mimetype = null;
 				if (attachment.getName().endsWith(".mp4")) {
 					mimetype = "video/mp4";
 				}
-				oebps.addItem(null, null, attachment, "images", mimetype, false, false, true);
+				ops.addItem(null, null, attachment, "images", mimetype, false, false, true);
 			}
 		}
-		oebps.setGenerateToc(true);
-		epub.add(oebps);
+		ops.setGenerateToc(true);
+		epub.add(ops);
 		try {
-			epub.pack(new File(dest.getParentFile().getAbsolutePath() + File.separator + getTitle() + ".epub"));
+			epub.pack(new File(pageDestination.getParentFile().getAbsolutePath() + File.separator + getTitle() + ".epub"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

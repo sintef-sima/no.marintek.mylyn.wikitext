@@ -8,7 +8,6 @@
  * Contributors:
  *     Torkild U. Resheim - initial API and implementation
  *******************************************************************************/
-
 package no.marintek.mylyn.internal.wikitext.confluence.core.tasks;
 
 import java.io.File;
@@ -44,40 +43,18 @@ import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
 import org.eclipse.mylyn.wikitext.core.util.anttask.MarkupTask;
 
 /**
- * Generates from a Confluence Wiki. The layout of the resulting documentation is similar to what you get in Confluence.
+ * Downloads pages and attachments from a Confluence Wiki.
  * 
- * @author Torkild U. Resheim, MARINTEK
+ * @author Torkild U. Resheim
  */
 public abstract class WikiConversionTask extends MarkupTask {
-	public static class Attribute {
-
-		protected String name;
-
-		protected String value;
-
-		public String getName() {
-			return name;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-	}
 
 	/**
 	 * Confluence supports Basic HTTP authentication which we will use when we need to download attachments.
 	 */
 	protected class BasicAuthenticator extends Authenticator {
 
-		protected final String username, password;
+		private final String username, password;
 
 		public BasicAuthenticator(String user, String pass) {
 			username = user;
@@ -94,7 +71,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 	/**
 	 * Type to describe a wiki page.
 	 */
-	public static class Page {
+	protected static class Page {
 
 		protected boolean exclude = false;
 
@@ -167,7 +144,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 		}
 	}
 
-	public static class PageAppendum {
+	protected static class PageAppendum {
 		String text;
 
 		public void addText(String text) {
@@ -187,15 +164,10 @@ public abstract class WikiConversionTask extends MarkupTask {
 		}
 	}
 
-	@Override
-	protected MarkupLanguage createMarkupLanguage() throws BuildException {
-		return markupLanguage;
-	}
-
 	/**
 	 * CSS style sheet which contents can be embedded into the finished HTML file.
 	 */
-	public static class Stylesheet {
+	protected static class Stylesheet {
 
 		protected final Map<String, String> attributes = new HashMap<String, String>();
 
@@ -203,7 +175,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 		protected String url;
 
-		public void addConfiguredAttribute(Attribute attribute) {
+		public void addConfiguredAttribute(StylesheetAttribute attribute) {
 			attributes.put(attribute.getName(), attribute.getValue());
 		}
 
@@ -224,18 +196,44 @@ public abstract class WikiConversionTask extends MarkupTask {
 		}
 	}
 
-	protected static ConfluenceserviceV1SoapBindingStub binding;
+	protected static class StylesheetAttribute {
+
+		protected String name;
+
+		protected String value;
+
+		public String getName() {
+			return name;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
+
+	private static ConfluenceserviceV1SoapBindingStub binding;
 
 	protected static final String FILE_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	protected static final Pattern PAGE_NAME_PATTERN = Pattern.compile("([^#]*)(?:#(.*))?"); //$NON-NLS-1$
 
+	/** Location for downloaded attachment */
 	protected File attachmentDestination;
+
+	protected String attachmentPrefix;
 
 	protected String defaultAbsoluteLinkTarget;
 
 	/** The destination directory */
-	protected File dest;
+	protected File pageDestination;
 
 	protected boolean emitDoctype = true;
 
@@ -247,9 +245,9 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	protected String htmlDoctype = null;
 
-	protected String httpPassword;
+	private String httpPassword;
 
-	protected String httpUsername;
+	private String httpUsername;
 
 	protected String linkRel;
 
@@ -259,16 +257,6 @@ public abstract class WikiConversionTask extends MarkupTask {
 
 	/** The list of pages encountered in Confluence */
 	protected final ArrayList<Page> pages = new ArrayList<Page>();
-
-	protected String attachmentPrefix;
-
-	public String getAttachmentPrefix() {
-		return attachmentPrefix;
-	}
-
-	public void setAttachmentPrefix(String attachmentPrefix) {
-		this.attachmentPrefix = attachmentPrefix;
-	}
 
 	protected OutlineItem rootItem;
 
@@ -338,10 +326,6 @@ public abstract class WikiConversionTask extends MarkupTask {
 		return item;
 	}
 
-	protected String computeRelativeFile(OutlineItem item) {
-		return null;
-	}
-
 	protected String computePrefixPath(File destDir, File tocParentFile) {
 		String prefix = destDir.getAbsolutePath().substring(tocParentFile.getAbsolutePath().length());
 		prefix = prefix.replace('\\', '/');
@@ -352,6 +336,15 @@ public abstract class WikiConversionTask extends MarkupTask {
 			prefix = prefix.substring(0, prefix.length() - 1);
 		}
 		return prefix;
+	}
+
+	protected String computeRelativeFile(OutlineItem item) {
+		return null;
+	}
+
+	@Override
+	protected MarkupLanguage createMarkupLanguage() throws BuildException {
+		return markupLanguage;
 	}
 
 	/**
@@ -386,10 +379,6 @@ public abstract class WikiConversionTask extends MarkupTask {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
-
-	/** Implement to handle additional processing of attachments */
-	protected void processAttachment(File file) {
 	}
 
 	/**
@@ -466,6 +455,10 @@ public abstract class WikiConversionTask extends MarkupTask {
 		postProcess();
 	}
 
+	public String getAttachmentPrefix() {
+		return attachmentPrefix;
+	}
+
 	/**
 	 * Provides a suffix to the Confluence wiki URL required for authenticating.
 	 * 
@@ -485,7 +478,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 	}
 
 	public File getDest() {
-		return dest;
+		return pageDestination;
 	}
 
 	public abstract String getFilenameFormat();
@@ -547,14 +540,14 @@ public abstract class WikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * Logs in to the confluence service.
+	 * Logs in to the Confluence service.
 	 */
 	protected void login() {
 		try {
 			ConfluenceSoapServiceServiceLocator locator = new ConfluenceSoapServiceServiceLocator();
 			locator.setConfluenceserviceV1EndpointAddress(getWikiBaseUrl() + "rpc/soap-axis/confluenceservice-v1"); //$NON-NLS-1$
 			binding = (ConfluenceserviceV1SoapBindingStub) locator.getConfluenceserviceV1();
-			binding.setTimeout(300000);
+			binding.setTimeout(3000);
 			sessionToken = binding.login(getHttpUsername(), getHttpPassword());
 		} catch (AuthenticationFailedException e) {
 			e.printStackTrace();
@@ -568,7 +561,7 @@ public abstract class WikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * Logs out of the confluence session.
+	 * Logs out of the Confluence session.
 	 */
 	protected void logout() {
 		try {
@@ -605,12 +598,20 @@ public abstract class WikiConversionTask extends MarkupTask {
 		return content;
 	}
 
+	/** Implement to handle additional processing of attachments */
+	protected void processAttachment(File file) {
+	}
+
+	public void setAttachmentPrefix(String attachmentPrefix) {
+		this.attachmentPrefix = attachmentPrefix;
+	}
+
 	public void setDefaultAbsoluteLinkTarget(String defaultAbsoluteLinkTarget) {
 		this.defaultAbsoluteLinkTarget = defaultAbsoluteLinkTarget;
 	}
 
 	public void setDest(File dest) {
-		this.dest = dest;
+		this.pageDestination = dest;
 	}
 
 	public void setEmitDoctype(boolean emitDoctype) {
@@ -654,11 +655,8 @@ public abstract class WikiConversionTask extends MarkupTask {
 	}
 
 	protected void validateSettings() {
-		if (dest == null) {
+		if (pageDestination == null) {
 			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyDestination")); //$NON-NLS-1$
-		}
-		if (wikiBaseUrl == null) {
-			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyBaseURL")); //$NON-NLS-1$
 		}
 		if (pages.isEmpty()) {
 			throw new IllegalArgumentException(Messages.getString("WikiToDocTask.SpecifyPagePaths")); //$NON-NLS-1$
@@ -685,21 +683,21 @@ public abstract class WikiConversionTask extends MarkupTask {
 			}
 		}
 		// Create a place for attachments
-		attachmentDestination = this.dest;
+		attachmentDestination = this.pageDestination;
 		if (attachmentPrefix != null) {
 			attachmentDestination = new File(attachmentDestination, attachmentPrefix);
 			if (!attachmentDestination.exists()) {
 				if (!attachmentDestination.mkdirs()) {
 					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateAttachmentsFolder"), //$NON-NLS-1$
-							dest.getAbsolutePath()));
+							pageDestination.getAbsolutePath()));
 				}
 			}
 		}
 
-		if (!dest.exists()) {
-			if (!dest.mkdirs()) {
+		if (!pageDestination.exists()) {
+			if (!pageDestination.mkdirs()) {
 				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
-						dest.getAbsolutePath()));
+						pageDestination.getAbsolutePath()));
 			}
 		}
 	}

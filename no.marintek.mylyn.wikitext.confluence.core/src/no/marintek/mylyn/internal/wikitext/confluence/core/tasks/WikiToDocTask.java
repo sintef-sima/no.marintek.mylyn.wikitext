@@ -56,7 +56,7 @@ public class WikiToDocTask extends WikiConversionTask {
 	 */
 	@Override
 	protected void markupToDoc(RemotePage page) throws BuildException {
-		File pathDir = dest;
+		File pathDir = pageDestination;
 		if (!pathDir.exists()) {
 			if (!pathDir.mkdirs()) {
 				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
@@ -80,7 +80,7 @@ public class WikiToDocTask extends WikiConversionTask {
 				if (stylesheet.url != null) {
 					StringBuilder relativePath = new StringBuilder();
 					File currentDest = pathDir;
-					while (!currentDest.equals(dest)) {
+					while (!currentDest.equals(pageDestination)) {
 						currentDest = currentDest.getParentFile();
 						relativePath.append("../"); //$NON-NLS-1$
 					}
@@ -158,14 +158,14 @@ public class WikiToDocTask extends WikiConversionTask {
 				}
 				// FIXME: This is incorrect!
 				name = createMarkupLanguage().getIdGenerationStrategy().generateId(name);
-				File destDir = dest;
-				File currentDest = dest;
+				File destDir = pageDestination;
+				File currentDest = pageDestination;
 				StringBuilder relativePath = new StringBuilder();
-				while (!currentDest.equals(dest)) {
+				while (!currentDest.equals(pageDestination)) {
 					currentDest = currentDest.getParentFile();
 					relativePath.append("../"); //$NON-NLS-1$
 				}
-				String relativeDir = destDir.getAbsolutePath().substring(dest.getAbsolutePath().length());
+				String relativeDir = destDir.getAbsolutePath().substring(pageDestination.getAbsolutePath().length());
 				if (relativeDir.startsWith("/")) { //$NON-NLS-1$
 					relativeDir = relativeDir.substring(1);
 				}
@@ -207,7 +207,7 @@ public class WikiToDocTask extends WikiConversionTask {
 	 */
 	@Override
 	protected String computeRelativeFile(OutlineItem item) {
-		File pathDestDir = dest;
+		File pathDestDir = pageDestination;
 		File tocParentFile = tocFile.getParentFile();
 		String prefix = computePrefixPath(pathDestDir, tocParentFile);
 		String relativePath = prefix + '/' + computeFilename(item.getLabel());
@@ -226,7 +226,7 @@ public class WikiToDocTask extends WikiConversionTask {
 
 	protected void createToc() {
 		if (tocFile == null) {
-			tocFile = new File(dest, "toc.xml"); //$NON-NLS-1$
+			tocFile = new File(pageDestination, "toc.xml"); //$NON-NLS-1$
 		}
 		getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.WritingTOC"), tocFile), Project.MSG_INFO); //$NON-NLS-1$
 

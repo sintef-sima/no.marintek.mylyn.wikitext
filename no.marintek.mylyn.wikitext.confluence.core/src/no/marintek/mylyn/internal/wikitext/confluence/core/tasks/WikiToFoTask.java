@@ -199,7 +199,7 @@ public class WikiToFoTask extends WikiConversionTask {
 
 	@Override
 	protected void postProcess() {
-		File pathDir = dest;
+		File pathDir = pageDestination;
 		if (!pathDir.exists()) {
 			if (!pathDir.mkdirs()) {
 				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
