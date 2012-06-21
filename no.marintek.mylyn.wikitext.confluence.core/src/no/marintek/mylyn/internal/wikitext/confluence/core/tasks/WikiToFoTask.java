@@ -35,7 +35,7 @@ import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
 
-public class WikiToFoTask extends WikiConversionTask {
+public class WikiToFoTask extends AbstractWikiConversionTask {
 
 	/**
 	 * As we will end up having multiple documents in the same structure we have to make sure that bookmark links to

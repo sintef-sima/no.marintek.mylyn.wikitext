@@ -47,7 +47,7 @@ import org.eclipse.mylyn.wikitext.core.util.anttask.MarkupTask;
  * 
  * @author Torkild U. Resheim
  */
-public abstract class WikiConversionTask extends MarkupTask {
+public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	/**
 	 * Confluence supports Basic HTTP authentication which we will use when we need to download attachments.

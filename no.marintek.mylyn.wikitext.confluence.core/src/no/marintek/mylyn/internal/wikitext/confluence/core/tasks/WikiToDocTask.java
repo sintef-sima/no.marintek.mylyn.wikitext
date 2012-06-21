@@ -41,7 +41,7 @@ import org.eclipse.mylyn.wikitext.core.parser.util.MarkupToEclipseToc;
  * 
  * @author Torkild U. Resheim, MARINTEK
  */
-public class WikiToDocTask extends WikiConversionTask {
+public class WikiToDocTask extends AbstractWikiConversionTask {
 	protected File tocFile;
 
 	/**
