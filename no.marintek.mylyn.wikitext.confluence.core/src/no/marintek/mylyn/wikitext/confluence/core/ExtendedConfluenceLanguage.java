@@ -31,7 +31,7 @@ import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 @SuppressWarnings("restriction")
 public class ExtendedConfluenceLanguage extends ConfluenceLanguage {
 
-	private int latexDpi = 120;
+	private int latexDpi = 220;
 
 	public ExtendedConfluenceLanguage() {
 		setName("ExtendedConfluence"); //$NON-NLS-1$

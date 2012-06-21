@@ -71,7 +71,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	/**
 	 * Type to describe a wiki page.
 	 */
-	protected static class Page {
+	public static class Page {
 
 		protected boolean exclude = false;
 
@@ -144,14 +144,15 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		}
 	}
 
-	protected static class PageAppendum {
+	public static class PageAppendum {
+
 		String text;
 
-		public void addText(String text) {
+		public void addText(String addendum) {
 			if (this.text == null) {
-				this.text = text;
+				this.text = addendum;
 			} else {
-				this.text += text;
+				this.text += addendum;
 			}
 		}
 
@@ -167,7 +168,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	/**
 	 * CSS style sheet which contents can be embedded into the finished HTML file.
 	 */
-	protected static class Stylesheet {
+	public static class Stylesheet {
 
 		protected final Map<String, String> attributes = new HashMap<String, String>();
 
@@ -196,7 +197,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		}
 	}
 
-	protected static class StylesheetAttribute {
+	public static class StylesheetAttribute {
 
 		protected String name;
 
@@ -260,7 +261,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	protected OutlineItem rootItem;
 
-	protected String sessionToken = null;
+	private String sessionToken = null;
 
 	protected final List<Stylesheet> stylesheets = new ArrayList<Stylesheet>();
 
@@ -542,7 +543,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	/**
 	 * Logs in to the Confluence service.
 	 */
-	protected void login() {
+	private void login() {
 		try {
 			ConfluenceSoapServiceServiceLocator locator = new ConfluenceSoapServiceServiceLocator();
 			locator.setConfluenceserviceV1EndpointAddress(getWikiBaseUrl() + "rpc/soap-axis/confluenceservice-v1"); //$NON-NLS-1$
@@ -563,7 +564,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	/**
 	 * Logs out of the Confluence session.
 	 */
-	protected void logout() {
+	private void logout() {
 		try {
 			binding.logout(sessionToken);
 		} catch (Exception ex) {
@@ -571,8 +572,17 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		}
 	}
 
+	/**
+	 * Implement to convert the given page to the desired format.
+	 * 
+	 * @param page
+	 *            the page to convert
+	 */
 	protected abstract void markupToDoc(RemotePage page);
 
+	/**
+	 * Implement to do processing after pages has been downloaded from Confluence.
+	 */
 	protected abstract void postProcess();
 
 	/**
@@ -598,7 +608,9 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		return content;
 	}
 
-	/** Implement to handle additional processing of attachments */
+	/**
+	 * Implement to handle additional processing of attachments
+	 */
 	protected void processAttachment(File file) {
 	}
 
