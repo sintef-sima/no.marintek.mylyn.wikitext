@@ -14,6 +14,7 @@ import java.io.File;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -353,32 +354,30 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	 * 
 	 * @param page
 	 *            the page to download for
+	 * @throws java.rmi.RemoteException
+	 * @throws RemoteException
+	 * @throws InvalidSessionException
+	 * @throws MalformedURLException
 	 */
-	protected void downloadAttachments(RemotePage page) {
-		try {
-			RemoteAttachment[] attachments = binding.getAttachments(sessionToken, page.getId());
-			if (attachments == null || attachments.length == 0) {
-				return;
-			}
-			for (RemoteAttachment attachment : attachments) {
-				try {
-					URL attachurl = new URL(attachment.getUrl() + getAuthenticationURLSuffix());
-					Get get = new Get();
-					get.setTaskName("get"); //$NON-NLS-1$
-					get.setProject(getProject());
-					get.setLocation(getLocation());
-					get.setSrc(attachurl);
-					File file = new File(attachmentDestination, attachment.getFileName());
-					get.setDest(file);
-					get.execute();
-					processAttachment(file);
+	protected void downloadAttachments(RemotePage page) throws InvalidSessionException, RemoteException, java.rmi.RemoteException,
+			MalformedURLException {
+		RemoteAttachment[] attachments = binding.getAttachments(sessionToken, page.getId());
+		if (attachments == null || attachments.length == 0) {
+			return;
+		}
+		for (RemoteAttachment attachment : attachments) {
+			URL attachurl = new URL(attachment.getUrl() + getAuthenticationURLSuffix());
+			Get get = new Get();
+			get.setRetries(5);
+			get.setTaskName("get"); //$NON-NLS-1$
+			get.setProject(getProject());
+			get.setLocation(getLocation());
+			get.setSrc(attachurl);
+			File file = new File(attachmentDestination, attachment.getFileName());
+			get.setDest(file);
+			get.execute();
+			processAttachment(file);
 
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		}
 	}
 
@@ -390,34 +389,51 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	 *            the parent page
 	 * @param page
 	 *            the page to download
-	 * @throws InvalidSessionException
-	 * @throws RemoteException
+	 * @throws java.rmi.RemoteException
+	 * @throws MalformedURLException
 	 * @throws java.rmi.RemoteException
 	 */
-	protected void downloadPage(Page parent, Page page) throws InvalidSessionException, RemoteException, java.rmi.RemoteException {
-		getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
-		RemotePage rpage = binding.getPage(sessionToken, page.getSpace(), page.getPath());
-		markupToDoc(rpage);
-		downloadAttachments(rpage);
-		// We're using the Confluence navigation structure to create outline
-		// items. This ensures that the structure will be the same. In addition
-		// we will have sub-items representing document headers.
-		OutlineItem newItem = computeOutline(page, rpage.getContent());
-		page.setOutline(newItem);
-		if (parent == null) {
-			rootItem.getChildren().add(newItem);
-		} else {
-			parent.getOutline().getChildren().add(newItem);
-		}
+	protected void downloadPage(Page parent, Page page) {
+		try {
+			getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
+			RemotePage rpage = binding.getPage(sessionToken, page.getSpace(), page.getPath());
+			markupToDoc(rpage);
+			downloadAttachments(rpage);
+			// We're using the Confluence navigation structure to create outline
+			// items. This ensures that the structure will be the same. In addition
+			// we will have sub-items representing document headers.
+			OutlineItem newItem = computeOutline(page, rpage.getContent());
+			page.setOutline(newItem);
+			if (parent == null) {
+				rootItem.getChildren().add(newItem);
+			} else {
+				parent.getOutline().getChildren().add(newItem);
+			}
 
-		RemotePageSummary[] remotePageSummaries = binding.getChildren(sessionToken, rpage.getId());
-		if (remotePageSummaries != null) {
-			for (RemotePageSummary remotePageSummary : remotePageSummaries) {
-				if (!isExcluded(remotePageSummary.getTitle())) {
-					Page newPage = new Page(remotePageSummary.getSpace(), remotePageSummary.getTitle(), false);
-					pages.add(newPage);
-					downloadPage(page, newPage);
+			RemotePageSummary[] remotePageSummaries = binding.getChildren(sessionToken, rpage.getId());
+			if (remotePageSummaries != null) {
+				for (RemotePageSummary remotePageSummary : remotePageSummaries) {
+					if (!isExcluded(remotePageSummary.getTitle())) {
+						Page newPage = new Page(remotePageSummary.getSpace(), remotePageSummary.getTitle(), false);
+						pages.add(newPage);
+						downloadPage(page, newPage);
+					}
 				}
+			}
+			timeoutCount = 0;
+		} catch (MalformedURLException e) {
+			throw new BuildException(e);
+		} catch (InvalidSessionException e) {
+			throw new BuildException(e);
+		} catch (RemoteException e) {
+			throw new BuildException(e);
+		} catch (java.rmi.RemoteException e) {
+			if (e.getCause() instanceof SocketTimeoutException && timeoutCount < 10) {
+				timeoutCount++;
+				System.out.println("Got timeout from Confluence, trying again " + timeoutCount);
+				downloadPage(parent, page);
+			} else {
+				throw new BuildException(e);
 			}
 		}
 	}
@@ -435,26 +451,19 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		setMarkupLanguage("Confluence"); //$NON-NLS-1$
 
 		rootItem = new OutlineItem(null, 0, "<root>", 0, -1, title); //$NON-NLS-1$
-
 		login();
 		ArrayList<Page> original = new ArrayList<Page>();
 		original.addAll(pages);
 		for (Page page : original) {
 			if (!page.isExclude()) {
-				try {
-					downloadPage(null, page);
-				} catch (InvalidSessionException e) {
-					e.printStackTrace();
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				} catch (java.rmi.RemoteException e) {
-					e.printStackTrace();
-				}
+				downloadPage(null, page);
 			}
 		}
 		logout();
 		postProcess();
 	}
+
+	private int timeoutCount;
 
 	public String getAttachmentPrefix() {
 		return attachmentPrefix;
@@ -548,7 +557,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			ConfluenceSoapServiceServiceLocator locator = new ConfluenceSoapServiceServiceLocator();
 			locator.setConfluenceserviceV1EndpointAddress(getWikiBaseUrl() + "rpc/soap-axis/confluenceservice-v1"); //$NON-NLS-1$
 			binding = (ConfluenceserviceV1SoapBindingStub) locator.getConfluenceserviceV1();
-			binding.setTimeout(3000);
+			binding.setTimeout(5000);
 			sessionToken = binding.login(getHttpUsername(), getHttpPassword());
 		} catch (AuthenticationFailedException e) {
 			e.printStackTrace();
