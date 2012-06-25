@@ -30,6 +30,7 @@ import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Configuration;
+import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Margins;
 import org.eclipse.mylyn.wikitext.core.parser.markup.IdGenerationStrategy;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
@@ -210,7 +211,7 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 		if (foFile == null) {
 			foFile = new File(pathDir, "document.fo"); //$NON-NLS-1$
 		}
-		Writer writer;
+		Writer writer = null;
 		try {
 			writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(foFile)), FILE_ENCODING);
 		} catch (Exception e) {
@@ -223,19 +224,15 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 			if (configuration != null) {
 				builder.setConfiguration(configuration);
 			}
-			// TODO: Put back when Eclipse bugs have been applied
-			// builder.getConfiguration().setPageMargins(new Margins(3f, 1f, 3f,
-			// 3f));
+			builder.getConfiguration().setPageMargins(new Margins(3f, 1f, 3f, 3f));
 			builder.getConfiguration().setDate(DateFormat.getDateInstance().format(new Date()));
-			// builder.setRootItem(rootItem);
-			// MarkupLanguage markupLanguageClone = markupLanguage.clone();
+			builder.setOutline(rootItem);
 			MarkupParser parser = new MarkupParser();
-			// parser.setMarkupLanguage(markupLanguageClone);
 			parser.setMarkupLanguage(createMarkupLanguage());
 			parser.setBuilder(builder);
 			parser.parse(sb.toString());
 
-			FileOutputStream fos;
+			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(new File(pathDir, "markup.confluence"));
 				fos.write(sb.toString().getBytes());
@@ -244,6 +241,14 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
+			} finally {
+				if (fos != null) {
+					try {
+						fos.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 
 		} finally {
