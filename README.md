@@ -12,9 +12,9 @@ Features
 --------
 * Downloads pages and attachments from a Confluence wiki using it's [SOAP](http://en.wikipedia.org/wiki/SOAP) [API](https://developer.atlassian.com/display/CONFDEV/Confluence+XML-RPC+and+SOAP+APIs).
 * Pages (or chapters) are assembled in the order specified in Confluence and are downloaded recursivly.
-* Authentication for logging in tothe wki.
-* Support for LaTeX math expressions. These are converted to PNG images and included into the final result.
-* Support for video files; attachments with the *.mp4* suffix are treated as video files and inserted into HTML results using the HTML5 video tag.
+* Authentication for logging in to the wki.
+* Support for [LaTeX](http://en.wikipedia.org/wiki/LaTeX) math expressions. These are converted to PNG images and included into the final result.
+* Support for video files; attachments with the *.mp4* suffix are treated as video files and inserted into HTML results using the HTML5 *video* tag.
 
 Copyright
 ---------
