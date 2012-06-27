@@ -78,17 +78,7 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 			super(out);
 		}
 
-		@Override
-		public void image(Attributes attributes, String url) {
-			// <fo:external-graphic src="url(<path>/images/editor-command-help.png)" width="auto" height="auto"
-			// content-width="auto" content-height="auto"/>
-			writer.writeEmptyElement(foNamespaceUri, "external-graphic"); //$NON-NLS-1$
-			writer.writeAttribute("src", String.format("url(%s)", makeImageUrl(url))); //$NON-NLS-1$//$NON-NLS-2$
-			// TODO: Put back when Eclipse bugs have been applied
-			// applyImageAttributes(attributes);
-		}
-
-		private String makeImageUrl(String url) {
+		protected String makeUrlAbsolute(String url) {
 			return new File(attachmentDestination, url).getAbsolutePath();
 		}
 
