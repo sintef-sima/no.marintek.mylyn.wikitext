@@ -6,7 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: %Bundle-Vendor.0
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.mylyn.wikitext.core;bundle-version="[1.4.0,2.0.0)",
- org.eclipse.team.core;resolution:=optional,
  org.apache.axis;bundle-version="[1.4.0,2.0.0)",
  org.apache.commons.discovery;bundle-version="[0.2.0,1.0.0)",
  javax.xml.rpc;bundle-version="[1.1.0,2.0.0)",
