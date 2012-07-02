@@ -15,7 +15,6 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import no.marintek.mylyn.internal.wikitext.confluence.core.block.LaTexBlock;
-import no.marintek.mylyn.internal.wikitext.confluence.core.block.TableBlock;
 import no.marintek.mylyn.internal.wikitext.confluence.core.phrase.AttachmentPhraseModifier;
 import no.marintek.mylyn.internal.wikitext.confluence.core.phrase.MappingHyperlinkPhraseModifier;
 
@@ -26,6 +25,7 @@ import org.eclipse.mylyn.internal.wikitext.confluence.core.block.ExtendedQuoteBl
 import org.eclipse.mylyn.internal.wikitext.confluence.core.block.HeadingBlock;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.block.ListBlock;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.block.QuoteBlock;
+import org.eclipse.mylyn.internal.wikitext.confluence.core.block.TableBlock;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.block.TableOfContentsBlock;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.block.TextBoxBlock;
 import org.eclipse.mylyn.internal.wikitext.confluence.core.phrase.ColorPhraseModifier;
