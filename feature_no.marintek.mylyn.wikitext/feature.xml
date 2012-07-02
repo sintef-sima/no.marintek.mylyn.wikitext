@@ -2,7 +2,7 @@
 <feature
       id="no.marintek.mylyn.wikitext"
       label="MARINTEK Mylyn Wikitext"
-      version="0.5.0.qualifier"
+      version="1.0.0.qualifier"
       provider-name="MARINTEK"
       license-feature="org.eclipse.platform"
       license-feature-version="3.7.0.v20110530-9gF7UHNFFt4cwE-pkZDJ7oz-mj4OSEIlu9SEv0f">
@@ -18,6 +18,22 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <requires>
+      <import plugin="org.eclipse.mylyn.wikitext.core" version="1.4.0" match="compatible"/>
+      <import plugin="org.apache.axis" version="1.4.0" match="compatible"/>
+      <import plugin="org.apache.commons.discovery" version="0.2.0" match="compatible"/>
+      <import plugin="javax.xml.rpc" version="1.1.0" match="compatible"/>
+      <import plugin="javax.xml.soap" version="1.2.0" match="compatible"/>
+      <import plugin="javax.wsdl" version="1.6.2" match="compatible"/>
+      <import plugin="org.apache.commons.logging" version="1.0.4" match="compatible"/>
+      <import plugin="org.eclipse.ant.core" version="3.2.200" match="compatible"/>
+      <import plugin="org.scilab.forge.jlatexmath" version="0.9.5" match="greaterOrEqual"/>
+      <import plugin="org.apache.ant" version="1.7.0" match="compatible"/>
+      <import plugin="org.eclipse.mylyn.docs.epub.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.mylyn.docs.epub.ant.core" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.mylyn.wikitext.confluence.core" version="1.7.0" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="no.marintek.mylyn.wikitext.confluence.core"
