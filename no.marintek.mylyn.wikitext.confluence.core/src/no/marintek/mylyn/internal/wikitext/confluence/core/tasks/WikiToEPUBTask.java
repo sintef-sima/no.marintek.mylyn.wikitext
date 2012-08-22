@@ -152,7 +152,7 @@ public class WikiToEPUBTask extends WikiToDocTask {
 		if (type == null) {
 			throw new BuildException("Unknown reference type " + reference.type); //$NON-NLS-1$
 		}
-		oebps.addReference(reference.href, reference.title, type);
+		oebps.addReference(reference.href, reference.title, reference.type);
 	}
 
 	public void addConfiguredRelation(RelationType relation) {
