@@ -117,7 +117,7 @@ public class WikiToDocTask extends AbstractWikiConversionTask {
 			parser.setBuilder(builder);
 			String markupContent = page.getContent();
 			if (generatePageHeaders) {
-				// Note a nice hack but we need to get the title in as a header
+				// Not a nice hack but we need to get the title in as a header
 				markupContent = "h1. " + page.getTitle() + "\n" + markupContent; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			markupContent = postProcessPage(page, markupContent);
