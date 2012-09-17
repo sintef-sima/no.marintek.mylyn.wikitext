@@ -57,6 +57,7 @@ public class WikiToEPUBTask extends WikiToDocTask {
 	private AntLogger logger;
 
 	private final OPS2Publication oebps;
+
 	private TocType toc = null;
 
 	private File workingFolder;

@@ -253,7 +253,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	protected String linkRel;
 
-	private final MarkupLanguage markupLanguage = new ExtendedConfluenceLanguage();
+	protected MarkupLanguage markupLanguage;
 
 	protected PageAppendum pageAppendum;
 
@@ -313,8 +313,6 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	 * 
 	 * @param page
 	 *            wiki page of the content
-	 * @param markupLanguage
-	 *            markup language of the content
 	 * @param markupContent
 	 *            markup content of the file
 	 * @return
@@ -346,7 +344,16 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	@Override
 	protected MarkupLanguage createMarkupLanguage() throws BuildException {
+		if (markupLanguage==null){
+			markupLanguage = new ExtendedConfluenceLanguage(latexDpi);
+		}
 		return markupLanguage;
+	}
+
+	private int latexDpi = 96;
+
+	public void setLatexDpi(int latexDpi) {
+		this.latexDpi = latexDpi;
 	}
 
 	/**

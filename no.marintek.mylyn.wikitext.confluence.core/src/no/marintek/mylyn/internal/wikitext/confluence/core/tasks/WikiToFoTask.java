@@ -32,7 +32,6 @@ import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Configuration;
 import org.eclipse.mylyn.wikitext.core.parser.builder.XslfoDocumentBuilder.Margins;
 import org.eclipse.mylyn.wikitext.core.parser.markup.IdGenerationStrategy;
-import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
 
@@ -60,11 +59,6 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 		}
 	}
 
-	@Override
-	protected MarkupLanguage createMarkupLanguage() throws BuildException {
-		return markupLanguage;
-	}
-
 	/**
 	 * We're using a custom version of the document builder as FOP really likes it's image URLs as absolute paths.
 	 * 
@@ -78,6 +72,7 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 			super(out);
 		}
 
+		@Override
 		protected String makeUrlAbsolute(String url) {
 			return new File(attachmentDestination, url).getAbsolutePath();
 		}
@@ -143,9 +138,6 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 	private Configuration configuration;
 
 	private File foFile;
-
-	// Make sure we get 300dpi
-	protected final MarkupLanguage markupLanguage = new SpecialConfluenceLanguage(300);
 
 	StringBuilder sb = new StringBuilder();
 
