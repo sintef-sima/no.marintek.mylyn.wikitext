@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JLaTeXMath
-Bundle-SymbolicName: org.scilab.forge.jlatexmath
-Bundle-Version: 0.9.5
+Bundle-SymbolicName: org.scilab.forge.jlatexmath.core
+Bundle-Version: 0.9.5.qualifier
 Bundle-Vendor: MARINTEK
 Export-Package: org.scilab.forge.jlatexmath,
  org.scilab.forge.jlatexmath.cache,

@@ -109,11 +109,13 @@ public class WikiToDocTask extends AbstractWikiConversionTask {
 			builder.setPrependImagePrefix(attachmentPrefix);
 			builder.setXhtmlStrict(xhtmlStrict);
 
-			ExtendedConfluenceLanguage markupLanguageClone = (ExtendedConfluenceLanguage) createMarkupLanguage().clone();
-			markupLanguageClone.setPageMapping(new PathPageMapping(page.getTitle(), pages));
+			// ExtendedConfluenceLanguage markupLanguageClone =
+			// (ExtendedConfluenceLanguage) createMarkupLanguage().clone();
+			((ExtendedConfluenceLanguage) createMarkupLanguage()).setPageMapping(new PathPageMapping(page.getTitle(),
+					pages));
 
 			MarkupParser parser = new MarkupParser();
-			parser.setMarkupLanguage(markupLanguageClone);
+			parser.setMarkupLanguage(createMarkupLanguage());
 			parser.setBuilder(builder);
 			String markupContent = page.getContent();
 			if (generatePageHeaders) {

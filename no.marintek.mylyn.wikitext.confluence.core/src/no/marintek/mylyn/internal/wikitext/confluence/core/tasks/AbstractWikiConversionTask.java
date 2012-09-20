@@ -234,9 +234,6 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	protected String defaultAbsoluteLinkTarget;
 
-	/** The destination directory */
-	protected File pageDestination;
-
 	protected boolean emitDoctype = true;
 
 	protected boolean formatOutput = true;
@@ -251,11 +248,16 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	private String httpUsername;
 
+	private int latexDpi = 120;
+
 	protected String linkRel;
 
-	protected MarkupLanguage markupLanguage;
+	private MarkupLanguage markupLanguage;
 
 	protected PageAppendum pageAppendum;
+
+	/** The destination directory */
+	protected File pageDestination;
 
 	/** The list of pages encountered in Confluence */
 	protected final ArrayList<Page> pages = new ArrayList<Page>();
@@ -267,6 +269,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	protected final List<Stylesheet> stylesheets = new ArrayList<Stylesheet>();
 
 	protected boolean suppressBuiltInCssStyles = false;
+
+	private int timeoutCount;
 
 	protected String title;
 
@@ -348,12 +352,6 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			markupLanguage = new ExtendedConfluenceLanguage(latexDpi);
 		}
 		return markupLanguage;
-	}
-
-	private int latexDpi = 96;
-
-	public void setLatexDpi(int latexDpi) {
-		this.latexDpi = latexDpi;
 	}
 
 	/**
@@ -449,7 +447,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	public void execute() {
 
 		validateSettings();
-		((ExtendedConfluenceLanguage) markupLanguage).setResourcesPath(attachmentDestination);
+		((ExtendedConfluenceLanguage) createMarkupLanguage()).setResourcesPath(attachmentDestination);
 
 		if (httpPassword != null && httpUsername != null) {
 			Authenticator.setDefault(new BasicAuthenticator(httpUsername, httpPassword));
@@ -469,8 +467,6 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 		logout();
 		postProcess();
 	}
-
-	private int timeoutCount;
 
 	public String getAttachmentPrefix() {
 		return attachmentPrefix;
@@ -660,6 +656,10 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	public void setHttpUsername(String httpUsername) {
 		this.httpUsername = httpUsername;
+	}
+
+	public void setLatexDpi(int latexDpi) {
+		this.latexDpi = latexDpi;
 	}
 
 	public void setSuppressBuiltInCssStyles(boolean suppressBuiltInCssStyles) {

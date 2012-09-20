@@ -304,7 +304,7 @@ POSSIBILITY OF SUCH DAMAGES.
    </license>
 
    <plugin
-         id="org.scilab.forge.jlatexmath"
+         id="org.scilab.forge.jlatexmath.core"
          download-size="0"
          install-size="0"
          version="0.0.0"

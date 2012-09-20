@@ -50,7 +50,7 @@ public class WikiToFoTask extends AbstractWikiConversionTask {
 
 		@Override
 		public OutlineItem createRootItem() {
-			String id = markupLanguage.getIdGenerationStrategy().generateId(rootPage.title);
+			String id = createMarkupLanguage().getIdGenerationStrategy().generateId(rootPage.title);
 			return createOutlineItem(null, 0, id, 0, 0, rootPage.title);
 		}
 

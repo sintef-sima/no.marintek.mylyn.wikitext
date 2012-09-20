@@ -1,2 +1,3 @@
-/no.marintek*/bin
-/no.marintek*/target
+/no.marintek.*/bin
+/no.marintek.*/target
+/org.scilab.forge.*/target
