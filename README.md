@@ -10,7 +10,7 @@ The EPUB task is a little special. It also supports all features of the Mylyn Do
 
 Note that version 1.1.0 of Mylyn Docs EPUB is required. This is currently only available in [weekly builds](http://download.eclipse.org/mylyn/snapshots/weekly/). The most recent release (with Eclipse Juno) is 1.0.0.
 
-For more information on usage; check out the [wiki](https://github.com/turesheim/no.marintek.mylyn.wikitext/wiki).
+For more information on usage; check out the [wiki](https://github.com/marintek-sima/no.marintek.mylyn.wikitext/wiki).
 
 Features
 --------
