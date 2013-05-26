@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.rpc.ServiceException;
 
-import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.AuthenticationFailedException;
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.InvalidSessionException;
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.RemoteException;
 import no.marintek.mylyn.internal.wikitext.confluence.core.wsdl.beans.RemoteAttachment;
@@ -41,6 +40,7 @@ import org.apache.tools.ant.taskdefs.Get;
 import org.eclipse.mylyn.wikitext.core.parser.markup.MarkupLanguage;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineItem;
 import org.eclipse.mylyn.wikitext.core.parser.outline.OutlineParser;
+import org.eclipse.mylyn.wikitext.core.util.anttask.BuilderExtension;
 import org.eclipse.mylyn.wikitext.core.util.anttask.MarkupTask;
 
 /**
@@ -51,7 +51,8 @@ import org.eclipse.mylyn.wikitext.core.util.anttask.MarkupTask;
 public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	/**
-	 * Confluence supports Basic HTTP authentication which we will use when we need to download attachments.
+	 * Confluence supports Basic HTTP authentication which we will use when we
+	 * need to download attachments.
 	 */
 	protected class BasicAuthenticator extends Authenticator {
 
@@ -167,7 +168,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * CSS style sheet which contents can be embedded into the finished HTML file.
+	 * CSS style sheet which contents can be embedded into the finished HTML
+	 * file.
 	 */
 	public static class Stylesheet {
 
@@ -296,7 +298,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * Determines a suitable name for the HTML file based on the wiki page having the supplied name.
+	 * Determines a suitable name for the HTML file based on the wiki page
+	 * having the supplied name.
 	 * 
 	 * @param name
 	 *            the wiki page name
@@ -348,7 +351,7 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 	@Override
 	protected MarkupLanguage createMarkupLanguage() throws BuildException {
-		if (markupLanguage==null){
+		if (markupLanguage == null) {
 			markupLanguage = new ExtendedConfluenceLanguage(latexDpi);
 		}
 		return markupLanguage;
@@ -364,8 +367,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	 * @throws InvalidSessionException
 	 * @throws MalformedURLException
 	 */
-	protected void downloadAttachments(RemotePage page) throws InvalidSessionException, RemoteException, java.rmi.RemoteException,
-			MalformedURLException {
+	protected void downloadAttachments(RemotePage page) throws InvalidSessionException, RemoteException,
+			java.rmi.RemoteException, MalformedURLException {
 		RemoteAttachment[] attachments = binding.getAttachments(sessionToken, page.getId());
 		if (attachments == null || attachments.length == 0) {
 			return;
@@ -387,8 +390,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * Downloads the specified page, converts it to HTML, creates a table of contents outline and triggers downloading
-	 * of child pages and attachments.
+	 * Downloads the specified page, converts it to HTML, creates a table of
+	 * contents outline and triggers downloading of child pages and attachments.
 	 * 
 	 * @param parent
 	 *            the parent page
@@ -400,12 +403,14 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	 */
 	protected void downloadPage(Page parent, Page page) {
 		try {
-			getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
+			getProject()
+					.log(MessageFormat.format(Messages.getString("WikiToDocTask.ProcessingPage"), page.path), Project.MSG_INFO); //$NON-NLS-1$//		StringBuffer buffer = new StringBuffer(page.getContent());
 			RemotePage rpage = binding.getPage(sessionToken, page.getSpace(), page.getPath());
 			markupToDoc(rpage);
 			downloadAttachments(rpage);
 			// We're using the Confluence navigation structure to create outline
-			// items. This ensures that the structure will be the same. In addition
+			// items. This ensures that the structure will be the same. In
+			// addition
 			// we will have sub-items representing document headers.
 			OutlineItem newItem = computeOutline(page, rpage.getContent());
 			page.setOutline(newItem);
@@ -521,7 +526,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	}
 
 	/**
-	 * Determines whether or not the page is excluded from being a part of the generated documentation.
+	 * Determines whether or not the page is excluded from being a part of the
+	 * generated documentation.
 	 * 
 	 * @param path
 	 *            path or name of the page
@@ -562,14 +568,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			binding = (ConfluenceserviceV1SoapBindingStub) locator.getConfluenceserviceV1();
 			binding.setTimeout(5000);
 			sessionToken = binding.login(getHttpUsername(), getHttpPassword());
-		} catch (AuthenticationFailedException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (java.rmi.RemoteException e) {
-			e.printStackTrace();
-		} catch (ServiceException e) {
-			e.printStackTrace();
+		} catch (java.rmi.RemoteException | ServiceException e) {
+			throw new BuildException("Could not log on to Confluence server", e);
 		}
 	}
 
@@ -579,8 +579,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	private void logout() {
 		try {
 			binding.logout(sessionToken);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception e) {
+			throw new BuildException("Could not log out of Confluence server", e);
 		}
 	}
 
@@ -593,7 +593,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 	protected abstract void markupToDoc(RemotePage page);
 
 	/**
-	 * Implement to do processing after pages has been downloaded from Confluence.
+	 * Implement to do processing after pages has been downloaded from
+	 * Confluence.
 	 */
 	protected abstract void postProcess();
 
@@ -613,7 +614,9 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			appendum = appendum.replace("{title}", page.getTitle()); //$NON-NLS-1$
 			content += appendum;
 			content += "\n"; //$NON-NLS-1$
-			getProject().log(MessageFormat.format(Messages.getString("WikiToDocTask.AppendingMarkup"), page.getTitle(), appendum), //$NON-NLS-1$
+			getProject()
+					.log(MessageFormat.format(
+							Messages.getString("WikiToDocTask.AppendingMarkup"), page.getTitle(), appendum), //$NON-NLS-1$
 					Project.MSG_VERBOSE);
 
 		}
@@ -698,15 +701,18 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			}
 			if (stylesheet.file != null) {
 				if (!stylesheet.file.exists()) {
-					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.StylesheetFileDoesNotExist"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(
+							Messages.getString("WikiToDocTask.StylesheetFileDoesNotExist"), //$NON-NLS-1$
 							stylesheet.file));
 				}
 				if (!stylesheet.file.isFile()) {
-					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.StyleSheetFileIsNotAFile"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(
+							Messages.getString("WikiToDocTask.StyleSheetFileIsNotAFile"), //$NON-NLS-1$
 							stylesheet.file));
 				}
 				if (!stylesheet.file.canRead()) {
-					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotReadStyleSheetFile"), stylesheet.file)); //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(
+							Messages.getString("WikiToDocTask.CannotReadStyleSheetFile"), stylesheet.file)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -716,7 +722,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 			attachmentDestination = new File(attachmentDestination, attachmentPrefix);
 			if (!attachmentDestination.exists()) {
 				if (!attachmentDestination.mkdirs()) {
-					throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateAttachmentsFolder"), //$NON-NLS-1$
+					throw new BuildException(MessageFormat.format(
+							Messages.getString("WikiToDocTask.CannotCreateAttachmentsFolder"), //$NON-NLS-1$
 							pageDestination.getAbsolutePath()));
 				}
 			}
@@ -724,7 +731,8 @@ public abstract class AbstractWikiConversionTask extends MarkupTask {
 
 		if (!pageDestination.exists()) {
 			if (!pageDestination.mkdirs()) {
-				throw new BuildException(MessageFormat.format(Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
+				throw new BuildException(MessageFormat.format(
+						Messages.getString("WikiToDocTask.CannotCreateDestFolder"), //$NON-NLS-1$
 						pageDestination.getAbsolutePath()));
 			}
 		}
