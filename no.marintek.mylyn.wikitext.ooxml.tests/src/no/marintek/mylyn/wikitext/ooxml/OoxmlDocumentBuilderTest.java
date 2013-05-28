@@ -58,6 +58,12 @@ public class OoxmlDocumentBuilderTest extends TestCase{
 		File file = new File("cube.png");
 		builder.image(ATTRIBUTES, file.getAbsolutePath());
 		
+		try {
+			builder.addExampleDrawingML((new File("Hier2Level.glox")).getAbsolutePath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		for (int h=1;h<10;h++){
 			builder.beginHeading(h,ATTRIBUTES);
 			builder.characters("Heading "+h);
