@@ -4,7 +4,6 @@ Bundle-Name: Docx4j
 Bundle-SymbolicName: org.docx4j
 Bundle-Version: 2.8.1
 Bundle-ClassPath: .,
- lib/xalan-2.7.1.jar,
  lib/jaxb-xmldsig-core-1.0.0.jar
 Export-Package: org.docx4j,
  org.docx4j.bibliography,
@@ -97,4 +96,8 @@ Export-Package: org.docx4j,
  org.docx4j.xmlPackage,
  org.docx4j.xpathextend.grammar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.apache.log4j;bundle-version="1.2.16"
+Require-Bundle: org.apache.log4j;bundle-version="1.2.16",
+ org.apache.commons.io;bundle-version="2.0.1",
+ org.apache.commons.logging;bundle-version="1.1.1",
+ org.apache.xalan;bundle-version="2.7.1",
+ org.apache.xmlgraphics;bundle-version="1.4.0"

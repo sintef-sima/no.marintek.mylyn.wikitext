@@ -53,6 +53,11 @@ public class OoxmlDocumentBuilderTest extends TestCase{
 	public void testHeading_1(){
 		builder = new OoxmlDocumentBuilder();
 		builder.beginDocument();
+
+		// 
+		File file = new File("cube.png");
+		builder.image(ATTRIBUTES, file.getAbsolutePath());
+		
 		for (int h=1;h<10;h++){
 			builder.beginHeading(h,ATTRIBUTES);
 			builder.characters("Heading "+h);
