@@ -60,6 +60,7 @@ public class OoxmlDocumentBuilderTest extends TestCase{
 		
 		try {
 			builder.addExampleDrawingML((new File("Hier2Level.glox")).getAbsolutePath());
+			builder.addExampleChart();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

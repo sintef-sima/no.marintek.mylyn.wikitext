@@ -20,6 +20,9 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.docx4j.dml.Graphic;
+import org.docx4j.dml.GraphicData;
+import org.docx4j.dml.chart.*;
 import org.docx4j.wml.P;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.Style;
@@ -30,6 +33,7 @@ import org.docx4j.wml.R;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
@@ -48,6 +52,7 @@ import org.docx4j.dml.diagram.ObjectFactory;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.jaxb.Context;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramColorsPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramDataPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramLayoutPart;
@@ -313,7 +318,19 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		// TODO Auto-generated method stub
 	}
 
-	// //////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	
+	public void addExampleChart() throws Exception{
+		
+		Chart c  = new Chart();
+		CTChartSpace chart = ChartFactory.createIt();
+		c.setJaxbElement(chart);
+		
+		String chartRelId = wordMLPackage.getMainDocumentPart().addTargetPart(c).getId();		
+		mainDocumentPart.addObject(createChart(chartRelId)); 
+	}
 
 	public void addExampleDrawingML(String inputfilepath) throws Exception {
 		// Now add the SmartArt parts from the glox
@@ -368,6 +385,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		mainDocumentPart.addObject(
 				createSmartArt( layoutRelId,  dataRelId, colorsRelId,  styleRelId)); 
 		}
+	
 	public static P createSmartArt(String layoutRelId, String dataRelId, 
 			String colorsRelId, String styleRelId) throws Exception {
 		
@@ -375,7 +393,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
         	  + "<w:r>"
         	    + "<w:rPr>"
         	      + "<w:noProof/>"
-        	      + "<w:lang w:eastAsia=\"en-AU\"/>"
+        	      + "<w:lang w:eastAsia=\"en-US\"/>"
         	    + "</w:rPr>"
         	    + "<w:drawing>"
         	      + "<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" >"
@@ -401,4 +419,45 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
         mappings.put("styleRelId", styleRelId);
 
         return (P)org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings ) ;        
-	}}
+	}
+	
+	/**
+	 * 
+	 * @param chartRelId
+	 * @return
+	 * @throws JAXBException
+	 */
+	public static P createChart(String chartRelId) throws JAXBException  {
+		
+        String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\">"+
+        	  "			<w:r>\n" + 
+        	  "				<w:rPr>\n" + 
+        	  "					<w:noProof />\n" + 
+        	  "					<w:lang w:val=\"en-US\" />\n" + 
+        	  "				</w:rPr>\n" + 
+        	  "				<w:drawing>\n" + 
+        	  "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n" + 
+        	  "						<wp:extent cx=\"5756910\" cy=\"3724915\" />\n" + 
+        	  "						<wp:effectExtent l=\"0\" t=\"0\" r=\"34290\" b=\"34290\" />\n" + 
+        	  "						<wp:docPr id=\"1\" name=\"Diagram 1\" />\n" + 
+        	  "						<wp:cNvGraphicFramePr />\n" + 
+        	  "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">\n" + 
+        	  "							<a:graphicData\n" + 
+        	  "								uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">\n" + 
+        	  "								<c:chart\n" + 
+        	  "									xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\"\n" + 
+        	  "									xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n" + 
+        	  "									r:id=\"${chartRelId}\" />\n" + 
+        	  "							</a:graphicData>\n" + 
+        	  "						</a:graphic>\n" + 
+        	  "					</wp:inline>\n" + 
+        	  "				</w:drawing>\n" + 
+        	  "			</w:r>\n" +
+              "       </w:p>";
+
+        java.util.HashMap<String, String>mappings = new java.util.HashMap<String, String>();
+        
+        mappings.put("chartRelId", chartRelId);
+        return (P)org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings ) ;        
+	}
+}
