@@ -66,7 +66,7 @@
 	</organization>
 
 	<issueManagement>
-		<url>https://github.com/turesheim/no.marintek.mylyn.wikitext/issues</url>
+		<url>https://github.com/marintek-sima/no.marintek.mylyn.wikitext/issues</url>
 		<system>Git</system>
 	</issueManagement>
 
@@ -555,6 +555,8 @@
 	<modules>
 		<module>no.marintek.mylyn.wikitext-feature</module>
 		<module>no.marintek.mylyn.wikitext.confluence.core</module>
+		<module>no.marintek.mylyn.wikitext.ooxml.core</module>
+		<module>org.docx4j</module>
 		<module>org.scilab.forge.jlatexmath-feature</module>
 		<module>org.scilab.forge.jlatexmath.core</module>
 		<module>no.marintek.mylyn.wikitext-site</module>
