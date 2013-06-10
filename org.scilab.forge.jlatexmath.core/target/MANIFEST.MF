@@ -5,7 +5,7 @@ Export-Package: org.scilab.forge.jlatexmath,org.scilab.forge.jlatexmat
  th.fop.image,org.scilab.forge.jlatexmath.fop.image.loader,org.scilab.
  forge.jlatexmath.greek
 Bundle-Vendor: MARINTEK
-Bundle-Version: 0.9.5.201209202013
+Bundle-Version: 0.9.5.201305270800
 Bundle-Name: JLaTeXMath
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.scilab.forge.jlatexmath.core

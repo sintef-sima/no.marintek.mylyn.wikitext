@@ -26,59 +26,66 @@ import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder.Stylesheet;
 import org.junit.Test;
 
-public class OoxmlDocumentBuilderTest extends TestCase{
-	
+/**
+ * This is not a proper test case. It is only used to generate a OOXML (for
+ * Word) document using the new API.
+ * 
+ * @author torkild
+ * 
+ */
+public class OoxmlDocumentBuilderTest extends TestCase {
+
 	private static final Attributes ATTRIBUTES = new Attributes();
 	private String lorem = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+	
 	private MarkupParser parser;
 
 	private StringWriter out;
 
 	private OoxmlDocumentBuilder builder;
-	
-	
-//	@Test
-//	public void testBasicSetup(){
-//		// default link rel
-//		out = new StringWriter();
-//		builder = new OoxmlDocumentBuilder();
-//		builder.beginDocument();
-//		builder.beginBlock(BlockType.PARAGRAPH, new Attributes());
-//		builder.endBlock();
-//		builder.endDocument();		
-//	}
-	
+
+	// @Test
+	// public void testBasicSetup(){
+	// // default link rel
+	// out = new StringWriter();
+	// builder = new OoxmlDocumentBuilder();
+	// builder.beginDocument();
+	// builder.beginBlock(BlockType.PARAGRAPH, new Attributes());
+	// builder.endBlock();
+	// builder.endDocument();
+	// }
+
 	@Test
-	public void testHeading_1(){
+	public void testHeading_1() {
 		builder = new OoxmlDocumentBuilder();
 		builder.beginDocument();
 
-		// 
+		//
 		File file = new File("cube.png");
 		builder.image(ATTRIBUTES, file.getAbsolutePath());
-		
+
 		try {
-			builder.addExampleDrawingML((new File("Hier2Level.glox")).getAbsolutePath());
-			builder.addExampleChart();
+			builder.addExampleDrawingML((new File("Hier2Level.glox"))
+					.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		for (int h=1;h<10;h++){
-			builder.beginHeading(h,ATTRIBUTES);
-			builder.characters("Heading "+h);
+
+		for (int h = 1; h < 10; h++) {
+			builder.beginHeading(h, ATTRIBUTES);
+			builder.characters("Heading " + h);
 			builder.endHeading();
 			builder.beginBlock(BlockType.PARAGRAPH, ATTRIBUTES);
 			builder.characters(lorem);
 			builder.endBlock();
-			
+
 			SpanType[] values = SpanType.values();
 			for (SpanType spanType : values) {
 				builder.beginSpan(spanType, ATTRIBUTES);
-				builder.characters(spanType.name()+" ");
+				builder.characters(spanType.name() + " ");
 				builder.endSpan();
 			}
 		}
-		builder.endDocument();				
+		builder.endDocument();
 	}
 }
