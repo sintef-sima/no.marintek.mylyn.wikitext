@@ -16,40 +16,40 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
-import org.docx4j.dml.chart.*;
-import org.docx4j.wml.P;
-import org.docx4j.wml.RPr;
-import org.docx4j.wml.Style;
-import org.docx4j.wml.STBrType;
-import org.docx4j.wml.U;
-import org.docx4j.wml.R;
-import org.docx4j.wml.Drawing;
-import org.docx4j.wml.UnderlineEnumeration;
-import org.docx4j.dml.wordprocessingDrawing.Inline;
-import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.exceptions.InvalidFormatException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
-import org.eclipse.mylyn.wikitext.core.parser.Attributes;
-import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
-import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 import org.docx4j.XmlUtils;
+import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.diagram.CTDataModel;
 import org.docx4j.dml.diagram.CTElemPropSet;
 import org.docx4j.dml.diagram.ObjectFactory;
+import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.openpackaging.contenttype.ContentType;
+import org.docx4j.openpackaging.contenttype.ContentTypes;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.exceptions.InvalidFormatException;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramColorsPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramDataPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramLayoutPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramStylePart;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
+import org.docx4j.wml.Drawing;
+import org.docx4j.wml.P;
+import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
+import org.docx4j.wml.STBrType;
+import org.docx4j.wml.Style;
+import org.docx4j.wml.U;
+import org.docx4j.wml.UnderlineEnumeration;
+import org.eclipse.mylyn.wikitext.core.parser.Attributes;
+import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 import org.glox4j.openpackaging.packages.GloxPackage;
 
 /**
@@ -277,9 +277,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 *            the data set
 	 */
 	public void chart(double[] data) {
-		try {
+		try {						
 			Chart c = new Chart();
 			CTChartSpace chart = ChartFactory.createChart(data);
+			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
 			String chartRelId = wordMLPackage.getMainDocumentPart()
 					.addTargetPart(c).getId();
@@ -287,6 +288,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Docx4JException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	};
@@ -303,7 +309,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 				+ "			<w:r>\n"
 				+ "				<w:rPr>\n"
 				+ "					<w:noProof />\n"
-				+ "					<w:lang w:val=\"en-US\" />\n"
+				+ "					<w:lang w:val=\"en-GB\" />\n"
 				+ "				</w:rPr>\n"
 				+ "				<w:drawing>\n"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n"
