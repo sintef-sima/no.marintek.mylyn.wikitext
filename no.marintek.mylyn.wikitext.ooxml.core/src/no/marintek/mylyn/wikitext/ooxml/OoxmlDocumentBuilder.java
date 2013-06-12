@@ -16,9 +16,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.chart.CTChartSpace;
@@ -26,6 +37,8 @@ import org.docx4j.dml.diagram.CTDataModel;
 import org.docx4j.dml.diagram.CTElemPropSet;
 import org.docx4j.dml.diagram.ObjectFactory;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.math.CTOMath;
+import org.docx4j.math.CTOMathPara;
 import org.docx4j.openpackaging.contenttype.ContentType;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -52,13 +65,19 @@ import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 import org.glox4j.openpackaging.packages.GloxPackage;
 
+import uk.ac.ed.ph.snuggletex.SerializationMethod;
+import uk.ac.ed.ph.snuggletex.SnuggleEngine;
+import uk.ac.ed.ph.snuggletex.SnuggleInput;
+import uk.ac.ed.ph.snuggletex.SnuggleSession;
+import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
+
 /**
  * 
  * @author Torkild U. Resheim
  * @since 1.9
  */
 public class OoxmlDocumentBuilder extends DocumentBuilder {
-	
+
 	public static P createSmartArt(String layoutRelId, String dataRelId,
 			String colorsRelId, String styleRelId) throws Exception {
 
@@ -115,6 +134,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private WordprocessingMLPackage wordMLPackage;
 
+	private org.docx4j.math.ObjectFactory mathFactory = new org.docx4j.math.ObjectFactory();;
+
 	@Override
 	public void acronym(String text, String definition) {
 		// TODO Auto-generated method stub
@@ -157,8 +178,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// TODO: in this case, try generating our own sample data?
 		}
 
-		CTDataModel clonedDataModel = XmlUtils
-				.deepCopy(sampleDataModel);
+		CTDataModel clonedDataModel = XmlUtils.deepCopy(sampleDataModel);
 		data.setJaxbElement(clonedDataModel);
 
 		CTElemPropSet prSet = factory.createCTElemPropSet();
@@ -255,7 +275,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void beginSpan(SpanType type, Attributes attributes) {
 		currentSpanType = type;
-	}
+	};
 
 	@Override
 	public void characters(String text) {
@@ -277,7 +297,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 *            the data set
 	 */
 	public void chart(double[] data) {
-		try {						
+		try {
 			Chart c = new Chart();
 			CTChartSpace chart = ChartFactory.createChart(data);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
@@ -295,7 +315,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	};
+	}
 
 	/**
 	 * 
@@ -335,7 +355,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 		mappings.put("chartRelId", chartRelId);
 		return (P) org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings);
-	};
+	}
 
 	private byte[] convertImageToByteArray(File file)
 			throws FileNotFoundException, IOException {
@@ -358,7 +378,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param text
 	 * @return
 	 */
-	private P createParagraphOfText(String text) {
+	private P createParagraph(String text) {
 		if (text != null) {
 			org.docx4j.wml.Text t = factory.createText();
 			t.setValue(text);
@@ -383,13 +403,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void endBlock() {
 		if (currentBlockType.equals(BlockType.PARAGRAPH)) {
-			mainDocumentPart.addObject(createParagraphOfText(characters));
+			mainDocumentPart.addObject(createParagraph(characters));
 		}
 	}
 
 	@Override
 	public void endDocument() {
-		try {		
+		try {
 			wordMLPackage.save(outputFile);
 		} catch (Docx4JException e) {
 			e.printStackTrace();
@@ -471,7 +491,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void image(Attributes attributes, String url) {
-		System.out.println(url);
 		byte[] bytes;
 		try {
 			bytes = convertImageToByteArray(new File(url));
@@ -487,9 +506,61 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		// TODO Auto-generated method stub
 	}
 
-	// ////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////
-	// ////////////////////////////////////////////////////////////////////////
+	/**
+	 * Converts <b>LaTeX</b> to <b>Office MathML</b> and inserts it into the document. 
+	 * 
+	 * @param latex the LaTeX code
+	 */
+	public void latex(String latex) {
+		/* Create vanilla SnuggleEngine and new SnuggleSession */
+		SnuggleEngine engine = new SnuggleEngine();
+		SnuggleSession session = engine.createSession();
+
+		/* Parse some LaTeX input */
+		SnuggleInput input = new SnuggleInput(latex);
+		try {
+			session.parseInput(input);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/* Specify how we want the resulting XML */
+		XMLStringOutputOptions options = new XMLStringOutputOptions();
+		options.setSerializationMethod(SerializationMethod.XHTML);
+		options.setIndenting(true);
+		options.setEncoding("UTF-8");
+		options.setAddingMathSourceAnnotations(true);
+		options.setUsingNamedEntities(true);
+		// Create a transform factory instance.
+		StringWriter sw = new StringWriter();
+		TransformerFactory tfactory = TransformerFactory.newInstance();
+		StreamSource xsl = new StreamSource(
+				OoxmlDocumentBuilder.class
+						.getResourceAsStream("xslt/mml2omml.xsl"));
+		Source xml = new StreamSource(new StringReader(
+				session.buildXMLString(options)));
+		StreamResult out = new StreamResult(sw);
+		try {
+			Transformer transformer = tfactory.newTransformer(xsl);
+			transformer.transform(xml, out);
+			currentParagraph = factory.createP();
+			org.docx4j.math.CTOMathPara para = mathFactory.createCTOMathPara();
+			JAXBContext jc = JAXBContext.newInstance("org.docx4j.math");
+			CTOMath math = (CTOMath) XmlUtils.unmarshalString(sw.toString(),
+					jc, CTOMath.class);
+			para.getOMath().add(math);
+			JAXBElement<CTOMathPara> wrapper = mathFactory.createOMathPara(para);
+			currentParagraph.getContent().add(wrapper);
+			mainDocumentPart.addObject(currentParagraph);
+			
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	@Override
 	public void lineBreak() {

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Snuggletex
+Bundle-SymbolicName: uk.ac.ed.ph.snuggletex
+Bundle-Version: 1.2.2
+Bundle-Vendor: MARINTEK
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: uk.ac.ed.ph.snuggletex,
+ uk.ac.ed.ph.snuggletex.definitions,
+ uk.ac.ed.ph.snuggletex.dombuilding,
+ uk.ac.ed.ph.snuggletex.internal,
+ uk.ac.ed.ph.snuggletex.internal.util,
+ uk.ac.ed.ph.snuggletex.samples,
+ uk.ac.ed.ph.snuggletex.semantics,
+ uk.ac.ed.ph.snuggletex.tokens,
+ uk.ac.ed.ph.snuggletex.utilities
