@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -54,18 +53,13 @@ import org.docx4j.openpackaging.parts.DrawingML.DiagramDataPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramLayoutPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramStylePart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
-import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
-import org.docx4j.wml.CTColumns;
-import org.docx4j.wml.CTDocGrid;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.P;
-import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.STBrType;
-import org.docx4j.wml.SectPr;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
@@ -307,10 +301,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param data
 	 *            the data set
 	 */
-	public void chart(double[] data) {
+	public void chart(String title, String ylabel, String xlabel, double[] data) {
 		try {
 			Chart c = new Chart();
-			CTChartSpace chart = ChartFactory.createChartSpace(data);
+			CTChartSpace chart = ChartFactory.createChartSpace(title, ylabel, xlabel, data);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
 			String chartRelId = wordMLPackage.getMainDocumentPart()

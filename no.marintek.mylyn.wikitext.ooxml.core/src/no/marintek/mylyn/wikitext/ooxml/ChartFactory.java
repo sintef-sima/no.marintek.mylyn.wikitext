@@ -1,10 +1,5 @@
 package no.marintek.mylyn.wikitext.ooxml;
 
-import java.lang.Byte;
-import java.lang.Integer;
-import java.lang.Long;
-
-import org.docx4j.XmlUtils;
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
 import org.docx4j.dml.CTRegularTextRun;
@@ -30,7 +25,6 @@ import org.docx4j.dml.chart.CTCrosses;
 import org.docx4j.dml.chart.CTDLbls;
 import org.docx4j.dml.chart.CTDispBlanksAs;
 import org.docx4j.dml.chart.CTDispUnits;
-import org.docx4j.dml.chart.CTExternalData;
 import org.docx4j.dml.chart.CTGrouping;
 import org.docx4j.dml.chart.CTLayout;
 import org.docx4j.dml.chart.CTLblAlgn;
@@ -63,7 +57,7 @@ import org.docx4j.dml.chart.ObjectFactory;
 
 public class ChartFactory {
 
-	public static CTChartSpace createChartSpace(double[] data) {
+	public static CTChartSpace createChartSpace(String title2, String ylabel, String xlabel, double[] data) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -236,7 +230,7 @@ public class ChartFactory {
 		CTStrVal strval = dmlchartObjectFactory.createCTStrVal();
 		strdata.getPt().add(strval);
 		strval.setIdx(0);
-		strval.setV("Gangway jib angle");
+		strval.setV(title2);
 		// Create object for ptCount
 		CTUnsignedInt count = dmlchartObjectFactory.createCTUnsignedInt();
 		count.setVal(1);
@@ -257,9 +251,9 @@ public class ChartFactory {
 		//lineser.setCat(createCTAxDataSource());
 		lineser.setCat(createCategories(dmlchartObjectFactory, data));
 		// Create object for catAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx());
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel));
 		// Create object for valAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx());
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel));
 		// Create object for plotVisOnly
 		CTBoolean boolean19 = dmlchartObjectFactory.createCTBoolean();
 		boolean19.setVal(Boolean.TRUE);
@@ -340,14 +334,15 @@ public class ChartFactory {
 
 	/**
 	 * Create the vertical axis
+	 * @param values 
 	 * 
 	 * @return
 	 */
-	private static Object createCTValAx() {
+	private static Object createCTValAx(String values) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 		CTValAx valax = dmlchartObjectFactory.createCTValAx();
 		// Create object for title
-		valax.setTitle(createCTValAxTitle());
+		valax.setTitle(createCTValAxTitle(values));
 
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 		// Create object for numFmt
@@ -426,7 +421,7 @@ public class ChartFactory {
 		return valax;
 	}
 
-	private static CTTitle createCTValAxTitle() {
+	private static CTTitle createCTValAxTitle(String values) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -474,7 +469,7 @@ public class ChartFactory {
 				.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("nb-NO");
-		regulartextrun.setT("Vertical");
+		regulartextrun.setT(values);
 
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
@@ -486,10 +481,11 @@ public class ChartFactory {
 
 	/**
 	 * Create the title of the horizontal axis and returns it
+	 * @param categories 
 	 * 
 	 * @return the horizontal title
 	 */
-	private static CTTitle createCTCatAxTitle() {
+	private static CTTitle createCTCatAxTitle(String categories) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -543,7 +539,7 @@ public class ChartFactory {
 				.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("nb-NO");		
-		regulartextrun.setT("Horizontal");
+		regulartextrun.setT(categories);
 
 		// Create object for layout
 		CTLayout layout = dmlchartObjectFactory.createCTLayout();
@@ -559,17 +555,18 @@ public class ChartFactory {
 
 	/**
 	 * Create the horizontal axis
+	 * @param categories 
 	 * 
 	 * @return
 	 */
-	private static Object createCTCatAx() {
+	private static Object createCTCatAx(String categories) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTCatAx catax = dmlchartObjectFactory.createCTCatAx();
 
 		// Create object for title
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
-		catax.setTitle(createCTCatAxTitle());
+		catax.setTitle(createCTCatAxTitle(categories));
 
 		// Create object for numFmt
 		CTNumFmt numfmt = dmlchartObjectFactory.createCTNumFmt();
@@ -649,228 +646,6 @@ public class ChartFactory {
 		catax.setNoMultiLvlLbl(boolean4);
 
 		return catax;
-	}
-
-	private static CTNumDataSource createCTNumDataSource() {
-		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
-
-		CTNumDataSource numdatasource = dmlchartObjectFactory
-				.createCTNumDataSource();
-		// Create object for numRef
-		CTNumRef numref = dmlchartObjectFactory.createCTNumRef();
-		numdatasource.setNumRef(numref);
-		numref.setF("'Ark1'!$B$2:$B$19");
-		// Create object for numCache
-		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
-		numref.setNumCache(numdata);
-		// Create object for pt
-		CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval);
-		numval.setIdx(0);
-		numval.setV("4.3");
-		// Create object for pt
-		CTNumVal numval2 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval2);
-		numval2.setIdx(1);
-		numval2.setV("2.5");
-		// Create object for pt
-		CTNumVal numval3 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval3);
-		numval3.setIdx(2);
-		numval3.setV("3.5");
-		// Create object for pt
-		CTNumVal numval4 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval4);
-		numval4.setIdx(3);
-		numval4.setV("4.5");
-		// Create object for pt
-		CTNumVal numval5 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval5);
-		numval5.setIdx(4);
-		numval5.setV("1.0");
-		// Create object for pt
-		CTNumVal numval6 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval6);
-		numval6.setIdx(5);
-		numval6.setV("2.0");
-		// Create object for pt
-		CTNumVal numval7 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval7);
-		numval7.setIdx(6);
-		numval7.setV("3.0");
-		// Create object for pt
-		CTNumVal numval8 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval8);
-		numval8.setIdx(7);
-		numval8.setV("4.0");
-		// Create object for pt
-		CTNumVal numval9 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval9);
-		numval9.setIdx(8);
-		numval9.setV("4.0");
-		// Create object for pt
-		CTNumVal numval10 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval10);
-		numval10.setIdx(9);
-		numval10.setV("7.0");
-		// Create object for pt
-		CTNumVal numval11 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval11);
-		numval11.setIdx(10);
-		numval11.setV("8.0");
-		// Create object for pt
-		CTNumVal numval12 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval12);
-		numval12.setIdx(11);
-		numval12.setV("9.0");
-		// Create object for pt
-		CTNumVal numval13 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval13);
-		numval13.setIdx(12);
-		numval13.setV("1.0");
-		// Create object for pt
-		CTNumVal numval14 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval14);
-		numval14.setIdx(13);
-		numval14.setV("2.0");
-		// Create object for pt
-		CTNumVal numval15 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval15);
-		numval15.setIdx(14);
-		numval15.setV("3.0");
-		// Create object for pt
-		CTNumVal numval16 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval16);
-		numval16.setIdx(15);
-		numval16.setV("4.0");
-		// Create object for pt
-		CTNumVal numval17 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval17);
-		numval17.setIdx(16);
-		numval17.setV("2.0");
-		// Create object for pt
-		CTNumVal numval18 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval18);
-		numval18.setIdx(17);
-		numval18.setV("4.0");
-		// Create object for ptCount
-		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		numdata.setPtCount(unsignedint);
-		unsignedint.setVal(18);
-		numdata.setFormatCode("General");
-
-		return numdatasource;
-	}
-
-	private static CTAxDataSource createCTAxDataSource() {
-		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
-
-		CTAxDataSource axdatasource = dmlchartObjectFactory
-				.createCTAxDataSource();
-		// Create object for numRef
-		CTNumRef numref = dmlchartObjectFactory.createCTNumRef();
-		axdatasource.setNumRef(numref);
-		numref.setF("'Ark1'!$A$2:$A$19");
-		// Create object for numCache
-		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
-		numref.setNumCache(numdata);
-		// Create object for pt
-		CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval);
-		numval.setIdx(0);
-		numval.setV("1.0");
-		// Create object for pt
-		CTNumVal numval2 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval2);
-		numval2.setIdx(1);
-		numval2.setV("2.0");
-		// Create object for pt
-		CTNumVal numval3 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval3);
-		numval3.setIdx(2);
-		numval3.setV("3.0");
-		// Create object for pt
-		CTNumVal numval4 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval4);
-		numval4.setIdx(3);
-		numval4.setV("4.0");
-		// Create object for pt
-		CTNumVal numval5 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval5);
-		numval5.setIdx(4);
-		numval5.setV("5.0");
-		// Create object for pt
-		CTNumVal numval6 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval6);
-		numval6.setIdx(5);
-		numval6.setV("6.0");
-		// Create object for pt
-		CTNumVal numval7 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval7);
-		numval7.setIdx(6);
-		numval7.setV("7.0");
-		// Create object for pt
-		CTNumVal numval8 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval8);
-		numval8.setIdx(7);
-		numval8.setV("8.0");
-		// Create object for pt
-		CTNumVal numval9 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval9);
-		numval9.setIdx(8);
-		numval9.setV("9.0");
-		// Create object for pt
-		CTNumVal numval10 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval10);
-		numval10.setIdx(9);
-		numval10.setV("10.0");
-		// Create object for pt
-		CTNumVal numval11 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval11);
-		numval11.setIdx(10);
-		numval11.setV("11.0");
-		// Create object for pt
-		CTNumVal numval12 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval12);
-		numval12.setIdx(11);
-		numval12.setV("12.0");
-		// Create object for pt
-		CTNumVal numval13 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval13);
-		numval13.setIdx(12);
-		numval13.setV("13.0");
-		// Create object for pt
-		CTNumVal numval14 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval14);
-		numval14.setIdx(13);
-		numval14.setV("14.0");
-		// Create object for pt
-		CTNumVal numval15 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval15);
-		numval15.setIdx(14);
-		numval15.setV("15.0");
-		// Create object for pt
-		CTNumVal numval16 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval16);
-		numval16.setIdx(15);
-		numval16.setV("16.0");
-		// Create object for pt
-		CTNumVal numval17 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval17);
-		numval17.setIdx(16);
-		numval17.setV("17.0");
-		// Create object for pt
-		CTNumVal numval18 = dmlchartObjectFactory.createCTNumVal();
-		numdata.getPt().add(numval18);
-		numval18.setIdx(17);
-		numval18.setV("18.0");
-		// Create object for ptCount
-		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		numdata.setPtCount(unsignedint);
-		unsignedint.setVal(18);
-		numdata.setFormatCode("General");
-
-		return axdatasource;
 	}
 
 	/**
