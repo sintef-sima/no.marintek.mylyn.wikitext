@@ -14,11 +14,15 @@ package no.marintek.mylyn.wikitext.ooxml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -50,13 +54,18 @@ import org.docx4j.openpackaging.parts.DrawingML.DiagramDataPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramLayoutPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramStylePart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
+import org.docx4j.wml.CTColumns;
+import org.docx4j.wml.CTDocGrid;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.STBrType;
+import org.docx4j.wml.SectPr;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
@@ -249,8 +258,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void beginDocument() {
 		try {
 			factory = new org.docx4j.wml.ObjectFactory();
+//			InputStream resourceAsStream = OoxmlDocumentBuilder.class.getResourceAsStream("templates/template.docx");
+//			wordMLPackage = WordprocessingMLPackage.load(resourceAsStream);
 			wordMLPackage = WordprocessingMLPackage.createPackage();
-			mainDocumentPart = wordMLPackage.getMainDocumentPart();
+			mainDocumentPart = wordMLPackage.getMainDocumentPart();			
 			if (title != null) {
 				mainDocumentPart.addStyledParagraphOfText("Title", title);
 			}
@@ -299,7 +310,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void chart(double[] data) {
 		try {
 			Chart c = new Chart();
-			CTChartSpace chart = ChartFactory.createChart(data);
+			CTChartSpace chart = ChartFactory.createChartSpace(data);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
 			String chartRelId = wordMLPackage.getMainDocumentPart()
@@ -308,11 +319,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Docx4JException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -333,8 +339,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 				+ "				</w:rPr>\n"
 				+ "				<w:drawing>\n"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n"
-				+ "						<wp:extent cx=\"5756910\" cy=\"3724915\" />\n"
-				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"34290\" b=\"34290\" />\n"
+				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />\n"
+				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\" />\n"
 				+ "						<wp:docPr id=\"1\" name=\"Diagram 1\" />\n"
 				+ "						<wp:cNvGraphicFramePr />\n"
 				+ "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">\n"
@@ -404,6 +410,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void endBlock() {
 		if (currentBlockType.equals(BlockType.PARAGRAPH)) {
 			mainDocumentPart.addObject(createParagraph(characters));
+		} else {
+			System.err.println("Unsupported block type!");
 		}
 	}
 
@@ -411,11 +419,66 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void endDocument() {
 		try {
 			wordMLPackage.save(outputFile);
+			File tmp = new File(System.getProperty("user.home")+"/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
+			unZipIt(outputFile.getAbsolutePath(), tmp.getAbsolutePath());
 		} catch (Docx4JException e) {
-			e.printStackTrace();
+			e.printStackTrace();		
 		}
 	}
-
+	/**
+     * Unzip it
+     * @param zipFile input zip file
+     * @param output zip file output folder
+     */
+    public void unZipIt(String zipFile, String outputFolder){
+ 
+     byte[] buffer = new byte[1024];
+ 
+     try{
+ 
+    	//create output directory is not exists
+    	File folder = new File(outputFolder);
+    	if(!folder.exists()){
+    		folder.mkdir();
+    	}
+ 
+    	//get the zip file content
+    	ZipInputStream zis = 
+    		new ZipInputStream(new FileInputStream(zipFile));
+    	//get the zipped file list entry
+    	ZipEntry ze = zis.getNextEntry();
+ 
+    	while(ze!=null){
+ 
+    	   String fileName = ze.getName();
+           File newFile = new File(outputFolder + File.separator + fileName);
+ 
+           System.out.println("file unzip : "+ newFile.getAbsoluteFile());
+ 
+            //create all non exists folders
+            //else you will hit FileNotFoundException for compressed folder
+            new File(newFile.getParent()).mkdirs();
+ 
+            FileOutputStream fos = new FileOutputStream(newFile);             
+ 
+            int len;
+            while ((len = zis.read(buffer)) > 0) {
+       		fos.write(buffer, 0, len);
+            }
+ 
+            fos.close();   
+            ze = zis.getNextEntry();
+    	}
+ 
+        zis.closeEntry();
+    	zis.close();
+ 
+    	System.out.println("Done");
+ 
+    }catch(IOException ex){
+       ex.printStackTrace(); 
+    }
+   }    
 	@Override
 	public void endHeading() {
 		mainDocumentPart.addStyledParagraphOfText(currentStyle, characters);
@@ -439,7 +502,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			block.setStrike(TRUE);
 			break;
 		case EMPHASIS:
-			// TODO Auto-generated method stub
+			block.setB(TRUE);
+			block.setI(TRUE);
 			break;
 		case INSERTED:
 			block.setB(TRUE);
@@ -469,7 +533,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// TODO Auto-generated method stub
 			break;
 		case UNDERLINED:
-			// TODO Auto-generated method stub
 			U underline = new U();
 			underline.setVal(UnderlineEnumeration.SINGLE);
 			block.setU(underline);
