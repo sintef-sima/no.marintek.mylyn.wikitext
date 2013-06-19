@@ -325,11 +325,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 */
 	private P chart(String chartRelId) throws JAXBException {
 
-		String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\">"
+		String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" "
+				+ "xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" w:rsidR=\"0084689C\" w:rsidRDefault=\"00D47CF0\">"
 				+ "			<w:r>\n"
 				+ "				<w:rPr>\n"
 				+ "					<w:noProof />\n"
-				+ "					<w:lang w:val=\"en-GB\" />\n"
 				+ "				</w:rPr>\n"
 				+ "				<w:drawing>\n"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n"

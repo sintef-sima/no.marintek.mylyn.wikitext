@@ -25,12 +25,16 @@ import org.docx4j.dml.chart.CTCrosses;
 import org.docx4j.dml.chart.CTDLbls;
 import org.docx4j.dml.chart.CTDispBlanksAs;
 import org.docx4j.dml.chart.CTDispUnits;
+import org.docx4j.dml.chart.CTDouble;
 import org.docx4j.dml.chart.CTGrouping;
 import org.docx4j.dml.chart.CTLayout;
+import org.docx4j.dml.chart.CTLayoutMode;
+import org.docx4j.dml.chart.CTLayoutTarget;
 import org.docx4j.dml.chart.CTLblAlgn;
 import org.docx4j.dml.chart.CTLblOffset;
 import org.docx4j.dml.chart.CTLineChart;
 import org.docx4j.dml.chart.CTLineSer;
+import org.docx4j.dml.chart.CTManualLayout;
 import org.docx4j.dml.chart.CTMarker;
 import org.docx4j.dml.chart.CTMarkerStyle;
 import org.docx4j.dml.chart.CTNumData;
@@ -45,7 +49,6 @@ import org.docx4j.dml.chart.CTSerTx;
 import org.docx4j.dml.chart.CTStrData;
 import org.docx4j.dml.chart.CTStrRef;
 import org.docx4j.dml.chart.CTStrVal;
-import org.docx4j.dml.chart.CTStyle;
 import org.docx4j.dml.chart.CTTextLanguageID;
 import org.docx4j.dml.chart.CTTickLblPos;
 import org.docx4j.dml.chart.CTTickMark;
@@ -57,15 +60,18 @@ import org.docx4j.dml.chart.ObjectFactory;
 
 public class ChartFactory {
 
-	public static CTChartSpace createChartSpace(String title2, String ylabel, String xlabel, double[] data) {
+	public static CTChartSpace createChartSpace(String title2, String ylabel,
+			String xlabel, double[] data) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTChartSpace chartspace = dmlchartObjectFactory.createCTChartSpace();
 		// Create object for style
+		/*
 		CTStyle style = dmlchartObjectFactory.createCTStyle();
-		style.setVal((short) 1);
+		style.setVal((short) 1);		
 		chartspace.setStyle(style);
+		*/
 		// Create object for lang
 		CTTextLanguageID textlanguageid = dmlchartObjectFactory
 				.createCTTextLanguageID();
@@ -124,8 +130,9 @@ public class ChartFactory {
 		CTPlotArea plotarea = dmlchartObjectFactory.createCTPlotArea();
 		chart.setPlotArea(plotarea);
 		// Create object for layout
-		CTLayout layout2 = dmlchartObjectFactory.createCTLayout();
-		plotarea.setLayout(layout2);
+		//CTLayout layout2 = dmlchartObjectFactory.createCTLayout();
+		//XXX
+		plotarea.setLayout(createLayout());
 		// Create object for valAx
 		CTLineChart linechart = dmlchartObjectFactory.createCTLineChart();
 		plotarea.getAreaChartOrArea3DChartOrLineChart().add(linechart);
@@ -193,7 +200,7 @@ public class ChartFactory {
 		lineser.setOrder(unsignedint3);
 		unsignedint3.setVal(0);
 		// Create object for val
-		//lineser.setVal(createCTNumDataSource());
+		// lineser.setVal(createCTNumDataSource());
 		lineser.setVal(createValues(dmlchartObjectFactory, data));
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory
@@ -248,7 +255,7 @@ public class ChartFactory {
 		boolean12.setVal(Boolean.FALSE);
 		lineser.setSmooth(boolean12);
 		// Create object for cat
-		//lineser.setCat(createCTAxDataSource());
+		// lineser.setCat(createCTAxDataSource());
 		lineser.setCat(createCategories(dmlchartObjectFactory, data));
 		// Create object for catAx
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel));
@@ -333,8 +340,55 @@ public class ChartFactory {
 	}
 
 	/**
+	 * Office 2011 creates an empty layout Office 2010 (on Windows) adds a
+	 * manualLayout element.
+	 * 
+	 * @return
+	 */
+	private static CTLayout createLayout() {
+		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
+		CTLayout layout = dmlchartObjectFactory.createCTLayout();
+		// Create object for manualLayout
+		CTManualLayout manuallayout = dmlchartObjectFactory
+				.createCTManualLayout();
+		layout.setManualLayout(manuallayout);
+		// Create object for h
+		CTDouble h = dmlchartObjectFactory.createCTDouble();
+		h.setVal(0.65701099862517198);
+		manuallayout.setH(h);
+		// Create object for layoutTarget
+		CTLayoutTarget layouttarget = dmlchartObjectFactory
+				.createCTLayoutTarget();
+		manuallayout.setLayoutTarget(layouttarget);
+		layouttarget.setVal(org.docx4j.dml.chart.STLayoutTarget.INNER);
+		// Create object for xMode
+		CTLayoutMode layoutmode = dmlchartObjectFactory.createCTLayoutMode();
+		manuallayout.setXMode(layoutmode);
+		layoutmode.setVal(org.docx4j.dml.chart.STLayoutMode.EDGE);
+		// Create object for yMode
+		CTLayoutMode layoutmode2 = dmlchartObjectFactory.createCTLayoutMode();
+		manuallayout.setYMode(layoutmode2);
+		layoutmode2.setVal(org.docx4j.dml.chart.STLayoutMode.EDGE);
+		// Create object for w
+		CTDouble double2 = dmlchartObjectFactory.createCTDouble();
+		double2.setVal(0.83550470253718301);
+		manuallayout.setW(double2);
+		// Create object for y
+		CTDouble double3 = dmlchartObjectFactory.createCTDouble();
+		double3.setVal(0.17619047619047601);
+		manuallayout.setY(double3);
+		// Create object for x
+		CTDouble double4 = dmlchartObjectFactory.createCTDouble();
+		double4.setVal(0.14366196412948401);
+		manuallayout.setX(double4);
+
+		return layout;
+	}
+
+	/**
 	 * Create the vertical axis
-	 * @param values 
+	 * 
+	 * @param values
 	 * 
 	 * @return
 	 */
@@ -481,7 +535,8 @@ public class ChartFactory {
 
 	/**
 	 * Create the title of the horizontal axis and returns it
-	 * @param categories 
+	 * 
+	 * @param categories
 	 * 
 	 * @return the horizontal title
 	 */
@@ -490,12 +545,11 @@ public class ChartFactory {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTTitle title = dmlchartObjectFactory.createCTTitle();
-		
 
 		// Create object for tx
 		CTTx tx = dmlchartObjectFactory.createCTTx();
 		title.setTx(tx);
-		
+
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 
 		// Create object for rich
@@ -538,7 +592,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory
 				.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
-		textcharacterproperties2.setLang("nb-NO");		
+		textcharacterproperties2.setLang("nb-NO");
 		regulartextrun.setT(categories);
 
 		// Create object for layout
@@ -555,7 +609,8 @@ public class ChartFactory {
 
 	/**
 	 * Create the horizontal axis
-	 * @param categories 
+	 * 
+	 * @param categories
 	 * 
 	 * @return
 	 */
