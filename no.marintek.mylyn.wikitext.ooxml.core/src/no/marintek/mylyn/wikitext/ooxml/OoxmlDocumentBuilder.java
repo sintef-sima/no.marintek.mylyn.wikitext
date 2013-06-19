@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -55,8 +56,14 @@ import org.docx4j.openpackaging.parts.DrawingML.DiagramStylePart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
+import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.CTBookmark;
+import org.docx4j.wml.CTMarkupRange;
 import org.docx4j.wml.Drawing;
+import org.docx4j.wml.FldChar;
 import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
+import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.STBrType;
@@ -125,7 +132,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.ObjectFactory factory;
 
+	private int figureCount;
+
 	private MainDocumentPart mainDocumentPart;
+
+	private org.docx4j.math.ObjectFactory mathFactory = new org.docx4j.math.ObjectFactory();
 
 	private File outputFile;
 
@@ -135,13 +146,137 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.BooleanDefaultTrue TRUE = new org.docx4j.wml.BooleanDefaultTrue();
 
-	private WordprocessingMLPackage wordMLPackage;
-
-	private org.docx4j.math.ObjectFactory mathFactory = new org.docx4j.math.ObjectFactory();;
+	private WordprocessingMLPackage wordMLPackage;;
 
 	@Override
 	public void acronym(String text, String definition) {
 		// TODO Auto-generated method stub
+	}
+
+	private void addCaptionToPackage(String caption) {
+
+		org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
+
+		P p = wmlObjectFactory.createP();
+		// Create object for pPr
+		PPr ppr = wmlObjectFactory.createPPr();
+		p.setPPr(ppr);
+		// Create object for pStyle
+		PPrBase.PStyle pprbasepstyle = wmlObjectFactory.createPPrBasePStyle();
+		ppr.setPStyle(pprbasepstyle);
+		pprbasepstyle.setVal("Caption");
+		// Create object for r
+		R r = wmlObjectFactory.createR();
+		p.getContent().add(r);
+		// Create object for t (wrapped in JAXBElement)
+		org.docx4j.wml.Text text = wmlObjectFactory.createText();
+		JAXBElement<org.docx4j.wml.Text> textWrapped = wmlObjectFactory
+				.createRT(text);
+		r.getContent().add(textWrapped);
+		text.setValue("Figure ");
+		text.setSpace("preserve");
+		// Create object for r
+		R r2 = wmlObjectFactory.createR();
+		p.getContent().add(r2);
+		// Create object for fldChar (wrapped in JAXBElement)
+		FldChar fldchar = wmlObjectFactory.createFldChar();
+		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped = wmlObjectFactory
+				.createRFldChar(fldchar);
+		r2.getContent().add(fldcharWrapped);
+		fldchar.setFldCharType(org.docx4j.wml.STFldCharType.BEGIN);
+		// Create object for r
+		R r3 = wmlObjectFactory.createR();
+		p.getContent().add(r3);
+		// Create object for instrText (wrapped in JAXBElement)
+		org.docx4j.wml.Text text2 = wmlObjectFactory.createText();
+		JAXBElement<org.docx4j.wml.Text> textWrapped2 = wmlObjectFactory
+				.createRInstrText(text2);
+		r3.getContent().add(textWrapped2);
+		text2.setValue(" ");
+		text2.setSpace("preserve");
+		// Create object for r
+		R r4 = wmlObjectFactory.createR();
+		p.getContent().add(r4);
+		// Create object for instrText (wrapped in JAXBElement)
+		org.docx4j.wml.Text text3 = wmlObjectFactory.createText();
+		JAXBElement<org.docx4j.wml.Text> textWrapped3 = wmlObjectFactory
+				.createRInstrText(text3);
+		r4.getContent().add(textWrapped3);
+		text3.setValue("SEQ Figure \\* ARABIC ");
+		text3.setSpace("preserve");
+		// Create object for r
+		R r5 = wmlObjectFactory.createR();
+		p.getContent().add(r5);
+		// Create object for fldChar (wrapped in JAXBElement)
+		FldChar fldchar2 = wmlObjectFactory.createFldChar();
+		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped2 = wmlObjectFactory
+				.createRFldChar(fldchar2);
+		r5.getContent().add(fldcharWrapped2);
+		fldchar2.setFldCharType(org.docx4j.wml.STFldCharType.SEPARATE);
+		// Create object for r
+		R r6 = wmlObjectFactory.createR();
+		p.getContent().add(r6);
+		// Create object for rPr
+		RPr rpr = wmlObjectFactory.createRPr();
+		r6.setRPr(rpr);
+		// Create object for noProof
+		BooleanDefaultTrue booleandefaulttrue = wmlObjectFactory
+				.createBooleanDefaultTrue();
+		rpr.setNoProof(booleandefaulttrue);
+		// Create object for t (wrapped in JAXBElement)
+		org.docx4j.wml.Text text4 = wmlObjectFactory.createText();
+		JAXBElement<org.docx4j.wml.Text> textWrapped4 = wmlObjectFactory
+				.createRT(text4);
+		r6.getContent().add(textWrapped4);
+		text4.setValue(Integer.toString(++figureCount));
+		// Create object for r
+		R r7 = wmlObjectFactory.createR();
+		p.getContent().add(r7);
+		// Create object for rPr
+		RPr rpr2 = wmlObjectFactory.createRPr();
+		r7.setRPr(rpr2);
+		// Create object for noProof
+		BooleanDefaultTrue booleandefaulttrue2 = wmlObjectFactory
+				.createBooleanDefaultTrue();
+		rpr2.setNoProof(booleandefaulttrue2);
+		// Create object for fldChar (wrapped in JAXBElement)
+		FldChar fldchar3 = wmlObjectFactory.createFldChar();
+		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped3 = wmlObjectFactory
+				.createRFldChar(fldchar3);
+		r7.getContent().add(fldcharWrapped3);
+		fldchar3.setFldCharType(org.docx4j.wml.STFldCharType.END);
+		// Create object for r
+		R r8 = wmlObjectFactory.createR();
+		p.getContent().add(r8);
+		// Create object for rPr
+		RPr rpr3 = wmlObjectFactory.createRPr();
+		r8.setRPr(rpr3);
+		// Create object for noProof
+		BooleanDefaultTrue booleandefaulttrue3 = wmlObjectFactory
+				.createBooleanDefaultTrue();
+		rpr3.setNoProof(booleandefaulttrue3);
+		// Create object for t (wrapped in JAXBElement)
+		org.docx4j.wml.Text text5 = wmlObjectFactory.createText();
+		JAXBElement<org.docx4j.wml.Text> textWrapped5 = wmlObjectFactory
+				.createRT(text5);
+		r8.getContent().add(textWrapped5);
+		text5.setValue(": " + caption);
+		// Create object for bookmarkStart (wrapped in JAXBElement)
+		CTBookmark bookmark = wmlObjectFactory.createCTBookmark();
+		JAXBElement<org.docx4j.wml.CTBookmark> bookmarkWrapped = wmlObjectFactory
+				.createPBookmarkStart(bookmark);
+		p.getContent().add(bookmarkWrapped);
+		bookmark.setName("_GoBack");
+		bookmark.setId(BigInteger.valueOf(0));
+		// Create object for bookmarkEnd (wrapped in JAXBElement)
+		CTMarkupRange markuprange = wmlObjectFactory.createCTMarkupRange();
+		JAXBElement<org.docx4j.wml.CTMarkupRange> markuprangeWrapped = wmlObjectFactory
+				.createPBookmarkEnd(markuprange);
+		p.getContent().add(markuprangeWrapped);
+		markuprange.setId(BigInteger.valueOf(0));
+
+		mainDocumentPart.addObject(p);
+
 	}
 
 	public void addExampleDrawingML(String inputfilepath) throws Exception {
@@ -252,10 +387,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void beginDocument() {
 		try {
 			factory = new org.docx4j.wml.ObjectFactory();
-//			InputStream resourceAsStream = OoxmlDocumentBuilder.class.getResourceAsStream("templates/template.docx");
-//			wordMLPackage = WordprocessingMLPackage.load(resourceAsStream);
+			// InputStream resourceAsStream =
+			// OoxmlDocumentBuilder.class.getResourceAsStream("templates/template.docx");
+			// wordMLPackage = WordprocessingMLPackage.load(resourceAsStream);
 			wordMLPackage = WordprocessingMLPackage.createPackage();
-			mainDocumentPart = wordMLPackage.getMainDocumentPart();			
+			mainDocumentPart = wordMLPackage.getMainDocumentPart();
 			if (title != null) {
 				mainDocumentPart.addStyledParagraphOfText("Title", title);
 			}
@@ -268,6 +404,37 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		}
 	}
 
+	/*
+	 * Heading1 EnvelopeAddress NormalWeb ColorfulGrid SalutationChar
+	 * ClosingChar Footer CommentText IntenseQuote Emphasis HTMLCite
+	 * BodyText3Char Date TableofFigures Heading9 ListNumber Heading8
+	 * HTMLKeyboard Heading7 Heading6 Heading3Char Index1 Heading5 Heading5Char
+	 * Heading4 Heading3 BodyTextIndentChar Heading2 EnvelopeReturn IndexHeading
+	 * Salutation Heading1Char MessageHeaderChar EndnoteReference SubtleEmphasis
+	 * FooterChar Closing TOCHeading BodyText2Char DocumentMap EndnoteTextChar
+	 * HeaderChar PlaceholderText Caption BodyTextIndent BodyTextIndent3
+	 * ListNumber3 List2 ListNumber4 List3 ListNumber5 BodyTextIndent2 List4
+	 * List5 HTMLTypewriter ListNumber2 ArticleSection FootnoteTextChar
+	 * FootnoteText Normal Header HTMLSample HTMLAddressChar MacroTextChar
+	 * IntenseEmphasis NoSpacing CommentSubject BodyTextIndent3Char BodyTextChar
+	 * Index5 Heading2Char Index4 TitleChar Index3 Index2 Index9 Index8
+	 * HTMLVariable Index7 Index6 TOAHeading NoList Title BodyTextFirstIndent2
+	 * QuoteChar MacroText TableGrid ListBullet NormalIndent
+	 * BodyTextFirstIndentChar DateChar FootnoteReference TOC8 ListContinue5
+	 * Strong TOC9 TableofAuthorities Heading4Char NoteHeading HTMLDefinition
+	 * NoteHeadingChar HTMLPreformattedChar BookTitle LineNumber ListContinue
+	 * Quote HTMLPreformatted SubtleReference TOC7 ListContinue4
+	 * BodyTextFirstIndent2Char TOC6 ListContinue3 TOC5 ListContinue2
+	 * IntenseQuoteChar TOC4 TOC3 TOC2 TOC1 PageNumber DefaultParagraphFont
+	 * CommentTextChar BodyText2 BodyText3 PlainTextChar BodyTextIndent2Char
+	 * SubtitleChar Bibliography TableNormal ListParagraph HTMLAddress
+	 * E-mailSignature E-mailSignatureChar BalloonText DocumentMapChar
+	 * BalloonTextChar IntenseReference 111111 Signature EndnoteText
+	 * SignatureChar CommentReference MessageHeader ListBullet2 ListBullet3
+	 * BodyTextFirstIndent ListBullet4 ListBullet5 Heading6Char PlainText 1ai
+	 * List Hyperlink HTMLCode Subtitle BodyText Heading7Char Heading9Char
+	 * BlockText HTMLAcronym Heading8Char CommentSubjectChar FollowedHyperlink
+	 */
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
 		currentStyle = "Heading" + level;
@@ -290,31 +457,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void charactersUnescaped(String literal) {
 		characters = literal;
-	}
-
-	/**
-	 * Creates a simple line chart using the given data set.
-	 * <p>
-	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
-	 * </p>
-	 * 
-	 * @param data
-	 *            the data set
-	 */
-	public void chart(String title, String ylabel, String xlabel, double[] data) {
-		try {
-			Chart c = new Chart();
-			CTChartSpace chart = ChartFactory.createChartSpace(title, ylabel, xlabel, data);
-			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
-			c.setJaxbElement(chart);
-			String chartRelId = wordMLPackage.getMainDocumentPart()
-					.addTargetPart(c).getId();
-			mainDocumentPart.addObject(chart(chartRelId));
-		} catch (InvalidFormatException e) {
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -355,6 +497,33 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 		mappings.put("chartRelId", chartRelId);
 		return (P) org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings);
+	}
+
+	/**
+	 * Creates a simple line chart using the given data set.
+	 * <p>
+	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
+	 * </p>
+	 * 
+	 * @param data
+	 *            the data set
+	 */
+	public void chart(String title, String ylabel, String xlabel, double[] data) {
+		try {
+			Chart c = new Chart();
+			CTChartSpace chart = ChartFactory.createChartSpace(title, ylabel,
+					xlabel, data);
+			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
+			c.setJaxbElement(chart);
+			String chartRelId = wordMLPackage.getMainDocumentPart()
+					.addTargetPart(c).getId();
+			mainDocumentPart.addObject(chart(chartRelId));
+			addCaptionToPackage(title);
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private byte[] convertImageToByteArray(File file)
@@ -413,66 +582,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void endDocument() {
 		try {
 			wordMLPackage.save(outputFile);
-			File tmp = new File(System.getProperty("user.home")+"/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
+			File tmp = new File(
+					System.getProperty("user.home")
+							+ "/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
 			unZipIt(outputFile.getAbsolutePath(), tmp.getAbsolutePath());
 		} catch (Docx4JException e) {
-			e.printStackTrace();		
+			e.printStackTrace();
 		}
 	}
-	/**
-     * Unzip it
-     * @param zipFile input zip file
-     * @param output zip file output folder
-     */
-    public void unZipIt(String zipFile, String outputFolder){
- 
-     byte[] buffer = new byte[1024];
- 
-     try{
- 
-    	//create output directory is not exists
-    	File folder = new File(outputFolder);
-    	if(!folder.exists()){
-    		folder.mkdir();
-    	}
- 
-    	//get the zip file content
-    	ZipInputStream zis = 
-    		new ZipInputStream(new FileInputStream(zipFile));
-    	//get the zipped file list entry
-    	ZipEntry ze = zis.getNextEntry();
- 
-    	while(ze!=null){
- 
-    	   String fileName = ze.getName();
-           File newFile = new File(outputFolder + File.separator + fileName);
- 
-           System.out.println("file unzip : "+ newFile.getAbsoluteFile());
- 
-            //create all non exists folders
-            //else you will hit FileNotFoundException for compressed folder
-            new File(newFile.getParent()).mkdirs();
- 
-            FileOutputStream fos = new FileOutputStream(newFile);             
- 
-            int len;
-            while ((len = zis.read(buffer)) > 0) {
-       		fos.write(buffer, 0, len);
-            }
- 
-            fos.close();   
-            ze = zis.getNextEntry();
-    	}
- 
-        zis.closeEntry();
-    	zis.close();
- 
-    	System.out.println("Done");
- 
-    }catch(IOException ex){
-       ex.printStackTrace(); 
-    }
-   }    
+
 	@Override
 	public void endHeading() {
 		mainDocumentPart.addStyledParagraphOfText(currentStyle, characters);
@@ -552,6 +670,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		try {
 			bytes = convertImageToByteArray(new File(url));
 			addImageToPackage(bytes);
+			if (attributes.getTitle() != null) {
+				addCaptionToPackage(attributes.getTitle());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -564,9 +685,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	}
 
 	/**
-	 * Converts <b>LaTeX</b> to <b>Office MathML</b> and inserts it into the document. 
+	 * Converts <b>LaTeX</b> to <b>Office MathML</b> and inserts it into the
+	 * document.
 	 * 
-	 * @param latex the LaTeX code
+	 * @param latex
+	 *            the LaTeX code
 	 */
 	public void latex(String latex) {
 		/* Create vanilla SnuggleEngine and new SnuggleSession */
@@ -605,10 +728,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			CTOMath math = (CTOMath) XmlUtils.unmarshalString(sw.toString(),
 					jc, CTOMath.class);
 			para.getOMath().add(math);
-			JAXBElement<CTOMathPara> wrapper = mathFactory.createOMathPara(para);
+			JAXBElement<CTOMathPara> wrapper = mathFactory
+					.createOMathPara(para);
 			currentParagraph.getContent().add(wrapper);
 			mainDocumentPart.addObject(currentParagraph);
-			
+
 		} catch (TransformerConfigurationException e) {
 			e.printStackTrace();
 		} catch (TransformerException e) {
@@ -639,5 +763,64 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	public void setTitle(String text) {
 		this.title = text;
+	}
+
+	/**
+	 * Unzip it
+	 * 
+	 * @param zipFile
+	 *            input zip file
+	 * @param output
+	 *            zip file output folder
+	 */
+	public void unZipIt(String zipFile, String outputFolder) {
+
+		byte[] buffer = new byte[1024];
+
+		try {
+
+			// create output directory is not exists
+			File folder = new File(outputFolder);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+
+			// get the zip file content
+			ZipInputStream zis = new ZipInputStream(
+					new FileInputStream(zipFile));
+			// get the zipped file list entry
+			ZipEntry ze = zis.getNextEntry();
+
+			while (ze != null) {
+
+				String fileName = ze.getName();
+				File newFile = new File(outputFolder + File.separator
+						+ fileName);
+
+				System.out.println("file unzip : " + newFile.getAbsoluteFile());
+
+				// create all non exists folders
+				// else you will hit FileNotFoundException for compressed folder
+				new File(newFile.getParent()).mkdirs();
+
+				FileOutputStream fos = new FileOutputStream(newFile);
+
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+
+				fos.close();
+				ze = zis.getNextEntry();
+			}
+
+			zis.closeEntry();
+			zis.close();
+
+			System.out.println("Done");
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
 	}
 }
