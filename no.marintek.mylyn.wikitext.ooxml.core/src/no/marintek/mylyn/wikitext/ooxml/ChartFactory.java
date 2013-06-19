@@ -59,10 +59,14 @@ import org.docx4j.dml.chart.ObjectFactory;
 
 public class ChartFactory {
 
+
 	public static CTChartSpace createChartSpace(String title2, String ylabel,
 			String xlabel, double[] ySeries, double[] xSeries) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
+
+		int valueAxisId = (int) (Math.random()*Integer.MAX_VALUE); //2137197080;
+		int categoryAxisId = (int) (Math.random()*Integer.MAX_VALUE); //2137440440;
 
 		CTChartSpace chartspace = dmlchartObjectFactory.createCTChartSpace();
 		// Create object for style
@@ -75,7 +79,7 @@ public class ChartFactory {
 		CTTextLanguageID textlanguageid = dmlchartObjectFactory
 				.createCTTextLanguageID();
 		chartspace.setLang(textlanguageid);
-		textlanguageid.setVal("nb-NO");
+		textlanguageid.setVal("en-US");
 		// Create object for chart
 		CTChart chart = dmlchartObjectFactory.createCTChart();
 		chartspace.setChart(chart);
@@ -116,7 +120,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory
 				.createCTTextCharacterProperties();
 		textparagraph.setEndParaRPr(textcharacterproperties2);
-		textcharacterproperties2.setLang("nb-NO");
+		textcharacterproperties2.setLang("en-US");
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
 		overlay.setVal(Boolean.FALSE);
@@ -171,13 +175,13 @@ public class ChartFactory {
 
 		// Create object for crossBetween
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		unsignedint.setVal(2137440440);
+		unsignedint.setVal(categoryAxisId);
 		linechart.getAxId().add(unsignedint);
 
 		// Create object for dispUnits
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory
 				.createCTUnsignedInt();
-		unsignedint2.setVal(2137197080);
+		unsignedint2.setVal(valueAxisId);
 		linechart.getAxId().add(unsignedint2);
 
 		// Create object for grouping
@@ -255,9 +259,9 @@ public class ChartFactory {
 		// lineser.setCat(createCTAxDataSource());
 		lineser.setCat(createCategories(dmlchartObjectFactory, xSeries));
 		// Create object for catAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel));
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel, valueAxisId, categoryAxisId));
 		// Create object for valAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel));
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId));
 		// Create object for plotVisOnly
 		CTBoolean boolean19 = dmlchartObjectFactory.createCTBoolean();
 		boolean19.setVal(Boolean.TRUE);
@@ -322,7 +326,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties8 = dmlObjectFactory
 				.createCTTextCharacterProperties();
 		textparagraph4.setEndParaRPr(textcharacterproperties8);
-		textcharacterproperties8.setLang("nb-NO");
+		textcharacterproperties8.setLang("en-US");
 		// Create object for externalData
 		// CTExternalData externaldata =
 		// dmlchartObjectFactory.createCTExternalData();
@@ -386,10 +390,12 @@ public class ChartFactory {
 	 * Create the vertical axis
 	 * 
 	 * @param values
+	 * @param valueAxisId 
+	 * @param categoryAxisId 
 	 * 
 	 * @return
 	 */
-	private static Object createCTValAx(String values) {
+	private static Object createCTValAx(String values, long valueAxisId, long categoryAxisId) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 		CTValAx valax = dmlchartObjectFactory.createCTValAx();
 		// Create object for title
@@ -418,7 +424,7 @@ public class ChartFactory {
 		schemecolor.setVal(org.docx4j.dml.STSchemeColorVal.TX_1);
 		// Create object for axId
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		unsignedint.setVal(2137197080);
+		unsignedint.setVal(valueAxisId);
 		valax.setAxId(unsignedint);
 		// Create object for scaling
 		CTScaling scaling = dmlchartObjectFactory.createCTScaling();
@@ -451,7 +457,7 @@ public class ChartFactory {
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory
 				.createCTUnsignedInt();
 		valax.setCrossAx(unsignedint2);
-		unsignedint2.setVal(2137440440);
+		unsignedint2.setVal(categoryAxisId);
 		// Create object for crosses
 		CTCrosses crosses = dmlchartObjectFactory.createCTCrosses();
 		valax.setCrosses(crosses);
@@ -519,7 +525,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory
 				.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
-		textcharacterproperties2.setLang("nb-NO");
+		textcharacterproperties2.setLang("en-US");
 		regulartextrun.setT(values);
 
 		// Create object for overlay
@@ -589,7 +595,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory
 				.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
-		textcharacterproperties2.setLang("nb-NO");
+		textcharacterproperties2.setLang("en-US");
 		regulartextrun.setT(categories);
 
 		// Create object for layout
@@ -608,10 +614,12 @@ public class ChartFactory {
 	 * Create the horizontal axis
 	 * 
 	 * @param categories
+	 * @param valueAxisId 
+	 * @param categoryAxisId 
 	 * 
 	 * @return
 	 */
-	private static Object createCTCatAx(String categories) {
+	private static Object createCTCatAx(String categories, long valueAxisId, long categoryAxisId) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTCatAx catax = dmlchartObjectFactory.createCTCatAx();
@@ -642,7 +650,7 @@ public class ChartFactory {
 		schemecolor.setVal(org.docx4j.dml.STSchemeColorVal.TX_1);
 		// Create object for axId
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		unsignedint.setVal(2137440440);
+		unsignedint.setVal(categoryAxisId);
 		catax.setAxId(unsignedint);
 		// Create object for scaling
 		CTScaling scaling = dmlchartObjectFactory.createCTScaling();
@@ -675,7 +683,7 @@ public class ChartFactory {
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory
 				.createCTUnsignedInt();
 		catax.setCrossAx(unsignedint2);
-		unsignedint2.setVal(2137197080);
+		unsignedint2.setVal(valueAxisId);
 		// Create object for crosses
 		CTCrosses crosses = dmlchartObjectFactory.createCTCrosses();
 		catax.setCrosses(crosses);

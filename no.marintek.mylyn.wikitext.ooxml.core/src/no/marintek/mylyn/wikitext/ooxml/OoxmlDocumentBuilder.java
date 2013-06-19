@@ -48,6 +48,7 @@ import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramColorsPart;
 import org.docx4j.openpackaging.parts.DrawingML.DiagramDataPart;
@@ -56,6 +57,8 @@ import org.docx4j.openpackaging.parts.DrawingML.DiagramStylePart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
+import org.docx4j.openpackaging.parts.relationships.Namespaces;
+import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTMarkupRange;
@@ -146,7 +149,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.BooleanDefaultTrue TRUE = new org.docx4j.wml.BooleanDefaultTrue();
 
-	private WordprocessingMLPackage wordMLPackage;;
+	private WordprocessingMLPackage wordMLPackage;
+
+	private int chartCounter = 0;
 
 	@Override
 	public void acronym(String text, String definition) {
@@ -465,7 +470,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @return the chart paragraph
 	 * @throws JAXBException
 	 */
-	private P chart(String chartRelId) throws JAXBException {
+	private P chart(String chartRelId, String docPr) throws JAXBException {
 
 		String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" "
 				+ "xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" w:rsidR=\"0084689C\" w:rsidRDefault=\"00D47CF0\">"
@@ -477,7 +482,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n"
 				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />\n"
 				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\" />\n"
-				+ "						<wp:docPr id=\"1\" name=\"Diagram 1\" />\n"
+				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram 1\" />\n"
 				+ "						<wp:cNvGraphicFramePr />\n"
 				+ "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">\n"
 				+ "							<a:graphicData\n"
@@ -495,6 +500,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 		java.util.HashMap<String, String> mappings = new java.util.HashMap<String, String>();
 
+		mappings.put("docPr", docPr);
 		mappings.put("chartRelId", chartRelId);
 		return (P) org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings);
 	}
@@ -508,16 +514,17 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param xSeries
 	 *            the data set
 	 */
-	public void chart(String title, String ylabel, String xlabel, double[] ySeries, double[] xSeries) {
+	public void chart(String title, String ylabel, String xlabel,
+			double[] ySeries, double[] xSeries) {
 		try {
-			Chart c = new Chart();
+			String prId = Integer.toString(++chartCounter);
+			Chart c = new Chart(new PartName("/word/charts/chart" + prId+".xml"));
 			CTChartSpace chart = ChartFactory.createChartSpace(title, ylabel,
 					xlabel, ySeries, xSeries);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
-			String chartRelId = wordMLPackage.getMainDocumentPart()
-					.addTargetPart(c).getId();
-			mainDocumentPart.addObject(chart(chartRelId));
+			Relationship part = mainDocumentPart.addTargetPart(c);
+			mainDocumentPart.addObject(chart(part.getId(), prId));
 			addCaptionToPackage(title);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
