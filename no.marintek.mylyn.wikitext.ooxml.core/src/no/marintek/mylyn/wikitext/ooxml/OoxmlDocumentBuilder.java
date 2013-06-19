@@ -505,14 +505,14 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
 	 * </p>
 	 * 
-	 * @param data
+	 * @param xSeries
 	 *            the data set
 	 */
-	public void chart(String title, String ylabel, String xlabel, double[] data) {
+	public void chart(String title, String ylabel, String xlabel, double[] ySeries, double[] xSeries) {
 		try {
 			Chart c = new Chart();
 			CTChartSpace chart = ChartFactory.createChartSpace(title, ylabel,
-					xlabel, data);
+					xlabel, ySeries, xSeries);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
 			String chartRelId = wordMLPackage.getMainDocumentPart()

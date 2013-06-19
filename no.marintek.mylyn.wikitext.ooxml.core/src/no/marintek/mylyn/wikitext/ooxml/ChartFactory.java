@@ -16,7 +16,6 @@ import org.docx4j.dml.TextFont;
 import org.docx4j.dml.chart.CTAxDataSource;
 import org.docx4j.dml.chart.CTAxPos;
 import org.docx4j.dml.chart.CTBoolean;
-import org.docx4j.dml.chart.CTBuiltInUnit;
 import org.docx4j.dml.chart.CTCatAx;
 import org.docx4j.dml.chart.CTChart;
 import org.docx4j.dml.chart.CTChartSpace;
@@ -61,7 +60,7 @@ import org.docx4j.dml.chart.ObjectFactory;
 public class ChartFactory {
 
 	public static CTChartSpace createChartSpace(String title2, String ylabel,
-			String xlabel, double[] data) {
+			String xlabel, double[] ySeries, double[] xSeries) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -130,8 +129,6 @@ public class ChartFactory {
 		CTPlotArea plotarea = dmlchartObjectFactory.createCTPlotArea();
 		chart.setPlotArea(plotarea);
 		// Create object for layout
-		//CTLayout layout2 = dmlchartObjectFactory.createCTLayout();
-		//XXX
 		plotarea.setLayout(createLayout());
 		// Create object for valAx
 		CTLineChart linechart = dmlchartObjectFactory.createCTLineChart();
@@ -201,7 +198,7 @@ public class ChartFactory {
 		unsignedint3.setVal(0);
 		// Create object for val
 		// lineser.setVal(createCTNumDataSource());
-		lineser.setVal(createValues(dmlchartObjectFactory, data));
+		lineser.setVal(createValues(dmlchartObjectFactory, ySeries));
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory
 				.createCTShapeProperties();
@@ -256,7 +253,7 @@ public class ChartFactory {
 		lineser.setSmooth(boolean12);
 		// Create object for cat
 		// lineser.setCat(createCTAxDataSource());
-		lineser.setCat(createCategories(dmlchartObjectFactory, data));
+		lineser.setCat(createCategories(dmlchartObjectFactory, xSeries));
 		// Create object for catAx
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel));
 		// Create object for valAx
@@ -463,9 +460,9 @@ public class ChartFactory {
 		CTDispUnits dispunits = dmlchartObjectFactory.createCTDispUnits();
 		valax.setDispUnits(dispunits);
 		// Create object for builtInUnit
-		CTBuiltInUnit builtinunit = dmlchartObjectFactory.createCTBuiltInUnit();
-		dispunits.setBuiltInUnit(builtinunit);
-		builtinunit.setVal(org.docx4j.dml.chart.STBuiltInUnit.HUNDREDS);
+//		CTBuiltInUnit builtinunit = dmlchartObjectFactory.createCTBuiltInUnit();
+//		dispunits.setBuiltInUnit(builtinunit);
+//		builtinunit.setVal(org.docx4j.dml.chart.STBuiltInUnit.HUNDREDS);
 		// Create object for crossBetween
 		CTCrossBetween crossbetween = dmlchartObjectFactory
 				.createCTCrossBetween();
@@ -754,7 +751,7 @@ public class ChartFactory {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
 			numval.setIdx(i);
-			numval.setV(Double.toString(i));
+			numval.setV(Double.toString(data[i]));
 		}
 		numdata.setFormatCode("General");
 		// Create object for ptCount
