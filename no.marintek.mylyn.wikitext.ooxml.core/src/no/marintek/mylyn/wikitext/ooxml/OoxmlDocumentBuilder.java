@@ -62,6 +62,7 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTMarkupRange;
+import org.docx4j.wml.CTTextEffect;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.FldChar;
 import org.docx4j.wml.P;
@@ -625,8 +626,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			block.setI(TRUE);
 			break;
 		case INSERTED:
-			block.setB(TRUE);
-			block.setI(TRUE);
 			break;
 		case ITALIC:
 			block.setI(TRUE);
@@ -659,7 +658,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		default:
 			break;
 		}
-
+		characters="";
 	}
 
 	@Override
