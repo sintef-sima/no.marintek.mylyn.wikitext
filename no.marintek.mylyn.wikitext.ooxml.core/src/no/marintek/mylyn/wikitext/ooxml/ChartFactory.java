@@ -52,6 +52,7 @@ import org.docx4j.dml.chart.CTOrientation;
 import org.docx4j.dml.chart.CTPlotArea;
 import org.docx4j.dml.chart.CTScaling;
 import org.docx4j.dml.chart.CTSerTx;
+import org.docx4j.dml.chart.CTSkip;
 import org.docx4j.dml.chart.CTStrData;
 import org.docx4j.dml.chart.CTStrRef;
 import org.docx4j.dml.chart.CTStrVal;
@@ -95,59 +96,19 @@ public class ChartFactory {
 	CTStyle style = dmlchartObjectFactory.createCTStyle();
 	style.setVal((short) 102);
 	chartspace.setStyle(style);
+	
 	// Create object for lang
 	CTTextLanguageID textlanguageid = dmlchartObjectFactory.createCTTextLanguageID();
 	chartspace.setLang(textlanguageid);
 	textlanguageid.setVal("en-US");
+	
 	// Create object for chart
 	CTChart chart = dmlchartObjectFactory.createCTChart();
 	chartspace.setChart(chart);
+	
 	// Create object for title
 	chart.setTitle(createChartTitle(title));
 	org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
-
-	// CTTitle ctTitle = dmlchartObjectFactory.createCTTitle();
-	// chart.setTitle(ctTitle);
-	// // Create object for layout
-	// CTLayout layout = dmlchartObjectFactory.createCTLayout();
-	// ctTitle.setLayout(layout);
-	// org.docx4j.dml.ObjectFactory dmlObjectFactory = new
-	// org.docx4j.dml.ObjectFactory();
-	// // Create object for txPr
-	// CTTextBody textbody = dmlObjectFactory.createCTTextBody();
-	// ctTitle.setTxPr(textbody);
-	// // Create object for lstStyle
-	// CTTextListStyle textliststyle =
-	// dmlObjectFactory.createCTTextListStyle();
-	// textbody.setLstStyle(textliststyle);
-	// // Create object for bodyPr
-	// CTTextBodyProperties textbodyproperties =
-	// dmlObjectFactory.createCTTextBodyProperties();
-	// textbody.setBodyPr(textbodyproperties);
-	// // Create object for p
-	// CTTextParagraph textparagraph =
-	// dmlObjectFactory.createCTTextParagraph();
-	// textbody.getP().add(textparagraph);
-	// // Create object for pPr
-	// CTTextParagraphProperties textparagraphproperties =
-	// dmlObjectFactory.createCTTextParagraphProperties();
-	// textparagraph.setPPr(textparagraphproperties);
-	// // Create object for defRPr
-	// CTTextCharacterProperties textcharacterproperties =
-	// dmlObjectFactory.createCTTextCharacterProperties();
-	// textparagraphproperties.setDefRPr(textcharacterproperties);
-	// textcharacterproperties.setSz(new Integer(1200));
-	// textcharacterproperties.setB(Boolean.FALSE);
-	// textcharacterproperties.setI(Boolean.FALSE);
-	// // Create object for endParaRPr
-	// CTTextCharacterProperties textcharacterproperties2 =
-	// dmlObjectFactory.createCTTextCharacterProperties();
-	// textparagraph.setEndParaRPr(textcharacterproperties2);
-	// textcharacterproperties2.setLang("en-US");
-	// // Create object for overlay
-	// CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
-	// overlay.setVal(Boolean.FALSE);
-	// ctTitle.setOverlay(overlay);
 
 	// Create object for autoTitleDeleted
 	CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
@@ -231,7 +192,15 @@ public class ChartFactory {
 	}
 
 	// Create object for catAx
-	plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx(xlabel, valueAxisId, categoryAxisId));
+	CTCatAx createCTCatAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
+	// A maximum of 10 major tick marks for the horizontal axis
+	int skip = xSeries[0].length/10;
+	CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
+	createCTSkip.setVal(skip);
+	createCTCatAx.setTickMarkSkip(createCTSkip);
+	createCTCatAx.setTickLblSkip(createCTSkip);
+	plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx);
+	
 	// Create object for valAx
 	plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId));
 
@@ -453,7 +422,7 @@ public class ChartFactory {
      * 
      * @return
      */
-    private static Object createCTValAx(String values, long valueAxisId, long categoryAxisId) {
+    private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId) {
 	org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 	CTValAx valax = dmlchartObjectFactory.createCTValAx();
 	// Create object for title
@@ -662,7 +631,7 @@ public class ChartFactory {
      * 
      * @return
      */
-    private static Object createCTCatAx(String categories, long valueAxisId, long categoryAxisId) {
+    private static CTCatAx createCTCatAx(String categories, long valueAxisId, long categoryAxisId) {
 	org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 	CTCatAx catax = dmlchartObjectFactory.createCTCatAx();
@@ -702,46 +671,57 @@ public class ChartFactory {
 	CTOrientation orientation = dmlchartObjectFactory.createCTOrientation();
 	scaling.setOrientation(orientation);
 	orientation.setVal(org.docx4j.dml.chart.STOrientation.MIN_MAX);
+
 	// Create object for delete
 	CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
 	boolean2.setVal(Boolean.FALSE);
 	catax.setDelete(boolean2);
+
 	// Create object for axPos
 	CTAxPos axpos = dmlchartObjectFactory.createCTAxPos();
 	catax.setAxPos(axpos);
 	axpos.setVal(org.docx4j.dml.chart.STAxPos.B);
+
 	// Create object for majorTickMark
 	CTTickMark tickmark = dmlchartObjectFactory.createCTTickMark();
 	catax.setMajorTickMark(tickmark);
 	tickmark.setVal(org.docx4j.dml.chart.STTickMark.IN);
+	
 	// Create object for minorTickMark
 	CTTickMark tickmark2 = dmlchartObjectFactory.createCTTickMark();
 	catax.setMinorTickMark(tickmark2);
 	tickmark2.setVal(org.docx4j.dml.chart.STTickMark.NONE);
+	
 	// Create object for tickLblPos
 	CTTickLblPos ticklblpos = dmlchartObjectFactory.createCTTickLblPos();
 	catax.setTickLblPos(ticklblpos);
 	ticklblpos.setVal(org.docx4j.dml.chart.STTickLblPos.NEXT_TO);
+	
 	// Create object for crossAx
 	CTUnsignedInt unsignedint2 = dmlchartObjectFactory.createCTUnsignedInt();
 	catax.setCrossAx(unsignedint2);
 	unsignedint2.setVal(valueAxisId);
+
 	// Create object for crosses
 	CTCrosses crosses = dmlchartObjectFactory.createCTCrosses();
 	catax.setCrosses(crosses);
 	crosses.setVal(org.docx4j.dml.chart.STCrosses.AUTO_ZERO);
+	
 	// Create object for auto
 	CTBoolean boolean3 = dmlchartObjectFactory.createCTBoolean();
 	boolean3.setVal(Boolean.TRUE);
 	catax.setAuto(boolean3);
+	
 	// Create object for lblOffset
 	CTLblOffset lbloffset = dmlchartObjectFactory.createCTLblOffset();
 	catax.setLblOffset(lbloffset);
 	lbloffset.setVal(new Integer(100));
+	
 	// Create object for lblAlgn
 	CTLblAlgn lblalgn = dmlchartObjectFactory.createCTLblAlgn();
 	catax.setLblAlgn(lblalgn);
-	lblalgn.setVal(org.docx4j.dml.chart.STLblAlgn.CTR);
+	lblalgn.setVal(org.docx4j.dml.chart.STLblAlgn.CTR);		
+	
 	// Create object for noMultiLvlLbl
 	CTBoolean boolean4 = dmlchartObjectFactory.createCTBoolean();
 	boolean4.setVal(Boolean.FALSE);
