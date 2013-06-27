@@ -590,10 +590,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void endDocument() {
 		try {
 			wordMLPackage.save(outputFile);
-			File tmp = new File(
-					System.getProperty("user.home")
-							+ "/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
-			unZipIt(outputFile.getAbsolutePath(), tmp.getAbsolutePath());
+//			File tmp = new File(
+//					System.getProperty("user.home")
+//							+ "/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
+//			unZipIt(outputFile.getAbsolutePath(), tmp.getAbsolutePath());
 		} catch (Docx4JException e) {
 			e.printStackTrace();
 		}
