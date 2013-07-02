@@ -176,7 +176,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	// TODO Auto-generated method stub
     }
 
-    private void addCaptionToPackage(String caption) {
+    public void addCaptionToPackage(String caption) {
 
 	org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
 
@@ -371,6 +371,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	r.getContent().add(br);
 	p.getContent().add(r);
 	mainDocumentPart.addObject(p);
+    }
+    
+    /**
+     * Adds a simple line break to the document flow.
+     */
+    public void addLineBreak() {
+	org.docx4j.wml.Br br = new org.docx4j.wml.Br();
+	br.setType(STBrType.TEXT_WRAPPING);
+	mainDocumentPart.addObject(br);
     }
 
     @Override
