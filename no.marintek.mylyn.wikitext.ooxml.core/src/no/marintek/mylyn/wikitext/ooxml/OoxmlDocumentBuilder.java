@@ -602,7 +602,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void endSpan() {
 		RPr block = createSpan(characters);
-
+		if (currentSpanType==null) {
+			return;
+		}
 		switch (currentSpanType) {
 		case BOLD:
 			block.setB(TRUE);
@@ -695,6 +697,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 *            the LaTeX code
 	 */
 	public void latex(String latex) {
+		if (!latex.startsWith("$$")) {
+			latex = "$$" + latex;
+		}
+		if (!latex.endsWith("$$")) {
+			latex = latex + "$$";
+		}
 		/* Create vanilla SnuggleEngine and new SnuggleSession */
 		SnuggleEngine engine = new SnuggleEngine();
 		SnuggleSession session = engine.createSession();
@@ -717,7 +725,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		StringWriter sw = new StringWriter();
 		TransformerFactory tfactory = TransformerFactory.newInstance();
 		StreamSource xsl = new StreamSource(OoxmlDocumentBuilder.class.getResourceAsStream("xslt/mml2omml.xsl"));
-		Source xml = new StreamSource(new StringReader(session.buildXMLString(options)));
+		String mathml = session.buildXMLString(options);
+		Source xml = new StreamSource(new StringReader(mathml));
 		StreamResult out = new StreamResult(sw);
 		try {
 			Transformer transformer = tfactory.newTransformer(xsl);
