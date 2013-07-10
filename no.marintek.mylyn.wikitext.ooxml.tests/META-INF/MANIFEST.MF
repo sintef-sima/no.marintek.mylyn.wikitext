@@ -4,6 +4,6 @@ Bundle-Name: Tests
 Bundle-SymbolicName: no.marintek.mylyn.wikitext.ooxml.tests
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.eclipse.mylyn.wikitext.core;bundle-version="1.8.0",
+Require-Bundle: org.eclipse.mylyn.wikitext.core;bundle-version="1.9.0",
  org.junit;bundle-version="4.10.0",
  no.marintek.mylyn.wikitext.ooxml.core;bundle-version="1.0.0"
