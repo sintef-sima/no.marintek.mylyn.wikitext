@@ -54,6 +54,7 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTBorder;
+import org.docx4j.wml.CTCaption;
 import org.docx4j.wml.CTMarkupRange;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.Drawing;
@@ -104,8 +105,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.ObjectFactory factory;
 
-	private int figureCount;
-
 	private MainDocumentPart mainDocumentPart;
 
 	private final org.docx4j.math.ObjectFactory mathFactory = new org.docx4j.math.ObjectFactory();
@@ -133,115 +132,151 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private int tableRowCount;
 
 	private Tbl currentTable;
+	
+	public enum CaptionType {
+		Table,
+		Figure,
+		Image,
+		Equation
+	}
+	
+	private int[] captionCount = new int[CaptionType.values().length];
 
 	@Override
 	public void acronym(String text, String definition) {
 		// TODO Auto-generated method stub
 	}
 
-	public void caption(String text) {
-
+	public void caption(String text, CaptionType captionType) {
+		String type = captionType.name();
+		
 		org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
 
 		P p = wmlObjectFactory.createP();
+
 		// Create object for pPr
 		PPr ppr = wmlObjectFactory.createPPr();
 		p.setPPr(ppr);
+
 		// Create object for pStyle
 		PPrBase.PStyle pprbasepstyle = wmlObjectFactory.createPPrBasePStyle();
 		ppr.setPStyle(pprbasepstyle);
 		pprbasepstyle.setVal("Caption");
+
 		// Create object for r
 		R r = wmlObjectFactory.createR();
 		p.getContent().add(r);
+
 		// Create object for t (wrapped in JAXBElement)
 		org.docx4j.wml.Text t = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped = wmlObjectFactory.createRT(t);
 		r.getContent().add(textWrapped);
-		t.setValue("Figure ");
+		t.setValue(type+" ");
 		t.setSpace("preserve");
+
 		// Create object for r
 		R r2 = wmlObjectFactory.createR();
 		p.getContent().add(r2);
+
 		// Create object for fldChar (wrapped in JAXBElement)
 		FldChar fldchar = wmlObjectFactory.createFldChar();
 		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped = wmlObjectFactory.createRFldChar(fldchar);
 		r2.getContent().add(fldcharWrapped);
 		fldchar.setFldCharType(org.docx4j.wml.STFldCharType.BEGIN);
+
 		// Create object for r
 		R r3 = wmlObjectFactory.createR();
 		p.getContent().add(r3);
+
 		// Create object for instrText (wrapped in JAXBElement)
 		org.docx4j.wml.Text text2 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped2 = wmlObjectFactory.createRInstrText(text2);
 		r3.getContent().add(textWrapped2);
 		text2.setValue(" ");
 		text2.setSpace("preserve");
+
 		// Create object for r
 		R r4 = wmlObjectFactory.createR();
 		p.getContent().add(r4);
+
 		// Create object for instrText (wrapped in JAXBElement)
 		org.docx4j.wml.Text text3 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped3 = wmlObjectFactory.createRInstrText(text3);
 		r4.getContent().add(textWrapped3);
-		text3.setValue("SEQ Figure \\* ARABIC ");
+		text3.setValue("SEQ "+type+" \\* ARABIC ");
 		text3.setSpace("preserve");
+		
 		// Create object for r
 		R r5 = wmlObjectFactory.createR();
 		p.getContent().add(r5);
+		
 		// Create object for fldChar (wrapped in JAXBElement)
 		FldChar fldchar2 = wmlObjectFactory.createFldChar();
 		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped2 = wmlObjectFactory.createRFldChar(fldchar2);
 		r5.getContent().add(fldcharWrapped2);
 		fldchar2.setFldCharType(org.docx4j.wml.STFldCharType.SEPARATE);
+		
 		// Create object for r
 		R r6 = wmlObjectFactory.createR();
 		p.getContent().add(r6);
+		
 		// Create object for rPr
 		RPr rpr = wmlObjectFactory.createRPr();
 		r6.setRPr(rpr);
+
 		// Create object for noProof
 		BooleanDefaultTrue booleandefaulttrue = wmlObjectFactory.createBooleanDefaultTrue();
 		rpr.setNoProof(booleandefaulttrue);
+
 		// Create object for t (wrapped in JAXBElement)
 		org.docx4j.wml.Text text4 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped4 = wmlObjectFactory.createRT(text4);
 		r6.getContent().add(textWrapped4);
-		text4.setValue(Integer.toString(++figureCount));
+		text4.setValue(Integer.toString(++captionCount[captionType.ordinal()]));
+		
 		// Create object for r
 		R r7 = wmlObjectFactory.createR();
 		p.getContent().add(r7);
+		
 		// Create object for rPr
 		RPr rpr2 = wmlObjectFactory.createRPr();
 		r7.setRPr(rpr2);
+		
 		// Create object for noProof
 		BooleanDefaultTrue booleandefaulttrue2 = wmlObjectFactory.createBooleanDefaultTrue();
 		rpr2.setNoProof(booleandefaulttrue2);
+		
 		// Create object for fldChar (wrapped in JAXBElement)
 		FldChar fldchar3 = wmlObjectFactory.createFldChar();
 		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped3 = wmlObjectFactory.createRFldChar(fldchar3);
 		r7.getContent().add(fldcharWrapped3);
 		fldchar3.setFldCharType(org.docx4j.wml.STFldCharType.END);
+		
 		// Create object for r
 		R r8 = wmlObjectFactory.createR();
 		p.getContent().add(r8);
+		
 		// Create object for rPr
 		RPr rpr3 = wmlObjectFactory.createRPr();
 		r8.setRPr(rpr3);
+		
 		// Create object for noProof
 		BooleanDefaultTrue booleandefaulttrue3 = wmlObjectFactory.createBooleanDefaultTrue();
 		rpr3.setNoProof(booleandefaulttrue3);
+		
 		// Create object for t (wrapped in JAXBElement)
 		org.docx4j.wml.Text text5 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped5 = wmlObjectFactory.createRT(text5);
 		r8.getContent().add(textWrapped5);
 		text5.setValue(": " + text);
+		
 		// Create object for bookmarkStart (wrapped in JAXBElement)
 		CTBookmark bookmark = wmlObjectFactory.createCTBookmark();
 		JAXBElement<org.docx4j.wml.CTBookmark> bookmarkWrapped = wmlObjectFactory.createPBookmarkStart(bookmark);
 		p.getContent().add(bookmarkWrapped);
 		bookmark.setName("_GoBack");
 		bookmark.setId(BigInteger.valueOf(0));
+		
 		// Create object for bookmarkEnd (wrapped in JAXBElement)
 		CTMarkupRange markuprange = wmlObjectFactory.createCTMarkupRange();
 		JAXBElement<org.docx4j.wml.CTMarkupRange> markuprangeWrapped = wmlObjectFactory.createPBookmarkEnd(markuprange);
@@ -249,7 +284,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		markuprange.setId(BigInteger.valueOf(0));
 
 		mainDocumentPart.addObject(p);
-
 	}
 
 	/**
@@ -306,6 +340,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			mainDocumentPart.addObject(currentTable);
 			TblPr tblpr = wmlObjectFactory.createTblPr();
 			currentTable.setTblPr(tblpr);
+						
 			// Create object for tblW
 			TblWidth tblwidth = wmlObjectFactory.createTblWidth();
 			tblpr.setTblW(tblwidth);
@@ -471,7 +506,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			c.setJaxbElement(chart);
 			Relationship part = mainDocumentPart.addTargetPart(c);
 			mainDocumentPart.addObject(chart(part.getId(), prId));
-			caption(title);
+			caption(title, CaptionType.Figure);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
@@ -677,7 +712,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			String title = attributes.getTitle() == null ? attributes.getTitle() : file.getAbsolutePath();
 			addImageToPackage(bytes, file, title);
 			if (attributes.getTitle() != null) {
-				caption(attributes.getTitle());
+				caption(attributes.getTitle(),CaptionType.Image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -696,7 +731,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param latex
 	 *            the LaTeX code
 	 */
-	public void latex(String latex) {
+	public void latex(String latex, Attributes attributes) {
 		if (!latex.startsWith("$$")) {
 			latex = "$$" + latex;
 		}
@@ -747,7 +782,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-
+		if (attributes.getTitle()!=null) {
+			caption(attributes.getTitle(), CaptionType.Equation);
+		}
 	}
 
 	@Override
