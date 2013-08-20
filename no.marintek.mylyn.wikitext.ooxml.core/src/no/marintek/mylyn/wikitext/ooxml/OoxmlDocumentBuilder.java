@@ -54,7 +54,6 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTBorder;
-import org.docx4j.wml.CTCaption;
 import org.docx4j.wml.CTMarkupRange;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.Drawing;
