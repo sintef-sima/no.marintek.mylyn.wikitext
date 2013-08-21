@@ -101,7 +101,7 @@ public class ChartFactory {
 	 *
 	 * @param title
 	 *            the chart title
-	 * @param names
+	 * @param legends
 	 *            series names
 	 * @param ylabel
 	 *            y-axis label
@@ -114,7 +114,7 @@ public class ChartFactory {
 	 * @return the chart space instance
 	 * @throws JAXBException
 	 */
-	public static CTChartSpace createChartSpace(String title, String[] names, String ylabel, String xlabel, double[][] ySeries, double[][] xSeries)
+	public static CTChartSpace createChartSpace(String title, String[] legends, String ylabel, String xlabel, double[][] ySeries, double[][] xSeries)
 			throws JAXBException {
 
 		if ((xSeries.length > COLOUR_SCHEME.length) || (ySeries.length > COLOUR_SCHEME.length)) {
@@ -223,7 +223,7 @@ public class ChartFactory {
 		linechart.setVaryColors(boolean11);
 
 		for (int series = 0; series < xSeries.length; series++) {
-			addSeries(names, ylabel, xlabel, ySeries[series], xSeries[series], dmlchartObjectFactory, valueAxisId, categoryAxisId, dmlObjectFactory,
+			addSeries(legends, ylabel, xlabel, ySeries[series], xSeries[series], dmlchartObjectFactory, valueAxisId, categoryAxisId, dmlObjectFactory,
 					plotarea, linechart, series, series);
 		}
 
@@ -241,7 +241,7 @@ public class ChartFactory {
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId));
 
 		// Add a legend
-		if (names.length>1) {
+		if (legends.length>1) {
 			chart.setLegend(createLegend());
 		}
 
