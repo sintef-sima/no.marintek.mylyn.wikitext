@@ -40,11 +40,13 @@ import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.math.CTOMath;
 import org.docx4j.math.CTOMathPara;
+import org.docx4j.model.styles.StyleUtil;
 import org.docx4j.openpackaging.contenttype.ContentType;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
@@ -54,6 +56,7 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTBorder;
+import org.docx4j.wml.CTLanguage;
 import org.docx4j.wml.CTMarkupRange;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.Drawing;
@@ -87,7 +90,7 @@ import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
 
 /**
- *
+ * 
  * @author Torkild U. Resheim
  * @since 1.9
  */
@@ -100,6 +103,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private P currentParagraph;
 
 	private SpanType currentSpanType;
+
 	private String currentStyle;
 
 	private org.docx4j.wml.ObjectFactory factory;
@@ -131,14 +135,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private int tableRowCount;
 
 	private Tbl currentTable;
-	
+
 	public enum CaptionType {
-		Table,
-		Figure,
-		Image,
-		Equation
+		Table, Figure, Image, Equation
 	}
-	
+
 	private int[] captionCount = new int[CaptionType.values().length];
 
 	@Override
@@ -148,7 +149,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	public void caption(String text, CaptionType captionType) {
 		String type = captionType.name();
-		
+
 		org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
 
 		P p = wmlObjectFactory.createP();
@@ -170,7 +171,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		org.docx4j.wml.Text t = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped = wmlObjectFactory.createRT(t);
 		r.getContent().add(textWrapped);
-		t.setValue(type+" ");
+		t.setValue(type + " ");
 		t.setSpace("preserve");
 
 		// Create object for r
@@ -202,23 +203,23 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		org.docx4j.wml.Text text3 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped3 = wmlObjectFactory.createRInstrText(text3);
 		r4.getContent().add(textWrapped3);
-		text3.setValue("SEQ "+type+" \\* ARABIC ");
+		text3.setValue("SEQ " + type + " \\* ARABIC ");
 		text3.setSpace("preserve");
-		
+
 		// Create object for r
 		R r5 = wmlObjectFactory.createR();
 		p.getContent().add(r5);
-		
+
 		// Create object for fldChar (wrapped in JAXBElement)
 		FldChar fldchar2 = wmlObjectFactory.createFldChar();
 		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped2 = wmlObjectFactory.createRFldChar(fldchar2);
 		r5.getContent().add(fldcharWrapped2);
 		fldchar2.setFldCharType(org.docx4j.wml.STFldCharType.SEPARATE);
-		
+
 		// Create object for r
 		R r6 = wmlObjectFactory.createR();
 		p.getContent().add(r6);
-		
+
 		// Create object for rPr
 		RPr rpr = wmlObjectFactory.createRPr();
 		r6.setRPr(rpr);
@@ -232,50 +233,50 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		JAXBElement<org.docx4j.wml.Text> textWrapped4 = wmlObjectFactory.createRT(text4);
 		r6.getContent().add(textWrapped4);
 		text4.setValue(Integer.toString(++captionCount[captionType.ordinal()]));
-		
+
 		// Create object for r
 		R r7 = wmlObjectFactory.createR();
 		p.getContent().add(r7);
-		
+
 		// Create object for rPr
 		RPr rpr2 = wmlObjectFactory.createRPr();
 		r7.setRPr(rpr2);
-		
+
 		// Create object for noProof
 		BooleanDefaultTrue booleandefaulttrue2 = wmlObjectFactory.createBooleanDefaultTrue();
 		rpr2.setNoProof(booleandefaulttrue2);
-		
+
 		// Create object for fldChar (wrapped in JAXBElement)
 		FldChar fldchar3 = wmlObjectFactory.createFldChar();
 		JAXBElement<org.docx4j.wml.FldChar> fldcharWrapped3 = wmlObjectFactory.createRFldChar(fldchar3);
 		r7.getContent().add(fldcharWrapped3);
 		fldchar3.setFldCharType(org.docx4j.wml.STFldCharType.END);
-		
+
 		// Create object for r
 		R r8 = wmlObjectFactory.createR();
 		p.getContent().add(r8);
-		
+
 		// Create object for rPr
 		RPr rpr3 = wmlObjectFactory.createRPr();
 		r8.setRPr(rpr3);
-		
+
 		// Create object for noProof
 		BooleanDefaultTrue booleandefaulttrue3 = wmlObjectFactory.createBooleanDefaultTrue();
 		rpr3.setNoProof(booleandefaulttrue3);
-		
+
 		// Create object for t (wrapped in JAXBElement)
 		org.docx4j.wml.Text text5 = wmlObjectFactory.createText();
 		JAXBElement<org.docx4j.wml.Text> textWrapped5 = wmlObjectFactory.createRT(text5);
 		r8.getContent().add(textWrapped5);
 		text5.setValue(": " + text);
-		
+
 		// Create object for bookmarkStart (wrapped in JAXBElement)
 		CTBookmark bookmark = wmlObjectFactory.createCTBookmark();
 		JAXBElement<org.docx4j.wml.CTBookmark> bookmarkWrapped = wmlObjectFactory.createPBookmarkStart(bookmark);
 		p.getContent().add(bookmarkWrapped);
 		bookmark.setName("_GoBack");
 		bookmark.setId(BigInteger.valueOf(0));
-		
+
 		// Create object for bookmarkEnd (wrapped in JAXBElement)
 		CTMarkupRange markuprange = wmlObjectFactory.createCTMarkupRange();
 		JAXBElement<org.docx4j.wml.CTMarkupRange> markuprangeWrapped = wmlObjectFactory.createPBookmarkEnd(markuprange);
@@ -287,7 +288,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Adds an image to the document.
-	 *
+	 * 
 	 * @param bytes
 	 * @param file
 	 * @param text
@@ -332,14 +333,19 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		if (currentBlockType.equals(BlockType.PARAGRAPH)) {
 			currentParagraph = factory.createP();
 		}
-		if (currentBlockType.equals(BlockType.TABLE)) {
+		// List items
+//		else if (currentBlockType.equals(BlockType.LIST_ITEM)) {
+//			//currentParagraph = createListItem();
+//		}
+		// Tables
+		else if (currentBlockType.equals(BlockType.TABLE)) {
 			tableColumnCount = 0;
 			tableRowCount = 0;
 			currentTable = wmlObjectFactory.createTbl();
 			mainDocumentPart.addObject(currentTable);
 			TblPr tblpr = wmlObjectFactory.createTblPr();
 			currentTable.setTblPr(tblpr);
-						
+
 			// Create object for tblW
 			TblWidth tblwidth = wmlObjectFactory.createTblWidth();
 			tblpr.setTblW(tblwidth);
@@ -347,7 +353,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			tblwidth.setW(BigInteger.valueOf(1));
 			tblpr.setTblBorders(createTableBorders());
 		}
-		if (currentBlockType.equals(BlockType.TABLE_ROW)) {
+		// Table rows
+		else if (currentBlockType.equals(BlockType.TABLE_ROW)) {
 			currentTableRow = wmlObjectFactory.createTr();
 			currentTable.getContent().add(currentTableRow);
 			if (tableRowCount == 1) {
@@ -362,7 +369,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			tableRowCount++;
 		}
 
-		if (currentBlockType.equals(BlockType.TABLE_CELL_NORMAL) || currentBlockType.equals(BlockType.TABLE_CELL_HEADER)) {
+		else if (currentBlockType.equals(BlockType.TABLE_CELL_NORMAL) || currentBlockType.equals(BlockType.TABLE_CELL_HEADER)) {
 			Tc tc = wmlObjectFactory.createTc();
 			JAXBElement<org.docx4j.wml.Tc> tcWrapped = wmlObjectFactory.createTrTc(tc);
 			currentTableRow.getContent().add(tcWrapped);
@@ -439,6 +446,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
 		currentStyle = "Heading" + level;
+		styleExists();
+	}
+
+	private void styleExists() {
 		Map<String, Style> knownStyles = StyleDefinitionsPart.getKnownStyles();
 		if (!knownStyles.containsKey(currentStyle)) {
 			throw new IllegalArgumentException("Unknown style!");
@@ -461,7 +472,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param chartRelId
 	 * @return the chart paragraph
 	 * @throws JAXBException
@@ -492,7 +503,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * <p>
 	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
 	 * </p>
-	 *
+	 * 
 	 * @param xSeries
 	 *            the data set
 	 */
@@ -528,11 +539,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Create a basic paragraph of text.
-	 *
+	 * 
 	 * @param text
 	 * @return
 	 */
-	private P createParagraph(String text) {
+	private void addTextToParagraph(String text) {
 		if (text != null) {
 			org.docx4j.wml.Text t = factory.createText();
 			t.setValue(text);
@@ -540,7 +551,29 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			run.getContent().add(t);
 			currentParagraph.getContent().add(run);
 		}
-		return currentParagraph;
+	}
+
+	/**
+	 * Use to apply a specific style on the given paragraph.
+	 * 
+	 * @param p
+	 * @param style
+	 * @return
+	 */
+	private PPr applyStyle(P p, String style) {
+		StyleDefinitionsPart styleDefinitionsPart = mainDocumentPart.getStyleDefinitionsPart();
+		if (mainDocumentPart.getPropertyResolver().activateStyle(style)) {
+			// Style is available
+			org.docx4j.wml.ObjectFactory factory = new org.docx4j.wml.ObjectFactory();
+			org.docx4j.wml.PPr pPr = factory.createPPr();
+			p.setPPr(pPr);
+			org.docx4j.wml.PPrBase.PStyle pStyle = factory.createPPrBasePStyle();
+			pPr.setPStyle(pStyle);
+			pStyle.setVal(style);
+			return pPr;
+		}
+		throw new RuntimeException("Missing style "+style);
+		//return null;
 	}
 
 	private org.docx4j.wml.RPr createSpan(String text) {
@@ -609,9 +642,22 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		if (currentBlockType.equals(BlockType.TABLE_CELL_NORMAL) || currentBlockType.equals(BlockType.TABLE_CELL_HEADER)) {
 			tableColumnCount++;
 			endSpan();
-		}
-		if (currentBlockType.equals(BlockType.PARAGRAPH)) {
-			mainDocumentPart.addObject(createParagraph(characters));
+		} else if (currentBlockType.equals(BlockType.PARAGRAPH)) {
+			addTextToParagraph(characters);
+			mainDocumentPart.addObject(currentParagraph);
+		} else if (currentBlockType.equals(BlockType.LIST_ITEM)) {
+			P p = mainDocumentPart.addStyledParagraphOfText("ListParagraph", characters);
+			PPr ppr = p.getPPr();
+			PPrBase.NumPr pprbasenumpr = wmlObjectFactory.createPPrBaseNumPr();
+			ppr.setNumPr(pprbasenumpr);
+			// Create object for numId
+			PPrBase.NumPr.NumId pprbasenumprnumid = wmlObjectFactory.createPPrBaseNumPrNumId();
+			pprbasenumpr.setNumId(pprbasenumprnumid);
+			pprbasenumprnumid.setVal(BigInteger.valueOf(1));
+			// Create object for ilvl
+			PPrBase.NumPr.Ilvl pprbasenumprilvl = wmlObjectFactory.createPPrBaseNumPrIlvl();
+			pprbasenumpr.setIlvl(pprbasenumprilvl);
+			pprbasenumprilvl.setVal(BigInteger.valueOf(0));
 		}
 	}
 
@@ -636,7 +682,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void endSpan() {
 		RPr block = createSpan(characters);
-		if (currentSpanType==null) {
+		if (currentSpanType == null) {
 			return;
 		}
 		switch (currentSpanType) {
@@ -711,7 +757,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			String title = attributes.getTitle() == null ? attributes.getTitle() : file.getAbsolutePath();
 			addImageToPackage(bytes, file, title);
 			if (attributes.getTitle() != null) {
-				caption(attributes.getTitle(),CaptionType.Image);
+				caption(attributes.getTitle(), CaptionType.Image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -726,7 +772,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	/**
 	 * Converts <b>LaTeX</b> to <b>Office MathML</b> and inserts it into the
 	 * document.
-	 *
+	 * 
 	 * @param latex
 	 *            the LaTeX code
 	 */
@@ -781,7 +827,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-		if (attributes.getTitle()!=null) {
+		if (attributes.getTitle() != null) {
 			caption(attributes.getTitle(), CaptionType.Equation);
 		}
 	}
@@ -812,7 +858,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Unzip it
-	 *
+	 * 
 	 * @param zipFile
 	 *            input zip file
 	 * @param output
