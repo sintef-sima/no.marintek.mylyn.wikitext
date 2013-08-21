@@ -241,7 +241,9 @@ public class ChartFactory {
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId));
 
 		// Add a legend
-		chart.setLegend(createLegend());
+		if (names.length>1) {
+			chart.setLegend(createLegend());
+		}
 
 		// Create object for plotVisOnly
 		CTBoolean boolean19 = dmlchartObjectFactory.createCTBoolean();
