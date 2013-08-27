@@ -864,42 +864,51 @@ public class ChartFactory {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTTitle title = dmlchartObjectFactory.createCTTitle();
+		
 		// Create object for layout
 		CTLayout layout = dmlchartObjectFactory.createCTLayout();
 		title.setLayout(layout);
+		
 		// Create object for tx
 		CTTx tx = dmlchartObjectFactory.createCTTx();
 		title.setTx(tx);
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
+		
 		// Create object for rich
 		CTTextBody textbody = dmlObjectFactory.createCTTextBody();
 		tx.setRich(textbody);
+		
 		// Create object for lstStyle
 		CTTextListStyle textliststyle = dmlObjectFactory.createCTTextListStyle();
 		textbody.setLstStyle(textliststyle);
+		
 		// Create object for bodyPr
 		CTTextBodyProperties textbodyproperties = dmlObjectFactory.createCTTextBodyProperties();
 		textbody.setBodyPr(textbodyproperties);
+		
 		// Create object for p
 		CTTextParagraph textparagraph = dmlObjectFactory.createCTTextParagraph();
 		textbody.getP().add(textparagraph);
+		
 		// Create object for pPr
 		CTTextParagraphProperties textparagraphproperties = dmlObjectFactory.createCTTextParagraphProperties();
 		textparagraph.setPPr(textparagraphproperties);
+		
 		// Create object for defRPr
 		CTTextCharacterProperties textcharacterproperties = dmlObjectFactory.createCTTextCharacterProperties();
 		textparagraphproperties.setDefRPr(textcharacterproperties);
 		textcharacterproperties.setSz(new Integer(1200));
-		textcharacterproperties.setSmtId(new Long(0));
+		
 		// Create object for r
 		CTRegularTextRun regulartextrun = dmlObjectFactory.createCTRegularTextRun();
 		textparagraph.getEGTextRun().add(regulartextrun);
+
 		// Create object for rPr
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("en-US");
-		textcharacterproperties2.setSmtId(new Long(0));
 		regulartextrun.setT(chartTitle);
+		
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
 		title.setOverlay(overlay);
