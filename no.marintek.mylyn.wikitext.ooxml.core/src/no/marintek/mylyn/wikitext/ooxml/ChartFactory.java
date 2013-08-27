@@ -327,6 +327,28 @@ public class ChartFactory {
 		legend.setLegendPos(legendpos);
 		legendpos.setVal(org.docx4j.dml.chart.STLegendPos.R);
 
+		// Add formatting to legend.
+		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
+		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
+
+		// Create object for solidFill
+		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
+		shapeproperties.setSolidFill(solidcolorfillproperties);
+		// Create object for schemeClr
+		CTSchemeColor schemecolor = dmlObjectFactory.createCTSchemeColor();
+		solidcolorfillproperties.setSchemeClr(schemecolor);
+		schemecolor.setVal(org.docx4j.dml.STSchemeColorVal.BG_1);
+		// Create object for ln
+		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
+		shapeproperties.setLn(lineproperties);
+		// Create object for solidFill
+		CTSolidColorFillProperties solidcolorfillproperties2 = dmlObjectFactory.createCTSolidColorFillProperties();
+		lineproperties.setSolidFill(solidcolorfillproperties2);
+		// Create object for schemeClr
+		CTSchemeColor schemecolor2 = dmlObjectFactory.createCTSchemeColor();
+		solidcolorfillproperties2.setSchemeClr(schemecolor2);
+		schemecolor2.setVal(org.docx4j.dml.STSchemeColorVal.TX_1);
+		legend.setSpPr(shapeproperties);
 		return legend;
 	}
 
