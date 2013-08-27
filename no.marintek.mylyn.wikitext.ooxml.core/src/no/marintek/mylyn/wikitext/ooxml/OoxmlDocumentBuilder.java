@@ -35,6 +35,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
+
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
@@ -688,11 +690,12 @@ org.docx4j.vml.officedrawing.ObjectFactory vmlofficedrawingObjectFactory = new o
 	 * @param xSeries
 	 *            the data set
 	 */
-	public void chart(String caption, String title, String[] legends, String ylabel, String xlabel, double[][] ySeries, double[][] xSeries) {
+	public void chart(ChartType chartType, String caption, String title, String ylabel, String xlabel, PlotSet plotset) {
 		try {
 			String prId = Integer.toString(++chartCounter);
 			Chart c = new Chart(new PartName("/word/charts/chart" + prId + ".xml"));
-			CTChartSpace chart = ChartFactory.createChartSpace(title, legends, ylabel, xlabel, ySeries, xSeries);
+			
+			CTChartSpace chart = ChartFactory.createChartSpace(chartType, title, ylabel, xlabel, plotset);
 			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			c.setJaxbElement(chart);
 			Relationship part = mainDocumentPart.addTargetPart(c);
