@@ -355,22 +355,28 @@ public class ChartFactory {
 	private static void addSeries(String[] title, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
 			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTLineChart linechart, int order, int index) {
+
 		// Create object for dispUnits
 		CTLineSer lineser = dmlchartObjectFactory.createCTLineSer();
 		linechart.getSer().add(lineser);
+		
 		// Create object for order
 		CTUnsignedInt unsignedint3 = dmlchartObjectFactory.createCTUnsignedInt();
 		lineser.setOrder(unsignedint3);
 		unsignedint3.setVal(order);
+		
 		// Create object for val
 		// lineser.setVal(createCTNumDataSource());
 		lineser.setVal(createValues(dmlchartObjectFactory, ySeries));
+		
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 		lineser.setSpPr(shapeproperties);
+		
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
 		shapeproperties.setLn(lineproperties);
+		
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
@@ -378,6 +384,7 @@ public class ChartFactory {
 		CTSRgbColor srgbcolor = dmlObjectFactory.createCTSRgbColor();
 		solidcolorfillproperties.setSrgbClr(srgbcolor);
 		srgbcolor.setVal(COLOUR_SCHEME[index]);
+
 		// Create object for idx
 		CTUnsignedInt unsignedint5 = dmlchartObjectFactory.createCTUnsignedInt();
 		lineser.setIdx(unsignedint5);
@@ -387,23 +394,8 @@ public class ChartFactory {
 		CTSerTx sertx = dmlchartObjectFactory.createCTSerTx();
 		lineser.setTx(sertx);
 		
-		// Create object for strRef
-		CTStrRef strref = dmlchartObjectFactory.createCTStrRef();
-		sertx.setStrRef(strref);
+		sertx.setV(title[index]);
 		
-		// strref.setF("'Ark1'!$B$1");
-		// Create object for strCache
-		CTStrData strdata = dmlchartObjectFactory.createCTStrData();
-		// Create object for pt
-		CTStrVal strval = dmlchartObjectFactory.createCTStrVal();
-		strdata.getPt().add(strval);
-		strval.setIdx(0);
-		strval.setV(title[index]);
-		// Create object for ptCount
-		CTUnsignedInt count = dmlchartObjectFactory.createCTUnsignedInt();
-		count.setVal(1);
-		strdata.setPtCount(count);
-		strref.setStrCache(strdata);
 		// Create object for marker
 		CTMarker marker = dmlchartObjectFactory.createCTMarker();
 		lineser.setMarker(marker);
