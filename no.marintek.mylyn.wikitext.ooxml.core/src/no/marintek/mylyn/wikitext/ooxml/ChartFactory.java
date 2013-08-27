@@ -123,14 +123,14 @@ public class ChartFactory {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
-		int valueAxisId = (int) (Math.random() * Integer.MAX_VALUE); // 2137197080;
-		int categoryAxisId = (int) (Math.random() * Integer.MAX_VALUE); // 2137440440;
+		int valueAxisId = (int) (Math.random() * Integer.MAX_VALUE);
+		int categoryAxisId = (int) (Math.random() * Integer.MAX_VALUE);
 
 		CTChartSpace chartspace = dmlchartObjectFactory.createCTChartSpace();
 
 		// Create object for style
 		CTStyle style = dmlchartObjectFactory.createCTStyle();
-		style.setVal((short) 102);
+		style.setVal((short) 2);
 		chartspace.setStyle(style);
 
 		// Create object for lang
@@ -320,6 +320,7 @@ public class ChartFactory {
 		legend.setLayout(layout);
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
+		overlay.setVal(Boolean.TRUE);
 		legend.setOverlay(overlay);
 		// Create object for legendPos
 		CTLegendPos legendpos = dmlchartObjectFactory.createCTLegendPos();
@@ -359,12 +360,15 @@ public class ChartFactory {
 		CTUnsignedInt unsignedint5 = dmlchartObjectFactory.createCTUnsignedInt();
 		lineser.setIdx(unsignedint5);
 		unsignedint5.setVal(index);
+
 		// Create object for tx
 		CTSerTx sertx = dmlchartObjectFactory.createCTSerTx();
 		lineser.setTx(sertx);
+		
 		// Create object for strRef
 		CTStrRef strref = dmlchartObjectFactory.createCTStrRef();
 		sertx.setStrRef(strref);
+		
 		// strref.setF("'Ark1'!$B$1");
 		// Create object for strCache
 		CTStrData strdata = dmlchartObjectFactory.createCTStrData();

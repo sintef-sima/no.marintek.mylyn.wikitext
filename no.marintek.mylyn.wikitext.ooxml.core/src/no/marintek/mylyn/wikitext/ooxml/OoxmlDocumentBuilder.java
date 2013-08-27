@@ -38,27 +38,44 @@ import javax.xml.transform.stream.StreamSource;
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.math.CTBreakBin;
+import org.docx4j.math.CTBreakBinSub;
+import org.docx4j.math.CTLimLoc;
+import org.docx4j.math.CTMathPr;
 import org.docx4j.math.CTOMath;
+import org.docx4j.math.CTOMathJc;
 import org.docx4j.math.CTOMathPara;
-import org.docx4j.model.styles.StyleUtil;
+import org.docx4j.math.CTOnOff;
+import org.docx4j.math.CTString;
 import org.docx4j.openpackaging.contenttype.ContentType;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.relationships.Relationship;
+import org.docx4j.vml.officedrawing.CTIdMap;
+import org.docx4j.vml.officedrawing.CTShapeLayout;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTBorder;
+import org.docx4j.wml.CTCharacterSpacing;
+import org.docx4j.wml.CTColorSchemeMapping;
+import org.docx4j.wml.CTCompat;
+import org.docx4j.wml.CTCompatSetting;
 import org.docx4j.wml.CTLanguage;
 import org.docx4j.wml.CTMarkupRange;
+import org.docx4j.wml.CTProof;
+import org.docx4j.wml.CTSettings;
+import org.docx4j.wml.CTShapeDefaults;
 import org.docx4j.wml.CTShd;
+import org.docx4j.wml.CTTwipsMeasure;
+import org.docx4j.wml.CTZoom;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.FldChar;
 import org.docx4j.wml.P;
@@ -400,6 +417,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// wordMLPackage = WordprocessingMLPackage.load(resourceAsStream);
 			wordMLPackage = WordprocessingMLPackage.createPackage();
 			mainDocumentPart = wordMLPackage.getMainDocumentPart();
+			mainDocumentPart.addTargetPart(addSettingsPart());
 			if (title != null) {
 				mainDocumentPart.addStyledParagraphOfText("Title", title);
 			}
@@ -410,6 +428,158 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private DocumentSettingsPart addSettingsPart() throws InvalidFormatException {
+		DocumentSettingsPart dsp = new DocumentSettingsPart();
+		CTSettings settings = wmlObjectFactory.createCTSettings();
+		dsp.setJaxbElement(settings);
+		// Create object for defaultTabStop
+		CTTwipsMeasure twipsmeasure = wmlObjectFactory.createCTTwipsMeasure(); 
+		settings.setDefaultTabStop(twipsmeasure); 
+		    twipsmeasure.setVal( BigInteger.valueOf( 708) ); 
+		// Create object for zoom
+		CTZoom zoom = wmlObjectFactory.createCTZoom(); 
+		settings.setZoom(zoom); 
+		    zoom.setPercent( BigInteger.valueOf( 120) ); 
+		// Create object for proofState
+		CTProof proof = wmlObjectFactory.createCTProof(); 
+		settings.setProofState(proof); 
+		    proof.setGrammar(org.docx4j.wml.STProof.CLEAN);
+		// Create object for hyphenationZone
+		CTTwipsMeasure twipsmeasure2 = wmlObjectFactory.createCTTwipsMeasure(); 
+		settings.setHyphenationZone(twipsmeasure2); 
+		    twipsmeasure2.setVal( BigInteger.valueOf( 425) ); 
+		// Create object for characterSpacingControl
+		CTCharacterSpacing characterspacing = wmlObjectFactory.createCTCharacterSpacing(); 
+		settings.setCharacterSpacingControl(characterspacing); 
+		    characterspacing.setVal(org.docx4j.wml.STCharacterSpacing.DO_NOT_COMPRESS);
+		// Create object for compat
+		CTCompat compat = wmlObjectFactory.createCTCompat(); 
+		settings.setCompat(compat); 
+		    // Create object for compatSetting
+		    CTCompatSetting compatsetting = wmlObjectFactory.createCTCompatSetting(); 
+		    compat.getCompatSetting().add( compatsetting); 
+		        compatsetting.setUri( "http://schemas.microsoft.com/office/word"); 
+		        compatsetting.setVal( "14"); 
+		        compatsetting.setName( "compatibilityMode"); 
+		    // Create object for compatSetting
+		    CTCompatSetting compatsetting2 = wmlObjectFactory.createCTCompatSetting(); 
+		    compat.getCompatSetting().add( compatsetting2); 
+		        compatsetting2.setUri( "http://schemas.microsoft.com/office/word"); 
+		        compatsetting2.setVal( "1"); 
+		        compatsetting2.setName( "overrideTableStyleFontSizeAndJustification"); 
+		    // Create object for compatSetting
+		    CTCompatSetting compatsetting3 = wmlObjectFactory.createCTCompatSetting(); 
+		    compat.getCompatSetting().add( compatsetting3); 
+		        compatsetting3.setUri( "http://schemas.microsoft.com/office/word"); 
+		        compatsetting3.setVal( "1"); 
+		        compatsetting3.setName( "enableOpenTypeFeatures"); 
+		    // Create object for compatSetting
+		    CTCompatSetting compatsetting4 = wmlObjectFactory.createCTCompatSetting(); 
+		    compat.getCompatSetting().add( compatsetting4); 
+		        compatsetting4.setUri( "http://schemas.microsoft.com/office/word"); 
+		        compatsetting4.setVal( "1"); 
+		        compatsetting4.setName( "doNotFlipMirrorIndents"); 
+		 org.docx4j.math.ObjectFactory mathObjectFactory = new org.docx4j.math.ObjectFactory();
+		// Create object for mathPr
+		CTMathPr mathpr = mathObjectFactory.createCTMathPr(); 
+		settings.setMathPr(mathpr); 
+		    // Create object for dispDef
+		    CTOnOff onoff = mathObjectFactory.createCTOnOff(); 
+		    mathpr.setDispDef(onoff); 
+		    // Create object for lMargin
+		    org.docx4j.math.CTTwipsMeasure twipsmeasure3 = mathObjectFactory.createCTTwipsMeasure(); 
+		    mathpr.setLMargin(twipsmeasure3); 
+		        twipsmeasure3.setVal( "0"); 
+		    // Create object for rMargin
+		    org.docx4j.math.CTTwipsMeasure twipsmeasure4 = mathObjectFactory.createCTTwipsMeasure(); 
+		    mathpr.setRMargin(twipsmeasure4); 
+		        twipsmeasure4.setVal( "0"); 
+		    // Create object for defJc
+		    CTOMathJc omathjc = mathObjectFactory.createCTOMathJc(); 
+		    mathpr.setDefJc(omathjc); 
+		        omathjc.setVal(org.docx4j.math.STJc.CENTER_GROUP);
+		    // Create object for wrapIndent
+		    org.docx4j.math.CTTwipsMeasure twipsmeasure5 = mathObjectFactory.createCTTwipsMeasure(); 
+		    mathpr.setWrapIndent(twipsmeasure5); 
+		        twipsmeasure5.setVal( "1440"); 
+		    // Create object for intLim
+		    CTLimLoc limloc = mathObjectFactory.createCTLimLoc(); 
+		    mathpr.setIntLim(limloc); 
+		        limloc.setVal(org.docx4j.math.STLimLoc.SUB_SUP);
+		    // Create object for naryLim
+		    CTLimLoc limloc2 = mathObjectFactory.createCTLimLoc(); 
+		    mathpr.setNaryLim(limloc2); 
+		        limloc2.setVal(org.docx4j.math.STLimLoc.UND_OVR);
+		    // Create object for mathFont
+		    CTString string = mathObjectFactory.createCTString(); 
+		    mathpr.setMathFont(string); 
+		        string.setVal( "Cambria Math"); 
+		    // Create object for brkBin
+		    CTBreakBin breakbin = mathObjectFactory.createCTBreakBin(); 
+		    mathpr.setBrkBin(breakbin); 
+		        breakbin.setVal(org.docx4j.math.STBreakBin.BEFORE);
+		    // Create object for brkBinSub
+		    CTBreakBinSub breakbinsub = mathObjectFactory.createCTBreakBinSub(); 
+		    mathpr.setBrkBinSub(breakbinsub); 
+		        breakbinsub.setVal( "--"); 
+		    // Create object for smallFrac
+		    CTOnOff onoff2 = mathObjectFactory.createCTOnOff(); 
+		    mathpr.setSmallFrac(onoff2); 
+		        onoff2.setVal(org.docx4j.sharedtypes.STOnOff.ZERO);
+		// Create object for themeFontLang
+		CTLanguage language = wmlObjectFactory.createCTLanguage(); 
+		settings.setThemeFontLang(language); 
+		    language.setVal( "en-US"); 
+		    language.setEastAsia( "ja-JP"); 
+		// Create object for clrSchemeMapping
+		CTColorSchemeMapping colorschememapping = wmlObjectFactory.createCTColorSchemeMapping(); 
+		settings.setClrSchemeMapping(colorschememapping); 
+		    colorschememapping.setBg1(org.docx4j.wml.STColorSchemeIndex.LIGHT_1);
+		    colorschememapping.setT1(org.docx4j.wml.STColorSchemeIndex.DARK_1);
+		    colorschememapping.setBg2(org.docx4j.wml.STColorSchemeIndex.LIGHT_2);
+		    colorschememapping.setT2(org.docx4j.wml.STColorSchemeIndex.DARK_2);
+		    colorschememapping.setAccent1(org.docx4j.wml.STColorSchemeIndex.ACCENT_1);
+		    colorschememapping.setAccent2(org.docx4j.wml.STColorSchemeIndex.ACCENT_2);
+		    colorschememapping.setAccent3(org.docx4j.wml.STColorSchemeIndex.ACCENT_3);
+		    colorschememapping.setAccent4(org.docx4j.wml.STColorSchemeIndex.ACCENT_4);
+		    colorschememapping.setAccent5(org.docx4j.wml.STColorSchemeIndex.ACCENT_5);
+		    colorschememapping.setAccent6(org.docx4j.wml.STColorSchemeIndex.ACCENT_6);
+		    colorschememapping.setHyperlink(org.docx4j.wml.STColorSchemeIndex.HYPERLINK);
+		    colorschememapping.setFollowedHyperlink(org.docx4j.wml.STColorSchemeIndex.FOLLOWED_HYPERLINK);
+		// Create object for doNotAutoCompressPictures
+		BooleanDefaultTrue booleandefaulttrue = wmlObjectFactory.createBooleanDefaultTrue(); 
+		settings.setDoNotAutoCompressPictures(booleandefaulttrue); 
+		// Create object for shapeDefaults
+		CTShapeDefaults shapedefaults = wmlObjectFactory.createCTShapeDefaults(); 
+		settings.setShapeDefaults(shapedefaults); 
+org.docx4j.vml.officedrawing.ObjectFactory vmlofficedrawingObjectFactory = new org.docx4j.vml.officedrawing.ObjectFactory();
+		    // Create object for shapedefaults (wrapped in JAXBElement) 
+		    org.docx4j.vml.officedrawing.CTShapeDefaults shapedefaults2 = vmlofficedrawingObjectFactory.createCTShapeDefaults(); 
+		    JAXBElement<org.docx4j.vml.officedrawing.CTShapeDefaults> shapedefaultsWrapped = vmlofficedrawingObjectFactory.createShapedefaults(shapedefaults2); 
+		    shapedefaults.getAny().add( shapedefaultsWrapped); 
+		        shapedefaults2.setSpidmax( BigInteger.valueOf( 1026) ); 
+		        shapedefaults2.setExt(org.docx4j.vml.STExt.EDIT);
+		    // Create object for shapelayout (wrapped in JAXBElement) 
+		    CTShapeLayout shapelayout = vmlofficedrawingObjectFactory.createCTShapeLayout(); 
+		    JAXBElement<org.docx4j.vml.officedrawing.CTShapeLayout> shapelayoutWrapped = vmlofficedrawingObjectFactory.createShapelayout(shapelayout); 
+		    shapedefaults.getAny().add( shapelayoutWrapped); 
+		        // Create object for idmap
+		        CTIdMap idmap = vmlofficedrawingObjectFactory.createCTIdMap(); 
+		        shapelayout.setIdmap(idmap); 
+		            idmap.setExt(org.docx4j.vml.STExt.EDIT);
+		            idmap.setData( "1"); 
+		        shapelayout.setExt(org.docx4j.vml.STExt.EDIT);
+		// Create object for decimalSymbol
+		CTSettings.DecimalSymbol settingsdecimalsymbol = wmlObjectFactory.createCTSettingsDecimalSymbol(); 
+		settings.setDecimalSymbol(settingsdecimalsymbol); 
+		    settingsdecimalsymbol.setVal( "."); 
+		// Create object for listSeparator
+		CTSettings.ListSeparator settingslistseparator = wmlObjectFactory.createCTSettingsListSeparator(); 
+		settings.setListSeparator(settingslistseparator); 
+		    settingslistseparator.setVal( ";");
+		return dsp;
 	};
 
 	/*
@@ -470,30 +640,41 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void charactersUnescaped(String literal) {
 		characters = literal;
 	}
-
+	
 	/**
 	 * 
 	 * @param chartRelId
 	 * @return the chart paragraph
 	 * @throws JAXBException
 	 */
-	private P chart(String chartRelId, String docPr) throws JAXBException {
-
+	private P chart(String chartRelId, String chartId) throws JAXBException {
 		String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" "
 				+ "xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" w:rsidR=\"0084689C\" w:rsidRDefault=\"00D47CF0\">"
-				+ "			<w:r>\n" + "				<w:rPr>\n" + "					<w:noProof />\n" + "				</w:rPr>\n" + "				<w:drawing>\n"
-				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">\n" + "						<wp:extent cx=\"5486400\" cy=\"3200400\" />\n"
-				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"0\" b=\"0\" />\n" + "						<wp:docPr id=\"${docPr}\" name=\"Diagram 1\" />\n"
-				+ "						<wp:cNvGraphicFramePr />\n" + "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">\n"
-				+ "							<a:graphicData\n" + "								uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">\n" + "								<c:chart\n"
-				+ "									xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\"\n"
-				+ "									xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"\n"
-				+ "									r:id=\"${chartRelId}\" />\n" + "							</a:graphicData>\n" + "						</a:graphic>\n" + "					</wp:inline>\n"
-				+ "				</w:drawing>\n" + "			</w:r>\n" + "       </w:p>";
-
+				+ "			<w:r>" 
+				+ "				<w:rPr>" 
+				+ "					<w:noProof />" 
+				+ "				</w:rPr>" 
+				+ "				<w:drawing>"
+				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">" 
+				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />"
+				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />" 
+				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram "+chartId+"\" />"
+				+ "						<wp:cNvGraphicFramePr />" 
+				+ "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">"
+				+ "							<a:graphicData" 
+				+ "								uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">" 
+				+ "								<c:chart"
+				+ "									xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\""
+				+ "									xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\""
+				+ "									r:id=\"${chartRelId}\" />" 
+				+ "							</a:graphicData>" 
+				+ "						</a:graphic>" 
+				+ "					</wp:inline>"
+				+ "				</w:drawing>" 
+				+ "			</w:r>"
+				+ "       </w:p>";
 		java.util.HashMap<String, String> mappings = new java.util.HashMap<String, String>();
-
-		mappings.put("docPr", docPr);
+		mappings.put("docPr", chartId);
 		mappings.put("chartRelId", chartRelId);
 		return (P) org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings);
 	}
@@ -665,10 +846,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void endDocument() {
 		try {
 			wordMLPackage.save(outputFile);
-			// File tmp = new File(System.getProperty("user.home")
-			// +
-			// "/git/no.marintek.mylyn.wikitext/no.marintek.mylyn.wikitext.ooxml.core/test/chart/");
-			// unZipIt(outputFile.getAbsolutePath(), tmp.getAbsolutePath());
 		} catch (Docx4JException e) {
 			e.printStackTrace();
 		}
