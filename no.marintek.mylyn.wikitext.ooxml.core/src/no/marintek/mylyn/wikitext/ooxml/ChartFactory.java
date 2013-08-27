@@ -56,16 +56,12 @@ import org.docx4j.dml.chart.CTMarkerStyle;
 import org.docx4j.dml.chart.CTNumData;
 import org.docx4j.dml.chart.CTNumDataSource;
 import org.docx4j.dml.chart.CTNumFmt;
-import org.docx4j.dml.chart.CTNumRef;
 import org.docx4j.dml.chart.CTNumVal;
 import org.docx4j.dml.chart.CTOrientation;
 import org.docx4j.dml.chart.CTPlotArea;
 import org.docx4j.dml.chart.CTScaling;
 import org.docx4j.dml.chart.CTSerTx;
 import org.docx4j.dml.chart.CTSkip;
-import org.docx4j.dml.chart.CTStrData;
-import org.docx4j.dml.chart.CTStrRef;
-import org.docx4j.dml.chart.CTStrVal;
 import org.docx4j.dml.chart.CTStyle;
 import org.docx4j.dml.chart.CTTextLanguageID;
 import org.docx4j.dml.chart.CTTickLblPos;
@@ -229,12 +225,16 @@ public class ChartFactory {
 
 		// Create object for catAx
 		CTCatAx createCTCatAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
+
 		// A maximum of 10 major tick marks for the horizontal axis
 		int skip = xSeries[0].length / 10;
-		CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
-		createCTSkip.setVal(skip);
-		createCTCatAx.setTickMarkSkip(createCTSkip);
-		createCTCatAx.setTickLblSkip(createCTSkip);
+		if (skip>0) {
+			CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
+			createCTSkip.setVal(skip);
+			createCTCatAx.setTickMarkSkip(createCTSkip);
+			createCTCatAx.setTickLblSkip(createCTSkip);
+		}
+		
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTCatAx);
 
 		// Create object for valAx
@@ -802,13 +802,10 @@ public class ChartFactory {
 	 */
 	private static CTNumDataSource createValues(ObjectFactory dmlchartObjectFactory, double[] data) {
 		CTNumDataSource datasource = dmlchartObjectFactory.createCTNumDataSource();
-		// Create object for numRef
-		CTNumRef numref = dmlchartObjectFactory.createCTNumRef();
-		datasource.setNumRef(numref);
-
+		
 		// Create object for numCache
-		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
-		numref.setNumCache(numdata);
+		CTNumData numdata = dmlchartObjectFactory.createCTNumData();	
+		datasource.setNumLit(numdata);
 
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
@@ -835,13 +832,9 @@ public class ChartFactory {
 	private static CTAxDataSource createCategories(ObjectFactory dmlchartObjectFactory, double[] data) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
-		// Create object for numRef
-		CTNumRef numref = dmlchartObjectFactory.createCTNumRef();
-		datasource.setNumRef(numref);
-
 		// Create object for numCache
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
-		numref.setNumCache(numdata);
+		datasource.setNumLit(numdata);
 
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
