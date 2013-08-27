@@ -30,6 +30,7 @@ import org.docx4j.dml.TextFont;
 import org.docx4j.dml.chart.CTAxDataSource;
 import org.docx4j.dml.chart.CTAxPos;
 import org.docx4j.dml.chart.CTBoolean;
+import org.docx4j.dml.chart.CTBuiltInUnit;
 import org.docx4j.dml.chart.CTCatAx;
 import org.docx4j.dml.chart.CTChart;
 import org.docx4j.dml.chart.CTChartLines;
@@ -146,14 +147,18 @@ public class ChartFactory {
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
 		boolean2.setVal(Boolean.FALSE);
 		chart.setAutoTitleDeleted(boolean2);
+		
 		// Create object for plotArea
 		CTPlotArea plotarea = dmlchartObjectFactory.createCTPlotArea();
 		chart.setPlotArea(plotarea);
+
 		// Create object for layout
 		plotarea.setLayout(createLayout());
+		
 		// Create object for valAx
 		CTLineChart linechart = dmlchartObjectFactory.createCTLineChart();
 		plotarea.getAreaChartOrArea3DChartOrLineChart().add(linechart);
+
 		// Create object for marker
 		CTBoolean boolean3 = dmlchartObjectFactory.createCTBoolean();
 		boolean3.setVal(Boolean.TRUE);
@@ -549,6 +554,7 @@ public class ChartFactory {
 
 		// Create object for dispUnits
 		CTDispUnits dispunits = dmlchartObjectFactory.createCTDispUnits();
+		dispunits.setBuiltInUnit(new CTBuiltInUnit());
 		valax.setDispUnits(dispunits);
 
 		// Create object for crossBetween
