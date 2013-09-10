@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.print.attribute.standard.DocumentName;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -119,11 +118,12 @@ import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
 /**
  * 
  * @author Torkild U. Resheim
+ * 
  * @since 1.9
  */
 public class OoxmlDocumentBuilder extends DocumentBuilder {
 
-	private String characters;
+	private StringBuilder characters;
 
 	private BlockType currentBlockType;
 
@@ -172,6 +172,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private Attributes currentAttributes;
 
 	private int currentListType;
+	
+	public OoxmlDocumentBuilder() {
+		characters = new StringBuilder();
+	}
 
 	@Override
 	public void acronym(String text, String definition) {
@@ -446,6 +450,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			}
 			break;
 		default:
+			beginSpan(SpanType.SPAN, currentAttributes);
 			break;
 		}		
 	}
@@ -1261,12 +1266,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void beginSpan(SpanType type, Attributes attributes) {
+		if (characters!=null && characters.length()>0) {
+			endSpan();
+		}
 		currentSpanType = type;
 	}
 
 	@Override
 	public void characters(String text) {
-		characters = text;
+		characters.append(text);
 	}
 
 	@Override
@@ -1378,6 +1386,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.RPr createSpan(String text) {
 		org.docx4j.wml.Text t = factory.createText();
+		t.setSpace( "preserve"); 
 		t.setValue(text);
 		org.docx4j.wml.R run = factory.createR();
 		run.getContent().add(t);
@@ -1439,22 +1448,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void endBlock() {
-		System.out.println(currentBlockType);
 		switch (currentBlockType) {
 		case TABLE_CELL_HEADER:
 		case TABLE_CELL_NORMAL:
 			tableColumnCount++;
-			endSpan();			
-			break;
-		case PARAGRAPH:
-			endSpan();
-			break;
-		case LIST_ITEM:
-			endSpan();
 			break;
 		default:
 			break;
 		}		
+		endSpan();			
 	}
 
 	@Override
@@ -1468,13 +1470,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void endHeading() {
-		mainDocumentPart.addStyledParagraphOfText(currentStyle, characters);
+		mainDocumentPart.addStyledParagraphOfText(currentStyle, characters.toString());
+		characters.setLength(0);
 	}
 
 	@Override
 	public void endSpan() {
-		RPr block = createSpan(characters);
-		if (currentSpanType == null) {
+		RPr block = createSpan(characters.toString());
+		characters.setLength(0);
+		if (currentSpanType==null) {
 			return;
 		}
 		switch (currentSpanType) {
@@ -1509,6 +1513,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// TODO Auto-generated method stub
 			break;
 		case SPAN:
+			
 			// TODO Auto-generated method stub
 			break;
 		case STRONG:
@@ -1527,7 +1532,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		default:
 			break;
 		}
-		characters = "";
 		currentSpanType = SpanType.SPAN;
 	}
 
