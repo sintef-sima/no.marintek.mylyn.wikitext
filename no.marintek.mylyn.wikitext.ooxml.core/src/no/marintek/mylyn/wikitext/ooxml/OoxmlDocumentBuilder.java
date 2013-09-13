@@ -326,7 +326,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * 
 	 * @param bytes
 	 * @param file
-	 * @param text
+	 * @param text alternative text
 	 * @throws Exception
 	 */
 	private void addImageToPackage(byte[] bytes, File file, String text) throws Exception {
@@ -1486,7 +1486,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			block.setB(TRUE);
 			break;
 		case CITATION:
-			// TODO Auto-generated method stub
+			block.setI(TRUE);
 			break;
 		case CODE:
 			// TODO Auto-generated method stub
@@ -1510,7 +1510,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			// TODO Auto-generated method stub
 			break;
 		case QUOTE:
-			// TODO Auto-generated method stub
+			block.setI(TRUE);
 			break;
 		case SPAN:
 			
@@ -1537,7 +1537,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void entityReference(String entity) {
-		// TODO Auto-generated method stub
+		// Convert the XML entity to Unicode.
+		if (entity.startsWith("#")) {
+			char c = (char)Integer.parseInt(entity.substring(1));
+			characters.append(c);
+		} else {
+			characters.append("<unknown entity reference>");
+		}
 	}
 
 	public File getOutputFile() {
