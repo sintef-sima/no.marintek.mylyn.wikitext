@@ -148,6 +148,12 @@ public class ChartFactory {
 		
 		// Create object for yVal
 		scatterser.setYVal(createValues(dmlchartObjectFactory, ySeries));
+	
+		// Create object for smooth
+		CTBoolean boolean12 = dmlchartObjectFactory.createCTBoolean();
+		boolean12.setVal(Boolean.FALSE);
+		scatterser.setSmooth(boolean12);
+		
 	}
 
 	/**
@@ -216,12 +222,12 @@ public class ChartFactory {
 		CTMarkerStyle markerstyle = dmlchartObjectFactory.createCTMarkerStyle();
 		marker.setSymbol(markerstyle);
 		markerstyle.setVal(org.docx4j.dml.chart.STMarkerStyle.NONE);
-		
+				
 		// Create object for smooth
 		CTBoolean boolean12 = dmlchartObjectFactory.createCTBoolean();
 		boolean12.setVal(Boolean.FALSE);
 		lineser.setSmooth(boolean12);
-		
+
 		lineser.setCat(createCategories(dmlchartObjectFactory, xSeries));
 
 	}
