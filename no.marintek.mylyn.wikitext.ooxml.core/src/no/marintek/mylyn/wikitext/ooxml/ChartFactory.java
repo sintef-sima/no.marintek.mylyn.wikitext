@@ -1044,7 +1044,11 @@ public class ChartFactory {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
 			numval.setIdx(i);
-			numval.setV(Double.toString(data[i]));
+			if (Double.isNaN(data[i])) {
+				numval.setV(""); // NaN must be represented as empty string (tested in MS Word 2010 on Windows 7)
+			} else {
+				numval.setV(Double.toString(data[i]));
+			}
 		}
 		numdata.setFormatCode("General");
 
