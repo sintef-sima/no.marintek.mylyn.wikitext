@@ -1,5 +1,7 @@
 package no.marintek.mylyn.wikitext.ooxml;
 
+import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
+
 /**
  * A representation of a data set for plotting
  * 
@@ -10,14 +12,16 @@ public class PlotSet {
 	String[] labels;
 	double[][] xSeries;
 	double[][] ySeries;
+	private ChartType chartType;
 
-	public PlotSet(String[] labels, double[][] xSeries, double[][] ySeries) {
+	public PlotSet(String[] labels, double[][] xSeries, double[][] ySeries, ChartType chartType) {
 		super();
 		this.labels = labels;
 		this.xSeries = xSeries;
 		this.ySeries = ySeries;
+		this.chartType = chartType;
 	}
-
+	
 	public String[] getLabels() {
 		return labels;
 	}
@@ -41,4 +45,14 @@ public class PlotSet {
 	public void setySeries(double[][] ySeries) {
 		this.ySeries = ySeries;
 	}
+
+	public ChartType getChartType() {
+		return chartType;
+	}
+
+	public void setChartType(ChartType chartType) {
+		this.chartType = chartType;
+	}
+
+	
 }

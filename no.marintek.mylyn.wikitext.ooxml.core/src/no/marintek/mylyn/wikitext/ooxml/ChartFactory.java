@@ -10,6 +10,8 @@
  *******************************************************************************/
 package no.marintek.mylyn.wikitext.ooxml;
 
+import java.text.DecimalFormat;
+
 import javax.xml.bind.JAXBException;
 
 import org.docx4j.dml.CTLineProperties;
@@ -53,6 +55,7 @@ import org.docx4j.dml.chart.CTLineChart;
 import org.docx4j.dml.chart.CTLineSer;
 import org.docx4j.dml.chart.CTManualLayout;
 import org.docx4j.dml.chart.CTMarker;
+import org.docx4j.dml.chart.CTMarkerSize;
 import org.docx4j.dml.chart.CTMarkerStyle;
 import org.docx4j.dml.chart.CTNumData;
 import org.docx4j.dml.chart.CTNumDataSource;
@@ -75,7 +78,9 @@ import org.docx4j.dml.chart.CTTx;
 import org.docx4j.dml.chart.CTUnsignedInt;
 import org.docx4j.dml.chart.CTValAx;
 import org.docx4j.dml.chart.ObjectFactory;
+import org.docx4j.dml.chart.STAxPos;
 import org.docx4j.dml.chart.STScatterStyle;
+import org.docx4j.dml.chart.STTickLblPos;
 
 /**
  * A factory for creating charts for OOXML documents. It will take a maximum of
@@ -131,6 +136,25 @@ public class ChartFactory {
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 		scatterser.setSpPr(shapeproperties);
 		
+		// Create object for marker 
+		CTMarker marker = dmlchartObjectFactory.createCTMarker();
+		CTMarkerSize size = dmlchartObjectFactory.createCTMarkerSize();
+		size.setVal((short) 3);
+		marker.setSize(size);
+		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
+		symbol.setVal(org.docx4j.dml.chart.STMarkerStyle.CIRCLE);
+		marker.setSymbol(symbol);
+		scatterser.setMarker(marker);
+		
+		// Create object for scatterStyle
+		CTScatterStyle scatterStyle = dmlchartObjectFactory.createCTScatterStyle();
+		scatterStyle.setVal(STScatterStyle.LINE);
+		
+		// Create object for smooth line style
+		CTBoolean smooth = dmlchartObjectFactory.createCTBoolean();
+		smooth.setVal(false);
+		scatterser.setSmooth(smooth);
+		 
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
 		shapeproperties.setLn(lineproperties);
@@ -250,7 +274,7 @@ public class ChartFactory {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
 			numval.setIdx(i);
-			numval.setV(Double.toString(data[i]));
+			numval.setV(new DecimalFormat("#.##").format(data[i]));
 		}
 
 		numdata.setFormatCode("General");
@@ -281,7 +305,7 @@ public class ChartFactory {
 	 * @return the chart space instance
 	 * @throws JAXBException
 	 */
-	public static CTChartSpace createChartSpace(ChartType type, String title, String ylabel, String xlabel,PlotSet plotSet)
+	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel,PlotSet plotSet)
 			throws JAXBException {
 
 		if ((plotSet.getxSeries().length > COLOUR_SCHEME.length) || (plotSet.getySeries().length > COLOUR_SCHEME.length)) {
@@ -324,13 +348,13 @@ public class ChartFactory {
 
 		// Create object for layout
 		plotarea.setLayout(createLayout());
-		if (type.equals(ChartType.SCATTER)) {
+		if (ChartType.SCATTER.equals(plotSet.getChartType())) {
 			CTScatterChart scatterchart = dmlchartObjectFactory.createCTScatterChart();
 			plotarea.getAreaChartOrArea3DChartOrLineChart().add(scatterchart);
 			
 			// Create object for scatter style
 			CTScatterStyle scatterStyle = dmlchartObjectFactory.createCTScatterStyle();
-			scatterStyle.setVal(STScatterStyle.SMOOTH_MARKER);			
+			scatterStyle.setVal(STScatterStyle.LINE_MARKER);			
 			scatterchart.setScatterStyle(scatterStyle);
 
 			// Specify X-axis relationships
@@ -353,9 +377,7 @@ public class ChartFactory {
 						plotarea, scatterchart, series);
 			}
 
-		}
-		
-		if (type.equals(ChartType.LINE)) {
+		} else if (ChartType.LINE.equals(plotSet.getChartType())) {
 			CTLineChart linechart = dmlchartObjectFactory.createCTLineChart();
 			plotarea.getAreaChartOrArea3DChartOrLineChart().add(linechart);
 	
@@ -397,20 +419,38 @@ public class ChartFactory {
 				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory, valueAxisId, categoryAxisId, dmlObjectFactory,
 						plotarea, linechart, series, series);
 			}
-
 		}
 
 		// Create object for catAx
 		CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
-
-		// A maximum of 10 major tick marks for the horizontal axis
+		
+		// Position
+		CTTickLblPos tickLblPos = dmlchartObjectFactory.createCTTickLblPos();
+		tickLblPos.setVal(STTickLblPos.LOW);
+		catAx.setTickLblPos(tickLblPos );
+		
+		CTAxPos pos = dmlchartObjectFactory.createCTAxPos();
+		pos.setVal(STAxPos.B); 
+		catAx.setAxPos(pos);
+		
+		// Minimum/maximum major tick marks for the horizontal axis
 		int skip = plotSet.getxSeries()[0].length / 10;
+
+		// Show X values
+		CTBoolean xValuesHidden = dmlchartObjectFactory.createCTBoolean();
+		xValuesHidden.setVal(false);
 		if (skip>0) {
+			// Hide X values if not sufficient space
+			if(skip<4){
+				skip = 4;
+				xValuesHidden.setVal(true);
+			}
 			CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
 			createCTSkip.setVal(skip);
 			catAx.setTickMarkSkip(createCTSkip);
 			catAx.setTickLblSkip(createCTSkip);
 		}
+		catAx.setDelete(xValuesHidden);
 				
 		plotarea.getValAxOrCatAxOrDateAx().add(catAx);
 

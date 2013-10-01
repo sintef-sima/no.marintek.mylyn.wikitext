@@ -38,7 +38,11 @@ import javax.xml.transform.stream.StreamSource;
 import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
 
 import org.docx4j.XmlUtils;
+import org.docx4j.dml.chart.CTBoolean;
 import org.docx4j.dml.chart.CTChartSpace;
+import org.docx4j.dml.chart.CTMarker;
+import org.docx4j.dml.chart.CTMarkerSize;
+import org.docx4j.dml.chart.CTStyle;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.math.CTBreakBin;
 import org.docx4j.math.CTBreakBinSub;
@@ -1329,15 +1333,16 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param xSeries
 	 *            the data set
 	 */
-	public void chart(ChartType chartType, String caption, String title, String ylabel, String xlabel, PlotSet plotset) {
+	public void chart(String caption, String title, String ylabel, String xlabel, PlotSet plotset) {
 		try {
 			String prId = Integer.toString(++chartCounter);
-			Chart c = new Chart(new PartName("/word/charts/chart" + prId + ".xml"));
+			Chart chart = new Chart(new PartName("/word/charts/chart" + prId + ".xml"));
 			
-			CTChartSpace chart = ChartFactory.createChartSpace(chartType, title, ylabel, xlabel, plotset);
-			c.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
-			c.setJaxbElement(chart);
-			Relationship part = mainDocumentPart.addTargetPart(c);
+			CTChartSpace chartSpace = ChartFactory.createChartSpace(title, ylabel, xlabel, plotset);
+			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
+			chart.setJaxbElement(chartSpace);
+
+			Relationship part = mainDocumentPart.addTargetPart(chart);
 			mainDocumentPart.addObject(chart(part.getId(), prId));
 			caption(caption, CaptionType.Figure);
 		} catch (InvalidFormatException e) {
