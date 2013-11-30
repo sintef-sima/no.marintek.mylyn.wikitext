@@ -2,7 +2,7 @@
 <feature
       id="no.marintek.mylyn.wikitext"
       label="%featureName"
-      version="1.1.0.qualifier"
+      version="1.2.0.qualifier"
       provider-name="%providerName">
 
    <description>
@@ -18,14 +18,21 @@
    </license>
 
    <plugin
-         id="no.marintek.mylyn.wikitext.confluence.core"
+         id="no.marintek.mylyn.wikitext.ooxml.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="no.marintek.mylyn.wikitext.ooxml.core"
+         id="org.docx4j"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="uk.ac.ed.ph.snuggletex"
          download-size="0"
          install-size="0"
          version="0.0.0"
