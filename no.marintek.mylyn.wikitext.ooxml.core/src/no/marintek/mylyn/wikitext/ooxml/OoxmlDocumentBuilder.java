@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -35,14 +36,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
-
 import org.docx4j.XmlUtils;
-import org.docx4j.dml.chart.CTBoolean;
 import org.docx4j.dml.chart.CTChartSpace;
-import org.docx4j.dml.chart.CTMarker;
-import org.docx4j.dml.chart.CTMarkerSize;
-import org.docx4j.dml.chart.CTStyle;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.math.CTBreakBin;
 import org.docx4j.math.CTBreakBinSub;
@@ -432,30 +427,81 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			tableRowCount++;
 			break;
 		case TABLE_CELL_NORMAL:
+			Tc normalTableCell = createTableCell();
+			TcPr tcpr = wmlObjectFactory.createTcPr();
+			normalTableCell.setTcPr(tcpr);
+
+			String backgroundColor = "FFFFFF";
+			SpanType spanType = SpanType.SPAN;
+			if (currentAttributes.getCssStyle() != null && !currentAttributes.getCssStyle().isEmpty()) {
+				backgroundColor = getCssValueForKey(currentAttributes.getCssStyle(), "background-color");
+				backgroundColor = backgroundColor.replace("#", "");
+
+				String fontWeight = getCssValueForKey(currentAttributes.getCssStyle(), "font-weight");
+				if (fontWeight.toLowerCase().equals("bold")) {
+					spanType = SpanType.BOLD;
+				}
+			}
+
+			CTShd shdNormal = createCellStyle(backgroundColor);
+			tcpr.setShd(shdNormal);
+			
+			beginSpan(spanType, new Attributes());
+			break;
 		case TABLE_CELL_HEADER:
 			Tc tc = wmlObjectFactory.createTc();
 			JAXBElement<org.docx4j.wml.Tc> tcWrapped = wmlObjectFactory.createTrTc(tc);
 			currentTableRow.getContent().add(tcWrapped);
 			currentParagraph = factory.createP();
 			tc.getContent().add(currentParagraph);
-			// Handle the header
-			if (currentBlockType.equals(BlockType.TABLE_CELL_HEADER)) {
-				TcPr tcpr = wmlObjectFactory.createTcPr();
-				tc.setTcPr(tcpr);
-				CTShd shd = wmlObjectFactory.createCTShd();
-				tcpr.setShd(shd);
-				shd.setVal(org.docx4j.wml.STShd.CLEAR);
-				shd.setColor("auto");
-				shd.setFill("D9D9D9");
-				shd.setThemeFill(org.docx4j.wml.STThemeColor.BACKGROUND_1);
-				shd.setThemeFillShade("D9");
-				beginSpan(SpanType.BOLD, new Attributes());
-			}
+
+			TcPr tcpr2 = wmlObjectFactory.createTcPr();
+			tc.setTcPr(tcpr2);
+			CTShd shdHeader = createCellStyle("D9D9D9");
+			tcpr2.setShd(shdHeader);
+			beginSpan(SpanType.BOLD, new Attributes());
+
 			break;
 		default:
 			beginSpan(SpanType.SPAN, currentAttributes);
 			break;
 		}
+	}
+
+	private Tc createTableCell() {
+		Tc tc = wmlObjectFactory.createTc();
+		JAXBElement<org.docx4j.wml.Tc> tcWrapped = wmlObjectFactory.createTrTc(tc);
+		currentTableRow.getContent().add(tcWrapped);
+		currentParagraph = factory.createP();
+		tc.getContent().add(currentParagraph);
+		return tc;
+	}
+
+	private CTShd createCellStyle(String fillColor) {
+		CTShd shd = wmlObjectFactory.createCTShd();
+		shd.setVal(org.docx4j.wml.STShd.CLEAR);
+		shd.setColor("auto");
+		shd.setFill(fillColor);
+		// Removed due to problems with setting bgColor for scatter diagram tables
+		// shd.setThemeFill(org.docx4j.wml.STThemeColor.BACKGROUND_1);
+		// shd.setThemeFillShade("D9");
+		return shd;
+	}
+
+	private String getCssValueForKey(String cssStyle, String key) {
+		Map<String, String> styleMap = getStylesFromCssString(cssStyle);
+		return styleMap.get(key) != null ? styleMap.get(key) : "";
+	}
+
+	private Map<String, String> getStylesFromCssString(String cssStyle) {
+		Map<String, String> cssStyleMap = new HashMap<String, String>();
+		String[] styles = cssStyle.split(";");
+		for (String style : styles) {
+			style = style.replaceAll(" ", "").trim();
+			String[] keyValuePair = style.split(":");
+			cssStyleMap.put(keyValuePair[0], keyValuePair[1]);
+		}
+		return cssStyleMap;
 	}
 
 	@Override
