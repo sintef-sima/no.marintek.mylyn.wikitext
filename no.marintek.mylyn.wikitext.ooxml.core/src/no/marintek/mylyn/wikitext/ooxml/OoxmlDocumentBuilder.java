@@ -101,11 +101,13 @@ import org.docx4j.wml.TblPr;
 import org.docx4j.wml.TblWidth;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
+import org.docx4j.wml.TcPrInner.GridSpan;
 import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
 import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
@@ -430,6 +432,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		case TABLE_CELL_NORMAL:
 			Tc normalTableCell = createTableCell();
 			TcPr tcpr = wmlObjectFactory.createTcPr();
+
+			if (currentAttributes != null && currentAttributes instanceof TableCellAttributes) {
+				TableCellAttributes tableCellAttributes = (TableCellAttributes) currentAttributes;
+				if (tableCellAttributes.getColspan() != null) {
+					applyGridSpan(tcpr, Integer.parseInt(tableCellAttributes.getColspan()));
+				}
+			}
+
+
 			normalTableCell.setTcPr(tcpr);
 
 			String backgroundColor = "FFFFFF";
@@ -457,6 +468,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			tc.getContent().add(currentParagraph);
 
 			TcPr tcpr2 = wmlObjectFactory.createTcPr();
+			if (currentAttributes != null && currentAttributes instanceof TableCellAttributes) {
+				TableCellAttributes tableCellAttributes = (TableCellAttributes) currentAttributes;
+				if (tableCellAttributes.getColspan() != null) {
+					applyGridSpan(tcpr2, Integer.parseInt(tableCellAttributes.getColspan()));
+				}
+			}
+
 			tc.setTcPr(tcpr2);
 			CTShd shdHeader = createCellStyle("D9D9D9");
 			tcpr2.setShd(shdHeader);
@@ -487,6 +505,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		// shd.setThemeFill(org.docx4j.wml.STThemeColor.BACKGROUND_1);
 		// shd.setThemeFillShade("D9");
 		return shd;
+	}
+
+
+	private void applyGridSpan(final TcPr tcpr, final int span) {
+		if (span > 1) {
+			GridSpan gridSpan = wmlObjectFactory.createTcPrInnerGridSpan();
+			gridSpan.setVal(BigInteger.valueOf(span));
+			tcpr.setGridSpan(gridSpan);
+		}
 	}
 
 	private String getCssValueForKey(String cssStyle, String key) {
