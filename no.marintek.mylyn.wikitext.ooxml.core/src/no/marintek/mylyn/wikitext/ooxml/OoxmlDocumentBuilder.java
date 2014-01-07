@@ -101,11 +101,14 @@ import org.docx4j.wml.TblPr;
 import org.docx4j.wml.TblWidth;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
+import org.docx4j.wml.TcPrInner.GridSpan;
 import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
+import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
@@ -114,9 +117,9 @@ import uk.ac.ed.ph.snuggletex.SnuggleSession;
 import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
 
 /**
- *
+ * 
  * @author Torkild U. Resheim
- *
+ * 
  * @since 1.9
  */
 public class OoxmlDocumentBuilder extends DocumentBuilder {
@@ -170,7 +173,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private Attributes currentAttributes;
 
 	private int currentListType;
-
+	
 	public OoxmlDocumentBuilder() {
 		characters = new StringBuilder();
 	}
@@ -321,7 +324,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Adds an image to the document.
-	 *
+	 * 
 	 * @param bytes
 	 * @param file
 	 * @param text alternative text
@@ -364,7 +367,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void beginBlock(BlockType type, Attributes attributes) {
 		currentBlockType = type;
 		currentAttributes = attributes;
-
+		
 		switch (currentBlockType) {
 		case DEFINITION_LIST:
 			currentListType = 1;
@@ -376,7 +379,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			currentListType = 2;
 			break;
 		case LIST_ITEM:
-			currentParagraph = factory.createP();
+			currentParagraph = factory.createP();			
 			applyStyle(currentParagraph, "ListParagraph");
 			PPr ppr = currentParagraph.getPPr();
 			PPrBase.NumPr pprbasenumpr = wmlObjectFactory.createPPrBaseNumPr();
@@ -429,6 +432,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		case TABLE_CELL_NORMAL:
 			Tc normalTableCell = createTableCell();
 			TcPr tcpr = wmlObjectFactory.createTcPr();
+
+			if (currentAttributes != null && currentAttributes instanceof TableCellAttributes) {
+				TableCellAttributes tableCellAttributes = (TableCellAttributes) currentAttributes;
+				if (tableCellAttributes.getColspan() != null) {
+					applyGridSpan(tcpr, Integer.parseInt(tableCellAttributes.getColspan()));
+				}
+			}
+
+
 			normalTableCell.setTcPr(tcpr);
 
 			String backgroundColor = "FFFFFF";
@@ -456,6 +468,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			tc.getContent().add(currentParagraph);
 
 			TcPr tcpr2 = wmlObjectFactory.createTcPr();
+			if (currentAttributes != null && currentAttributes instanceof TableCellAttributes) {
+				TableCellAttributes tableCellAttributes = (TableCellAttributes) currentAttributes;
+				if (tableCellAttributes.getColspan() != null) {
+					applyGridSpan(tcpr2, Integer.parseInt(tableCellAttributes.getColspan()));
+				}
+			}
+
 			tc.setTcPr(tcpr2);
 			CTShd shdHeader = createCellStyle("D9D9D9");
 			tcpr2.setShd(shdHeader);
@@ -465,7 +484,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		default:
 			beginSpan(SpanType.SPAN, currentAttributes);
 			break;
-		}
+		}		
 	}
 
 	private Tc createTableCell() {
@@ -486,6 +505,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		// shd.setThemeFill(org.docx4j.wml.STThemeColor.BACKGROUND_1);
 		// shd.setThemeFillShade("D9");
 		return shd;
+	}
+
+
+	private void applyGridSpan(final TcPr tcpr, final int span) {
+		if (span > 1) {
+			GridSpan gridSpan = wmlObjectFactory.createTcPrInnerGridSpan();
+			gridSpan.setVal(BigInteger.valueOf(span));
+			tcpr.setGridSpan(gridSpan);
+		}
 	}
 
 	private String getCssValueForKey(String cssStyle, String key) {
@@ -526,594 +554,594 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private NumberingDefinitionsPart addNumberingPart() throws InvalidFormatException {
 		org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
-		Numbering numbering = wmlObjectFactory.createNumbering();
+		Numbering numbering = wmlObjectFactory.createNumbering(); 
 		NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
 		ndp.setJaxbElement(numbering);
 
 		    // Create object for abstractNum
-		    Numbering.Num numberingnum = wmlObjectFactory.createNumberingNum();
-		    numbering.getNum().add( numberingnum);
-		        numberingnum.setNumId( BigInteger.valueOf( 1) );
+		    Numbering.Num numberingnum = wmlObjectFactory.createNumberingNum(); 
+		    numbering.getNum().add( numberingnum); 
+		        numberingnum.setNumId( BigInteger.valueOf( 1) ); 
 		        // Create object for abstractNumId
-		        Numbering.Num.AbstractNumId numberingnumabstractnumid = wmlObjectFactory.createNumberingNumAbstractNumId();
-		        numberingnum.setAbstractNumId(numberingnumabstractnumid);
-		            numberingnumabstractnumid.setVal( BigInteger.valueOf( 0) );
+		        Numbering.Num.AbstractNumId numberingnumabstractnumid = wmlObjectFactory.createNumberingNumAbstractNumId(); 
+		        numberingnum.setAbstractNumId(numberingnumabstractnumid); 
+		            numberingnumabstractnumid.setVal( BigInteger.valueOf( 0) ); 
 		    // Create object for abstractNum
-		    Numbering.Num numberingnum2 = wmlObjectFactory.createNumberingNum();
-		    numbering.getNum().add( numberingnum2);
-		        numberingnum2.setNumId( BigInteger.valueOf( 2) );
+		    Numbering.Num numberingnum2 = wmlObjectFactory.createNumberingNum(); 
+		    numbering.getNum().add( numberingnum2); 
+		        numberingnum2.setNumId( BigInteger.valueOf( 2) ); 
 		        // Create object for abstractNumId
-		        Numbering.Num.AbstractNumId numberingnumabstractnumid2 = wmlObjectFactory.createNumberingNumAbstractNumId();
-		        numberingnum2.setAbstractNumId(numberingnumabstractnumid2);
-		            numberingnumabstractnumid2.setVal( BigInteger.valueOf( 1) );
+		        Numbering.Num.AbstractNumId numberingnumabstractnumid2 = wmlObjectFactory.createNumberingNumAbstractNumId(); 
+		        numberingnum2.setAbstractNumId(numberingnumabstractnumid2); 
+		            numberingnumabstractnumid2.setVal( BigInteger.valueOf( 1) ); 
 		    // Create object for abstractNum
-		    Numbering.AbstractNum numberingabstractnum = wmlObjectFactory.createNumberingAbstractNum();
-		    numbering.getAbstractNum().add( numberingabstractnum);
-		        numberingabstractnum.setAbstractNumId( BigInteger.valueOf( 0) );
+		    Numbering.AbstractNum numberingabstractnum = wmlObjectFactory.createNumberingAbstractNum(); 
+		    numbering.getAbstractNum().add( numberingabstractnum); 
+		        numberingabstractnum.setAbstractNumId( BigInteger.valueOf( 0) ); 
 		        // Create object for lvl
-		        Lvl lvl = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl);
-		            lvl.setIlvl( BigInteger.valueOf( 0) );
+		        Lvl lvl = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl); 
+		            lvl.setIlvl( BigInteger.valueOf( 0) ); 
 		            // Create object for pPr
-		            PPr ppr = wmlObjectFactory.createPPr();
-		            lvl.setPPr(ppr);
+		            PPr ppr = wmlObjectFactory.createPPr(); 
+		            lvl.setPPr(ppr); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind = wmlObjectFactory.createPPrBaseInd();
-		                ppr.setInd(pprbaseind);
-		                    pprbaseind.setLeft( BigInteger.valueOf( 720) );
-		                    pprbaseind.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr.setInd(pprbaseind); 
+		                    pprbaseind.setLeft( BigInteger.valueOf( 720) ); 
+		                    pprbaseind.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt = wmlObjectFactory.createNumFmt();
-		            lvl.setNumFmt(numfmt);
+		            NumFmt numfmt = wmlObjectFactory.createNumFmt(); 
+		            lvl.setNumFmt(numfmt); 
 		                numfmt.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext = wmlObjectFactory.createLvlLvlText();
-		            lvl.setLvlText(lvllvltext);
-		                lvllvltext.setVal( "%1.");
+		            Lvl.LvlText lvllvltext = wmlObjectFactory.createLvlLvlText(); 
+		            lvl.setLvlText(lvllvltext); 
+		                lvllvltext.setVal( "%1."); 
 		            // Create object for lvlJc
-		            Jc jc = wmlObjectFactory.createJc();
-		            lvl.setLvlJc(jc);
+		            Jc jc = wmlObjectFactory.createJc(); 
+		            lvl.setLvlJc(jc); 
 		                jc.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl.setTplc( "0409000F");
+		            lvl.setTplc( "0409000F"); 
 		            // Create object for start
-		            Lvl.Start lvlstart = wmlObjectFactory.createLvlStart();
-		            lvl.setStart(lvlstart);
-		                lvlstart.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart = wmlObjectFactory.createLvlStart(); 
+		            lvl.setStart(lvlstart); 
+		                lvlstart.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl2 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl2);
-		            lvl2.setIlvl( BigInteger.valueOf( 1) );
+		        Lvl lvl2 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl2); 
+		            lvl2.setIlvl( BigInteger.valueOf( 1) ); 
 		            // Create object for pPr
-		            PPr ppr2 = wmlObjectFactory.createPPr();
-		            lvl2.setPPr(ppr2);
+		            PPr ppr2 = wmlObjectFactory.createPPr(); 
+		            lvl2.setPPr(ppr2); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind2 = wmlObjectFactory.createPPrBaseInd();
-		                ppr2.setInd(pprbaseind2);
-		                    pprbaseind2.setLeft( BigInteger.valueOf( 1440) );
-		                    pprbaseind2.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind2 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr2.setInd(pprbaseind2); 
+		                    pprbaseind2.setLeft( BigInteger.valueOf( 1440) ); 
+		                    pprbaseind2.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt2 = wmlObjectFactory.createNumFmt();
-		            lvl2.setNumFmt(numfmt2);
+		            NumFmt numfmt2 = wmlObjectFactory.createNumFmt(); 
+		            lvl2.setNumFmt(numfmt2); 
 		                numfmt2.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext2 = wmlObjectFactory.createLvlLvlText();
-		            lvl2.setLvlText(lvllvltext2);
-		                lvllvltext2.setVal( "%2.");
+		            Lvl.LvlText lvllvltext2 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl2.setLvlText(lvllvltext2); 
+		                lvllvltext2.setVal( "%2."); 
 		            // Create object for lvlJc
-		            Jc jc2 = wmlObjectFactory.createJc();
-		            lvl2.setLvlJc(jc2);
+		            Jc jc2 = wmlObjectFactory.createJc(); 
+		            lvl2.setLvlJc(jc2); 
 		                jc2.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl2.setTplc( "04090019");
+		            lvl2.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart2 = wmlObjectFactory.createLvlStart();
-		            lvl2.setStart(lvlstart2);
-		                lvlstart2.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart2 = wmlObjectFactory.createLvlStart(); 
+		            lvl2.setStart(lvlstart2); 
+		                lvlstart2.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl3 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl3);
-		            lvl3.setIlvl( BigInteger.valueOf( 2) );
+		        Lvl lvl3 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl3); 
+		            lvl3.setIlvl( BigInteger.valueOf( 2) ); 
 		            // Create object for pPr
-		            PPr ppr3 = wmlObjectFactory.createPPr();
-		            lvl3.setPPr(ppr3);
+		            PPr ppr3 = wmlObjectFactory.createPPr(); 
+		            lvl3.setPPr(ppr3); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind3 = wmlObjectFactory.createPPrBaseInd();
-		                ppr3.setInd(pprbaseind3);
-		                    pprbaseind3.setLeft( BigInteger.valueOf( 2160) );
-		                    pprbaseind3.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind3 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr3.setInd(pprbaseind3); 
+		                    pprbaseind3.setLeft( BigInteger.valueOf( 2160) ); 
+		                    pprbaseind3.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt3 = wmlObjectFactory.createNumFmt();
-		            lvl3.setNumFmt(numfmt3);
+		            NumFmt numfmt3 = wmlObjectFactory.createNumFmt(); 
+		            lvl3.setNumFmt(numfmt3); 
 		                numfmt3.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext3 = wmlObjectFactory.createLvlLvlText();
-		            lvl3.setLvlText(lvllvltext3);
-		                lvllvltext3.setVal( "%3.");
+		            Lvl.LvlText lvllvltext3 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl3.setLvlText(lvllvltext3); 
+		                lvllvltext3.setVal( "%3."); 
 		            // Create object for lvlJc
-		            Jc jc3 = wmlObjectFactory.createJc();
-		            lvl3.setLvlJc(jc3);
+		            Jc jc3 = wmlObjectFactory.createJc(); 
+		            lvl3.setLvlJc(jc3); 
 		                jc3.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl3.setTplc( "0409001B");
+		            lvl3.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart3 = wmlObjectFactory.createLvlStart();
-		            lvl3.setStart(lvlstart3);
-		                lvlstart3.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart3 = wmlObjectFactory.createLvlStart(); 
+		            lvl3.setStart(lvlstart3); 
+		                lvlstart3.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl4 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl4);
-		            lvl4.setIlvl( BigInteger.valueOf( 3) );
+		        Lvl lvl4 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl4); 
+		            lvl4.setIlvl( BigInteger.valueOf( 3) ); 
 		            // Create object for pPr
-		            PPr ppr4 = wmlObjectFactory.createPPr();
-		            lvl4.setPPr(ppr4);
+		            PPr ppr4 = wmlObjectFactory.createPPr(); 
+		            lvl4.setPPr(ppr4); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind4 = wmlObjectFactory.createPPrBaseInd();
-		                ppr4.setInd(pprbaseind4);
-		                    pprbaseind4.setLeft( BigInteger.valueOf( 2880) );
-		                    pprbaseind4.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind4 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr4.setInd(pprbaseind4); 
+		                    pprbaseind4.setLeft( BigInteger.valueOf( 2880) ); 
+		                    pprbaseind4.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt4 = wmlObjectFactory.createNumFmt();
-		            lvl4.setNumFmt(numfmt4);
+		            NumFmt numfmt4 = wmlObjectFactory.createNumFmt(); 
+		            lvl4.setNumFmt(numfmt4); 
 		                numfmt4.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext4 = wmlObjectFactory.createLvlLvlText();
-		            lvl4.setLvlText(lvllvltext4);
-		                lvllvltext4.setVal( "%4.");
+		            Lvl.LvlText lvllvltext4 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl4.setLvlText(lvllvltext4); 
+		                lvllvltext4.setVal( "%4."); 
 		            // Create object for lvlJc
-		            Jc jc4 = wmlObjectFactory.createJc();
-		            lvl4.setLvlJc(jc4);
+		            Jc jc4 = wmlObjectFactory.createJc(); 
+		            lvl4.setLvlJc(jc4); 
 		                jc4.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl4.setTplc( "0409000F");
+		            lvl4.setTplc( "0409000F"); 
 		            // Create object for start
-		            Lvl.Start lvlstart4 = wmlObjectFactory.createLvlStart();
-		            lvl4.setStart(lvlstart4);
-		                lvlstart4.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart4 = wmlObjectFactory.createLvlStart(); 
+		            lvl4.setStart(lvlstart4); 
+		                lvlstart4.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl5 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl5);
-		            lvl5.setIlvl( BigInteger.valueOf( 4) );
+		        Lvl lvl5 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl5); 
+		            lvl5.setIlvl( BigInteger.valueOf( 4) ); 
 		            // Create object for pPr
-		            PPr ppr5 = wmlObjectFactory.createPPr();
-		            lvl5.setPPr(ppr5);
+		            PPr ppr5 = wmlObjectFactory.createPPr(); 
+		            lvl5.setPPr(ppr5); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind5 = wmlObjectFactory.createPPrBaseInd();
-		                ppr5.setInd(pprbaseind5);
-		                    pprbaseind5.setLeft( BigInteger.valueOf( 3600) );
-		                    pprbaseind5.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind5 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr5.setInd(pprbaseind5); 
+		                    pprbaseind5.setLeft( BigInteger.valueOf( 3600) ); 
+		                    pprbaseind5.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt5 = wmlObjectFactory.createNumFmt();
-		            lvl5.setNumFmt(numfmt5);
+		            NumFmt numfmt5 = wmlObjectFactory.createNumFmt(); 
+		            lvl5.setNumFmt(numfmt5); 
 		                numfmt5.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext5 = wmlObjectFactory.createLvlLvlText();
-		            lvl5.setLvlText(lvllvltext5);
-		                lvllvltext5.setVal( "%5.");
+		            Lvl.LvlText lvllvltext5 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl5.setLvlText(lvllvltext5); 
+		                lvllvltext5.setVal( "%5."); 
 		            // Create object for lvlJc
-		            Jc jc5 = wmlObjectFactory.createJc();
-		            lvl5.setLvlJc(jc5);
+		            Jc jc5 = wmlObjectFactory.createJc(); 
+		            lvl5.setLvlJc(jc5); 
 		                jc5.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl5.setTplc( "04090019");
+		            lvl5.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart5 = wmlObjectFactory.createLvlStart();
-		            lvl5.setStart(lvlstart5);
-		                lvlstart5.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart5 = wmlObjectFactory.createLvlStart(); 
+		            lvl5.setStart(lvlstart5); 
+		                lvlstart5.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl6 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl6);
-		            lvl6.setIlvl( BigInteger.valueOf( 5) );
+		        Lvl lvl6 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl6); 
+		            lvl6.setIlvl( BigInteger.valueOf( 5) ); 
 		            // Create object for pPr
-		            PPr ppr6 = wmlObjectFactory.createPPr();
-		            lvl6.setPPr(ppr6);
+		            PPr ppr6 = wmlObjectFactory.createPPr(); 
+		            lvl6.setPPr(ppr6); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind6 = wmlObjectFactory.createPPrBaseInd();
-		                ppr6.setInd(pprbaseind6);
-		                    pprbaseind6.setLeft( BigInteger.valueOf( 4320) );
-		                    pprbaseind6.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind6 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr6.setInd(pprbaseind6); 
+		                    pprbaseind6.setLeft( BigInteger.valueOf( 4320) ); 
+		                    pprbaseind6.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt6 = wmlObjectFactory.createNumFmt();
-		            lvl6.setNumFmt(numfmt6);
+		            NumFmt numfmt6 = wmlObjectFactory.createNumFmt(); 
+		            lvl6.setNumFmt(numfmt6); 
 		                numfmt6.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext6 = wmlObjectFactory.createLvlLvlText();
-		            lvl6.setLvlText(lvllvltext6);
-		                lvllvltext6.setVal( "%6.");
+		            Lvl.LvlText lvllvltext6 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl6.setLvlText(lvllvltext6); 
+		                lvllvltext6.setVal( "%6."); 
 		            // Create object for lvlJc
-		            Jc jc6 = wmlObjectFactory.createJc();
-		            lvl6.setLvlJc(jc6);
+		            Jc jc6 = wmlObjectFactory.createJc(); 
+		            lvl6.setLvlJc(jc6); 
 		                jc6.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl6.setTplc( "0409001B");
+		            lvl6.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart6 = wmlObjectFactory.createLvlStart();
-		            lvl6.setStart(lvlstart6);
-		                lvlstart6.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart6 = wmlObjectFactory.createLvlStart(); 
+		            lvl6.setStart(lvlstart6); 
+		                lvlstart6.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl7 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl7);
-		            lvl7.setIlvl( BigInteger.valueOf( 6) );
+		        Lvl lvl7 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl7); 
+		            lvl7.setIlvl( BigInteger.valueOf( 6) ); 
 		            // Create object for pPr
-		            PPr ppr7 = wmlObjectFactory.createPPr();
-		            lvl7.setPPr(ppr7);
+		            PPr ppr7 = wmlObjectFactory.createPPr(); 
+		            lvl7.setPPr(ppr7); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind7 = wmlObjectFactory.createPPrBaseInd();
-		                ppr7.setInd(pprbaseind7);
-		                    pprbaseind7.setLeft( BigInteger.valueOf( 5040) );
-		                    pprbaseind7.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind7 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr7.setInd(pprbaseind7); 
+		                    pprbaseind7.setLeft( BigInteger.valueOf( 5040) ); 
+		                    pprbaseind7.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt7 = wmlObjectFactory.createNumFmt();
-		            lvl7.setNumFmt(numfmt7);
+		            NumFmt numfmt7 = wmlObjectFactory.createNumFmt(); 
+		            lvl7.setNumFmt(numfmt7); 
 		                numfmt7.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext7 = wmlObjectFactory.createLvlLvlText();
-		            lvl7.setLvlText(lvllvltext7);
-		                lvllvltext7.setVal( "%7.");
+		            Lvl.LvlText lvllvltext7 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl7.setLvlText(lvllvltext7); 
+		                lvllvltext7.setVal( "%7."); 
 		            // Create object for lvlJc
-		            Jc jc7 = wmlObjectFactory.createJc();
-		            lvl7.setLvlJc(jc7);
+		            Jc jc7 = wmlObjectFactory.createJc(); 
+		            lvl7.setLvlJc(jc7); 
 		                jc7.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl7.setTplc( "0409000F");
+		            lvl7.setTplc( "0409000F"); 
 		            // Create object for start
-		            Lvl.Start lvlstart7 = wmlObjectFactory.createLvlStart();
-		            lvl7.setStart(lvlstart7);
-		                lvlstart7.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart7 = wmlObjectFactory.createLvlStart(); 
+		            lvl7.setStart(lvlstart7); 
+		                lvlstart7.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl8 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl8);
-		            lvl8.setIlvl( BigInteger.valueOf( 7) );
+		        Lvl lvl8 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl8); 
+		            lvl8.setIlvl( BigInteger.valueOf( 7) ); 
 		            // Create object for pPr
-		            PPr ppr8 = wmlObjectFactory.createPPr();
-		            lvl8.setPPr(ppr8);
+		            PPr ppr8 = wmlObjectFactory.createPPr(); 
+		            lvl8.setPPr(ppr8); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind8 = wmlObjectFactory.createPPrBaseInd();
-		                ppr8.setInd(pprbaseind8);
-		                    pprbaseind8.setLeft( BigInteger.valueOf( 5760) );
-		                    pprbaseind8.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind8 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr8.setInd(pprbaseind8); 
+		                    pprbaseind8.setLeft( BigInteger.valueOf( 5760) ); 
+		                    pprbaseind8.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt8 = wmlObjectFactory.createNumFmt();
-		            lvl8.setNumFmt(numfmt8);
+		            NumFmt numfmt8 = wmlObjectFactory.createNumFmt(); 
+		            lvl8.setNumFmt(numfmt8); 
 		                numfmt8.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext8 = wmlObjectFactory.createLvlLvlText();
-		            lvl8.setLvlText(lvllvltext8);
-		                lvllvltext8.setVal( "%8.");
+		            Lvl.LvlText lvllvltext8 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl8.setLvlText(lvllvltext8); 
+		                lvllvltext8.setVal( "%8."); 
 		            // Create object for lvlJc
-		            Jc jc8 = wmlObjectFactory.createJc();
-		            lvl8.setLvlJc(jc8);
+		            Jc jc8 = wmlObjectFactory.createJc(); 
+		            lvl8.setLvlJc(jc8); 
 		                jc8.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl8.setTplc( "04090019");
+		            lvl8.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart8 = wmlObjectFactory.createLvlStart();
-		            lvl8.setStart(lvlstart8);
-		                lvlstart8.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart8 = wmlObjectFactory.createLvlStart(); 
+		            lvl8.setStart(lvlstart8); 
+		                lvlstart8.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl9 = wmlObjectFactory.createLvl();
-		        numberingabstractnum.getLvl().add( lvl9);
-		            lvl9.setIlvl( BigInteger.valueOf( 8) );
+		        Lvl lvl9 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum.getLvl().add( lvl9); 
+		            lvl9.setIlvl( BigInteger.valueOf( 8) ); 
 		            // Create object for pPr
-		            PPr ppr9 = wmlObjectFactory.createPPr();
-		            lvl9.setPPr(ppr9);
+		            PPr ppr9 = wmlObjectFactory.createPPr(); 
+		            lvl9.setPPr(ppr9); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind9 = wmlObjectFactory.createPPrBaseInd();
-		                ppr9.setInd(pprbaseind9);
-		                    pprbaseind9.setLeft( BigInteger.valueOf( 6480) );
-		                    pprbaseind9.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind9 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr9.setInd(pprbaseind9); 
+		                    pprbaseind9.setLeft( BigInteger.valueOf( 6480) ); 
+		                    pprbaseind9.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt9 = wmlObjectFactory.createNumFmt();
-		            lvl9.setNumFmt(numfmt9);
+		            NumFmt numfmt9 = wmlObjectFactory.createNumFmt(); 
+		            lvl9.setNumFmt(numfmt9); 
 		                numfmt9.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext9 = wmlObjectFactory.createLvlLvlText();
-		            lvl9.setLvlText(lvllvltext9);
-		                lvllvltext9.setVal( "%9.");
+		            Lvl.LvlText lvllvltext9 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl9.setLvlText(lvllvltext9); 
+		                lvllvltext9.setVal( "%9."); 
 		            // Create object for lvlJc
-		            Jc jc9 = wmlObjectFactory.createJc();
-		            lvl9.setLvlJc(jc9);
+		            Jc jc9 = wmlObjectFactory.createJc(); 
+		            lvl9.setLvlJc(jc9); 
 		                jc9.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl9.setTplc( "0409001B");
+		            lvl9.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart9 = wmlObjectFactory.createLvlStart();
-		            lvl9.setStart(lvlstart9);
-		                lvlstart9.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart9 = wmlObjectFactory.createLvlStart(); 
+		            lvl9.setStart(lvlstart9); 
+		                lvlstart9.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for nsid
-		        CTLongHexNumber longhexnumber = wmlObjectFactory.createCTLongHexNumber();
-		        numberingabstractnum.setNsid(longhexnumber);
-		            longhexnumber.setVal( "321F1D95");
+		        CTLongHexNumber longhexnumber = wmlObjectFactory.createCTLongHexNumber(); 
+		        numberingabstractnum.setNsid(longhexnumber); 
+		            longhexnumber.setVal( "321F1D95"); 
 		        // Create object for multiLevelType
-		        Numbering.AbstractNum.MultiLevelType numberingabstractnummultileveltype = wmlObjectFactory.createNumberingAbstractNumMultiLevelType();
-		        numberingabstractnum.setMultiLevelType(numberingabstractnummultileveltype);
-		            numberingabstractnummultileveltype.setVal( "hybridMultilevel");
+		        Numbering.AbstractNum.MultiLevelType numberingabstractnummultileveltype = wmlObjectFactory.createNumberingAbstractNumMultiLevelType(); 
+		        numberingabstractnum.setMultiLevelType(numberingabstractnummultileveltype); 
+		            numberingabstractnummultileveltype.setVal( "hybridMultilevel"); 
 		        // Create object for tmpl
-		        CTLongHexNumber longhexnumber2 = wmlObjectFactory.createCTLongHexNumber();
-		        numberingabstractnum.setTmpl(longhexnumber2);
-		            longhexnumber2.setVal( "0F14D706");
+		        CTLongHexNumber longhexnumber2 = wmlObjectFactory.createCTLongHexNumber(); 
+		        numberingabstractnum.setTmpl(longhexnumber2); 
+		            longhexnumber2.setVal( "0F14D706"); 
 		    // Create object for abstractNum
-		    Numbering.AbstractNum numberingabstractnum2 = wmlObjectFactory.createNumberingAbstractNum();
-		    numbering.getAbstractNum().add( numberingabstractnum2);
-		        numberingabstractnum2.setAbstractNumId( BigInteger.valueOf( 1) );
+		    Numbering.AbstractNum numberingabstractnum2 = wmlObjectFactory.createNumberingAbstractNum(); 
+		    numbering.getAbstractNum().add( numberingabstractnum2); 
+		        numberingabstractnum2.setAbstractNumId( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl10 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl10);
-		            lvl10.setIlvl( BigInteger.valueOf( 0) );
+		        Lvl lvl10 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl10); 
+		            lvl10.setIlvl( BigInteger.valueOf( 0) ); 
 		            // Create object for pPr
-		            PPr ppr10 = wmlObjectFactory.createPPr();
-		            lvl10.setPPr(ppr10);
+		            PPr ppr10 = wmlObjectFactory.createPPr(); 
+		            lvl10.setPPr(ppr10); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind10 = wmlObjectFactory.createPPrBaseInd();
-		                ppr10.setInd(pprbaseind10);
-		                    pprbaseind10.setLeft( BigInteger.valueOf( 720) );
-		                    pprbaseind10.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind10 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr10.setInd(pprbaseind10); 
+		                    pprbaseind10.setLeft( BigInteger.valueOf( 720) ); 
+		                    pprbaseind10.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for rPr
-		            RPr rpr = wmlObjectFactory.createRPr();
-		            lvl10.setRPr(rpr);
+		            RPr rpr = wmlObjectFactory.createRPr(); 
+		            lvl10.setRPr(rpr); 
 		                // Create object for rFonts
-		                RFonts rfonts = wmlObjectFactory.createRFonts();
-		                rpr.setRFonts(rfonts);
-		                    rfonts.setAscii( "Symbol");
+		                RFonts rfonts = wmlObjectFactory.createRFonts(); 
+		                rpr.setRFonts(rfonts); 
+		                    rfonts.setAscii( "Symbol"); 
 		                    rfonts.setHint(org.docx4j.wml.STHint.DEFAULT);
-		                    rfonts.setHAnsi( "Symbol");
+		                    rfonts.setHAnsi( "Symbol"); 
 		            // Create object for numFmt
-		            NumFmt numfmt10 = wmlObjectFactory.createNumFmt();
-		            lvl10.setNumFmt(numfmt10);
+		            NumFmt numfmt10 = wmlObjectFactory.createNumFmt(); 
+		            lvl10.setNumFmt(numfmt10); 
 		                numfmt10.setVal(org.docx4j.wml.NumberFormat.BULLET);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext10 = wmlObjectFactory.createLvlLvlText();
-		            lvl10.setLvlText(lvllvltext10);
-		                lvllvltext10.setVal( "");
+		            Lvl.LvlText lvllvltext10 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl10.setLvlText(lvllvltext10); 
+		                lvllvltext10.setVal( ""); 
 		            // Create object for lvlJc
-		            Jc jc10 = wmlObjectFactory.createJc();
-		            lvl10.setLvlJc(jc10);
+		            Jc jc10 = wmlObjectFactory.createJc(); 
+		            lvl10.setLvlJc(jc10); 
 		                jc10.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl10.setTplc( "04090001");
+		            lvl10.setTplc( "04090001"); 
 		            // Create object for start
-		            Lvl.Start lvlstart10 = wmlObjectFactory.createLvlStart();
-		            lvl10.setStart(lvlstart10);
-		                lvlstart10.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart10 = wmlObjectFactory.createLvlStart(); 
+		            lvl10.setStart(lvlstart10); 
+		                lvlstart10.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl11 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl11);
-		            lvl11.setIlvl( BigInteger.valueOf( 1) );
+		        Lvl lvl11 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl11); 
+		            lvl11.setIlvl( BigInteger.valueOf( 1) ); 
 		            // Create object for pPr
-		            PPr ppr11 = wmlObjectFactory.createPPr();
-		            lvl11.setPPr(ppr11);
+		            PPr ppr11 = wmlObjectFactory.createPPr(); 
+		            lvl11.setPPr(ppr11); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind11 = wmlObjectFactory.createPPrBaseInd();
-		                ppr11.setInd(pprbaseind11);
-		                    pprbaseind11.setLeft( BigInteger.valueOf( 1440) );
-		                    pprbaseind11.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind11 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr11.setInd(pprbaseind11); 
+		                    pprbaseind11.setLeft( BigInteger.valueOf( 1440) ); 
+		                    pprbaseind11.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt11 = wmlObjectFactory.createNumFmt();
-		            lvl11.setNumFmt(numfmt11);
+		            NumFmt numfmt11 = wmlObjectFactory.createNumFmt(); 
+		            lvl11.setNumFmt(numfmt11); 
 		                numfmt11.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext11 = wmlObjectFactory.createLvlLvlText();
-		            lvl11.setLvlText(lvllvltext11);
-		                lvllvltext11.setVal( "%2.");
+		            Lvl.LvlText lvllvltext11 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl11.setLvlText(lvllvltext11); 
+		                lvllvltext11.setVal( "%2."); 
 		            // Create object for lvlJc
-		            Jc jc11 = wmlObjectFactory.createJc();
-		            lvl11.setLvlJc(jc11);
+		            Jc jc11 = wmlObjectFactory.createJc(); 
+		            lvl11.setLvlJc(jc11); 
 		                jc11.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl11.setTplc( "04090019");
+		            lvl11.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart11 = wmlObjectFactory.createLvlStart();
-		            lvl11.setStart(lvlstart11);
-		                lvlstart11.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart11 = wmlObjectFactory.createLvlStart(); 
+		            lvl11.setStart(lvlstart11); 
+		                lvlstart11.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl12 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl12);
-		            lvl12.setIlvl( BigInteger.valueOf( 2) );
+		        Lvl lvl12 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl12); 
+		            lvl12.setIlvl( BigInteger.valueOf( 2) ); 
 		            // Create object for pPr
-		            PPr ppr12 = wmlObjectFactory.createPPr();
-		            lvl12.setPPr(ppr12);
+		            PPr ppr12 = wmlObjectFactory.createPPr(); 
+		            lvl12.setPPr(ppr12); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind12 = wmlObjectFactory.createPPrBaseInd();
-		                ppr12.setInd(pprbaseind12);
-		                    pprbaseind12.setLeft( BigInteger.valueOf( 2160) );
-		                    pprbaseind12.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind12 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr12.setInd(pprbaseind12); 
+		                    pprbaseind12.setLeft( BigInteger.valueOf( 2160) ); 
+		                    pprbaseind12.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt12 = wmlObjectFactory.createNumFmt();
-		            lvl12.setNumFmt(numfmt12);
+		            NumFmt numfmt12 = wmlObjectFactory.createNumFmt(); 
+		            lvl12.setNumFmt(numfmt12); 
 		                numfmt12.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext12 = wmlObjectFactory.createLvlLvlText();
-		            lvl12.setLvlText(lvllvltext12);
-		                lvllvltext12.setVal( "%3.");
+		            Lvl.LvlText lvllvltext12 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl12.setLvlText(lvllvltext12); 
+		                lvllvltext12.setVal( "%3."); 
 		            // Create object for lvlJc
-		            Jc jc12 = wmlObjectFactory.createJc();
-		            lvl12.setLvlJc(jc12);
+		            Jc jc12 = wmlObjectFactory.createJc(); 
+		            lvl12.setLvlJc(jc12); 
 		                jc12.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl12.setTplc( "0409001B");
+		            lvl12.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart12 = wmlObjectFactory.createLvlStart();
-		            lvl12.setStart(lvlstart12);
-		                lvlstart12.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart12 = wmlObjectFactory.createLvlStart(); 
+		            lvl12.setStart(lvlstart12); 
+		                lvlstart12.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl13 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl13);
-		            lvl13.setIlvl( BigInteger.valueOf( 3) );
+		        Lvl lvl13 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl13); 
+		            lvl13.setIlvl( BigInteger.valueOf( 3) ); 
 		            // Create object for pPr
-		            PPr ppr13 = wmlObjectFactory.createPPr();
-		            lvl13.setPPr(ppr13);
+		            PPr ppr13 = wmlObjectFactory.createPPr(); 
+		            lvl13.setPPr(ppr13); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind13 = wmlObjectFactory.createPPrBaseInd();
-		                ppr13.setInd(pprbaseind13);
-		                    pprbaseind13.setLeft( BigInteger.valueOf( 2880) );
-		                    pprbaseind13.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind13 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr13.setInd(pprbaseind13); 
+		                    pprbaseind13.setLeft( BigInteger.valueOf( 2880) ); 
+		                    pprbaseind13.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt13 = wmlObjectFactory.createNumFmt();
-		            lvl13.setNumFmt(numfmt13);
+		            NumFmt numfmt13 = wmlObjectFactory.createNumFmt(); 
+		            lvl13.setNumFmt(numfmt13); 
 		                numfmt13.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext13 = wmlObjectFactory.createLvlLvlText();
-		            lvl13.setLvlText(lvllvltext13);
-		                lvllvltext13.setVal( "%4.");
+		            Lvl.LvlText lvllvltext13 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl13.setLvlText(lvllvltext13); 
+		                lvllvltext13.setVal( "%4."); 
 		            // Create object for lvlJc
-		            Jc jc13 = wmlObjectFactory.createJc();
-		            lvl13.setLvlJc(jc13);
+		            Jc jc13 = wmlObjectFactory.createJc(); 
+		            lvl13.setLvlJc(jc13); 
 		                jc13.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl13.setTplc( "0409000F");
+		            lvl13.setTplc( "0409000F"); 
 		            // Create object for start
-		            Lvl.Start lvlstart13 = wmlObjectFactory.createLvlStart();
-		            lvl13.setStart(lvlstart13);
-		                lvlstart13.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart13 = wmlObjectFactory.createLvlStart(); 
+		            lvl13.setStart(lvlstart13); 
+		                lvlstart13.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl14 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl14);
-		            lvl14.setIlvl( BigInteger.valueOf( 4) );
+		        Lvl lvl14 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl14); 
+		            lvl14.setIlvl( BigInteger.valueOf( 4) ); 
 		            // Create object for pPr
-		            PPr ppr14 = wmlObjectFactory.createPPr();
-		            lvl14.setPPr(ppr14);
+		            PPr ppr14 = wmlObjectFactory.createPPr(); 
+		            lvl14.setPPr(ppr14); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind14 = wmlObjectFactory.createPPrBaseInd();
-		                ppr14.setInd(pprbaseind14);
-		                    pprbaseind14.setLeft( BigInteger.valueOf( 3600) );
-		                    pprbaseind14.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind14 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr14.setInd(pprbaseind14); 
+		                    pprbaseind14.setLeft( BigInteger.valueOf( 3600) ); 
+		                    pprbaseind14.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt14 = wmlObjectFactory.createNumFmt();
-		            lvl14.setNumFmt(numfmt14);
+		            NumFmt numfmt14 = wmlObjectFactory.createNumFmt(); 
+		            lvl14.setNumFmt(numfmt14); 
 		                numfmt14.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext14 = wmlObjectFactory.createLvlLvlText();
-		            lvl14.setLvlText(lvllvltext14);
-		                lvllvltext14.setVal( "%5.");
+		            Lvl.LvlText lvllvltext14 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl14.setLvlText(lvllvltext14); 
+		                lvllvltext14.setVal( "%5."); 
 		            // Create object for lvlJc
-		            Jc jc14 = wmlObjectFactory.createJc();
-		            lvl14.setLvlJc(jc14);
+		            Jc jc14 = wmlObjectFactory.createJc(); 
+		            lvl14.setLvlJc(jc14); 
 		                jc14.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl14.setTplc( "04090019");
+		            lvl14.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart14 = wmlObjectFactory.createLvlStart();
-		            lvl14.setStart(lvlstart14);
-		                lvlstart14.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart14 = wmlObjectFactory.createLvlStart(); 
+		            lvl14.setStart(lvlstart14); 
+		                lvlstart14.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl15 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl15);
-		            lvl15.setIlvl( BigInteger.valueOf( 5) );
+		        Lvl lvl15 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl15); 
+		            lvl15.setIlvl( BigInteger.valueOf( 5) ); 
 		            // Create object for pPr
-		            PPr ppr15 = wmlObjectFactory.createPPr();
-		            lvl15.setPPr(ppr15);
+		            PPr ppr15 = wmlObjectFactory.createPPr(); 
+		            lvl15.setPPr(ppr15); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind15 = wmlObjectFactory.createPPrBaseInd();
-		                ppr15.setInd(pprbaseind15);
-		                    pprbaseind15.setLeft( BigInteger.valueOf( 4320) );
-		                    pprbaseind15.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind15 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr15.setInd(pprbaseind15); 
+		                    pprbaseind15.setLeft( BigInteger.valueOf( 4320) ); 
+		                    pprbaseind15.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt15 = wmlObjectFactory.createNumFmt();
-		            lvl15.setNumFmt(numfmt15);
+		            NumFmt numfmt15 = wmlObjectFactory.createNumFmt(); 
+		            lvl15.setNumFmt(numfmt15); 
 		                numfmt15.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext15 = wmlObjectFactory.createLvlLvlText();
-		            lvl15.setLvlText(lvllvltext15);
-		                lvllvltext15.setVal( "%6.");
+		            Lvl.LvlText lvllvltext15 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl15.setLvlText(lvllvltext15); 
+		                lvllvltext15.setVal( "%6."); 
 		            // Create object for lvlJc
-		            Jc jc15 = wmlObjectFactory.createJc();
-		            lvl15.setLvlJc(jc15);
+		            Jc jc15 = wmlObjectFactory.createJc(); 
+		            lvl15.setLvlJc(jc15); 
 		                jc15.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl15.setTplc( "0409001B");
+		            lvl15.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart15 = wmlObjectFactory.createLvlStart();
-		            lvl15.setStart(lvlstart15);
-		                lvlstart15.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart15 = wmlObjectFactory.createLvlStart(); 
+		            lvl15.setStart(lvlstart15); 
+		                lvlstart15.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl16 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl16);
-		            lvl16.setIlvl( BigInteger.valueOf( 6) );
+		        Lvl lvl16 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl16); 
+		            lvl16.setIlvl( BigInteger.valueOf( 6) ); 
 		            // Create object for pPr
-		            PPr ppr16 = wmlObjectFactory.createPPr();
-		            lvl16.setPPr(ppr16);
+		            PPr ppr16 = wmlObjectFactory.createPPr(); 
+		            lvl16.setPPr(ppr16); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind16 = wmlObjectFactory.createPPrBaseInd();
-		                ppr16.setInd(pprbaseind16);
-		                    pprbaseind16.setLeft( BigInteger.valueOf( 5040) );
-		                    pprbaseind16.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind16 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr16.setInd(pprbaseind16); 
+		                    pprbaseind16.setLeft( BigInteger.valueOf( 5040) ); 
+		                    pprbaseind16.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt16 = wmlObjectFactory.createNumFmt();
-		            lvl16.setNumFmt(numfmt16);
+		            NumFmt numfmt16 = wmlObjectFactory.createNumFmt(); 
+		            lvl16.setNumFmt(numfmt16); 
 		                numfmt16.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext16 = wmlObjectFactory.createLvlLvlText();
-		            lvl16.setLvlText(lvllvltext16);
-		                lvllvltext16.setVal( "%7.");
+		            Lvl.LvlText lvllvltext16 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl16.setLvlText(lvllvltext16); 
+		                lvllvltext16.setVal( "%7."); 
 		            // Create object for lvlJc
-		            Jc jc16 = wmlObjectFactory.createJc();
-		            lvl16.setLvlJc(jc16);
+		            Jc jc16 = wmlObjectFactory.createJc(); 
+		            lvl16.setLvlJc(jc16); 
 		                jc16.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl16.setTplc( "0409000F");
+		            lvl16.setTplc( "0409000F"); 
 		            // Create object for start
-		            Lvl.Start lvlstart16 = wmlObjectFactory.createLvlStart();
-		            lvl16.setStart(lvlstart16);
-		                lvlstart16.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart16 = wmlObjectFactory.createLvlStart(); 
+		            lvl16.setStart(lvlstart16); 
+		                lvlstart16.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl17 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl17);
-		            lvl17.setIlvl( BigInteger.valueOf( 7) );
+		        Lvl lvl17 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl17); 
+		            lvl17.setIlvl( BigInteger.valueOf( 7) ); 
 		            // Create object for pPr
-		            PPr ppr17 = wmlObjectFactory.createPPr();
-		            lvl17.setPPr(ppr17);
+		            PPr ppr17 = wmlObjectFactory.createPPr(); 
+		            lvl17.setPPr(ppr17); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind17 = wmlObjectFactory.createPPrBaseInd();
-		                ppr17.setInd(pprbaseind17);
-		                    pprbaseind17.setLeft( BigInteger.valueOf( 5760) );
-		                    pprbaseind17.setHanging( BigInteger.valueOf( 360) );
+		                PPrBase.Ind pprbaseind17 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr17.setInd(pprbaseind17); 
+		                    pprbaseind17.setLeft( BigInteger.valueOf( 5760) ); 
+		                    pprbaseind17.setHanging( BigInteger.valueOf( 360) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt17 = wmlObjectFactory.createNumFmt();
-		            lvl17.setNumFmt(numfmt17);
+		            NumFmt numfmt17 = wmlObjectFactory.createNumFmt(); 
+		            lvl17.setNumFmt(numfmt17); 
 		                numfmt17.setVal(org.docx4j.wml.NumberFormat.LOWER_LETTER);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext17 = wmlObjectFactory.createLvlLvlText();
-		            lvl17.setLvlText(lvllvltext17);
-		                lvllvltext17.setVal( "%8.");
+		            Lvl.LvlText lvllvltext17 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl17.setLvlText(lvllvltext17); 
+		                lvllvltext17.setVal( "%8."); 
 		            // Create object for lvlJc
-		            Jc jc17 = wmlObjectFactory.createJc();
-		            lvl17.setLvlJc(jc17);
+		            Jc jc17 = wmlObjectFactory.createJc(); 
+		            lvl17.setLvlJc(jc17); 
 		                jc17.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		            lvl17.setTplc( "04090019");
+		            lvl17.setTplc( "04090019"); 
 		            // Create object for start
-		            Lvl.Start lvlstart17 = wmlObjectFactory.createLvlStart();
-		            lvl17.setStart(lvlstart17);
-		                lvlstart17.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart17 = wmlObjectFactory.createLvlStart(); 
+		            lvl17.setStart(lvlstart17); 
+		                lvlstart17.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for lvl
-		        Lvl lvl18 = wmlObjectFactory.createLvl();
-		        numberingabstractnum2.getLvl().add( lvl18);
-		            lvl18.setIlvl( BigInteger.valueOf( 8) );
+		        Lvl lvl18 = wmlObjectFactory.createLvl(); 
+		        numberingabstractnum2.getLvl().add( lvl18); 
+		            lvl18.setIlvl( BigInteger.valueOf( 8) ); 
 		            // Create object for pPr
-		            PPr ppr18 = wmlObjectFactory.createPPr();
-		            lvl18.setPPr(ppr18);
+		            PPr ppr18 = wmlObjectFactory.createPPr(); 
+		            lvl18.setPPr(ppr18); 
 		                // Create object for ind
-		                PPrBase.Ind pprbaseind18 = wmlObjectFactory.createPPrBaseInd();
-		                ppr18.setInd(pprbaseind18);
-		                    pprbaseind18.setLeft( BigInteger.valueOf( 6480) );
-		                    pprbaseind18.setHanging( BigInteger.valueOf( 180) );
+		                PPrBase.Ind pprbaseind18 = wmlObjectFactory.createPPrBaseInd(); 
+		                ppr18.setInd(pprbaseind18); 
+		                    pprbaseind18.setLeft( BigInteger.valueOf( 6480) ); 
+		                    pprbaseind18.setHanging( BigInteger.valueOf( 180) ); 
 		            // Create object for numFmt
-		            NumFmt numfmt18 = wmlObjectFactory.createNumFmt();
-		            lvl18.setNumFmt(numfmt18);
+		            NumFmt numfmt18 = wmlObjectFactory.createNumFmt(); 
+		            lvl18.setNumFmt(numfmt18); 
 		                numfmt18.setVal(org.docx4j.wml.NumberFormat.LOWER_ROMAN);
 		            // Create object for lvlText
-		            Lvl.LvlText lvllvltext18 = wmlObjectFactory.createLvlLvlText();
-		            lvl18.setLvlText(lvllvltext18);
-		                lvllvltext18.setVal( "%9.");
+		            Lvl.LvlText lvllvltext18 = wmlObjectFactory.createLvlLvlText(); 
+		            lvl18.setLvlText(lvllvltext18); 
+		                lvllvltext18.setVal( "%9."); 
 		            // Create object for lvlJc
-		            Jc jc18 = wmlObjectFactory.createJc();
-		            lvl18.setLvlJc(jc18);
+		            Jc jc18 = wmlObjectFactory.createJc(); 
+		            lvl18.setLvlJc(jc18); 
 		                jc18.setVal(org.docx4j.wml.JcEnumeration.RIGHT);
-		            lvl18.setTplc( "0409001B");
+		            lvl18.setTplc( "0409001B"); 
 		            // Create object for start
-		            Lvl.Start lvlstart18 = wmlObjectFactory.createLvlStart();
-		            lvl18.setStart(lvlstart18);
-		                lvlstart18.setVal( BigInteger.valueOf( 1) );
+		            Lvl.Start lvlstart18 = wmlObjectFactory.createLvlStart(); 
+		            lvl18.setStart(lvlstart18); 
+		                lvlstart18.setVal( BigInteger.valueOf( 1) ); 
 		        // Create object for nsid
-		        CTLongHexNumber longhexnumber3 = wmlObjectFactory.createCTLongHexNumber();
-		        numberingabstractnum2.setNsid(longhexnumber3);
-		            longhexnumber3.setVal( "72BA27DB");
+		        CTLongHexNumber longhexnumber3 = wmlObjectFactory.createCTLongHexNumber(); 
+		        numberingabstractnum2.setNsid(longhexnumber3); 
+		            longhexnumber3.setVal( "72BA27DB"); 
 		        // Create object for multiLevelType
-		        Numbering.AbstractNum.MultiLevelType numberingabstractnummultileveltype2 = wmlObjectFactory.createNumberingAbstractNumMultiLevelType();
-		        numberingabstractnum2.setMultiLevelType(numberingabstractnummultileveltype2);
-		            numberingabstractnummultileveltype2.setVal( "hybridMultilevel");
+		        Numbering.AbstractNum.MultiLevelType numberingabstractnummultileveltype2 = wmlObjectFactory.createNumberingAbstractNumMultiLevelType(); 
+		        numberingabstractnum2.setMultiLevelType(numberingabstractnummultileveltype2); 
+		            numberingabstractnummultileveltype2.setVal( "hybridMultilevel"); 
 		        // Create object for tmpl
-		        CTLongHexNumber longhexnumber4 = wmlObjectFactory.createCTLongHexNumber();
-		        numberingabstractnum2.setTmpl(longhexnumber4);
-		            longhexnumber4.setVal( "75ACB30A");
+		        CTLongHexNumber longhexnumber4 = wmlObjectFactory.createCTLongHexNumber(); 
+		        numberingabstractnum2.setTmpl(longhexnumber4); 
+		            longhexnumber4.setVal( "75ACB30A"); 
 
-		return ndp;
+		return ndp;		
 	}
 
 	private DocumentSettingsPart addSettingsPart() throws InvalidFormatException {
@@ -1330,9 +1358,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	public void charactersUnescaped(String literal) {
 //		characters = literal;
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @param chartRelId
 	 * @return the chart paragraph
 	 * @throws JAXBException
@@ -1340,27 +1368,27 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private P chart(String chartRelId, String chartId) throws JAXBException {
 		String ml = "<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" "
 				+ "xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" w:rsidR=\"0084689C\" w:rsidRDefault=\"00D47CF0\">"
-				+ "			<w:r>"
-				+ "				<w:rPr>"
-				+ "					<w:noProof />"
-				+ "				</w:rPr>"
+				+ "			<w:r>" 
+				+ "				<w:rPr>" 
+				+ "					<w:noProof />" 
+				+ "				</w:rPr>" 
 				+ "				<w:drawing>"
-				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">"
+				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">" 
 				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />"
-				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />"
+				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />" 
 				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram "+chartId+"\" />"
-				+ "						<wp:cNvGraphicFramePr />"
+				+ "						<wp:cNvGraphicFramePr />" 
 				+ "						<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\">"
-				+ "							<a:graphicData"
-				+ "								uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">"
+				+ "							<a:graphicData" 
+				+ "								uri=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">" 
 				+ "								<c:chart"
 				+ "									xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\""
 				+ "									xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\""
-				+ "									r:id=\"${chartRelId}\" />"
-				+ "							</a:graphicData>"
-				+ "						</a:graphic>"
+				+ "									r:id=\"${chartRelId}\" />" 
+				+ "							</a:graphicData>" 
+				+ "						</a:graphic>" 
 				+ "					</wp:inline>"
-				+ "				</w:drawing>"
+				+ "				</w:drawing>" 
 				+ "			</w:r>"
 				+ "       </w:p>";
 		java.util.HashMap<String, String> mappings = new java.util.HashMap<String, String>();
@@ -1374,7 +1402,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * <p>
 	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
 	 * </p>
-	 *
+	 * 
 	 * @param xSeries
 	 *            the data set
 	 */
@@ -1382,7 +1410,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		try {
 			String prId = Integer.toString(++chartCounter);
 			Chart chart = new Chart(new PartName("/word/charts/chart" + prId + ".xml"));
-
+			
 			CTChartSpace chartSpace = ChartFactory.createChartSpace(title, ylabel, xlabel, plotset);
 			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			chart.setJaxbElement(chartSpace);
@@ -1413,7 +1441,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Use to apply a specific style on the given paragraph.
-	 *
+	 * 
 	 * @param p
 	 * @param style
 	 * @return
@@ -1436,7 +1464,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private org.docx4j.wml.RPr createSpan(String text) {
 		org.docx4j.wml.Text t = factory.createText();
-		t.setSpace( "preserve");
+		t.setSpace( "preserve"); 
 		t.setValue(text);
 		org.docx4j.wml.R run = factory.createR();
 		run.getContent().add(t);
@@ -1505,8 +1533,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			break;
 		default:
 			break;
-		}
-		endSpan();
+		}		
+		endSpan();			
 	}
 
 	@Override
@@ -1563,7 +1591,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			block.setI(TRUE);
 			break;
 		case SPAN:
-
+			
 			// TODO Auto-generated method stub
 			break;
 		case STRONG:
@@ -1624,7 +1652,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	/**
 	 * Converts <b>LaTeX</b> to <b>Office MathML</b> and inserts it into the
 	 * document.
-	 *
+	 * 
 	 * @param latex
 	 *            the LaTeX code
 	 */
@@ -1710,7 +1738,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Unzip it
-	 *
+	 * 
 	 * @param zipFile
 	 *            input zip file
 	 * @param output
