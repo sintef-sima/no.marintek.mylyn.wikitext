@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/no.marintek.mylyn.wikitext_1.2.1.qualifier.jar" id="no.marintek.mylyn.wikitext" version="1.2.1.qualifier"/>
+   <feature url="features/no.marintek.mylyn.wikitext_1.2.2.qualifier.jar" id="no.marintek.mylyn.wikitext" version="1.2.2.qualifier"/>
 </site>
