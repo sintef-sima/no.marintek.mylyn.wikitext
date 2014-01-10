@@ -81,13 +81,16 @@ import org.docx4j.wml.CTTwipsMeasure;
 import org.docx4j.wml.CTZoom;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.FldChar;
+import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.Jc;
+import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.Lvl;
 import org.docx4j.wml.NumFmt;
 import org.docx4j.wml.Numbering;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase;
+import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RFonts;
 import org.docx4j.wml.RPr;
@@ -458,7 +461,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			CTShd shdNormal = createCellStyle(backgroundColor);
 			tcpr.setShd(shdNormal);
 			
-			beginSpan(spanType, new Attributes());
+			beginSpan(spanType, currentAttributes);
 			break;
 		case TABLE_CELL_HEADER:
 			Tc tc = wmlObjectFactory.createTc();
@@ -523,11 +526,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	private Map<String, String> getStylesFromCssString(String cssStyle) {
 		Map<String, String> cssStyleMap = new HashMap<String, String>();
-		String[] styles = cssStyle.split(";");
-		for (String style : styles) {
-			style = style.replaceAll(" ", "").trim();
-			String[] keyValuePair = style.split(":");
-			cssStyleMap.put(keyValuePair[0], keyValuePair[1]);
+		if (cssStyle != null) {
+			String[] styles = cssStyle.split(";");
+			for (String style : styles) {
+				style = style.replaceAll(" ", "").trim();
+				String[] keyValuePair = style.split(":");
+				cssStyleMap.put(keyValuePair[0], keyValuePair[1]);
+			}
 		}
 		return cssStyleMap;
 	}
@@ -1474,6 +1479,34 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		return rpr;
 	}
 
+	private org.docx4j.wml.RPr createSpanWithFontSize(String text, String fontSize) {
+		HpsMeasure m = wmlObjectFactory.createHpsMeasure();
+		m.setVal(new BigInteger(fontSize));
+
+		PPr ppr = factory.createPPr();
+		ParaRPr prpr = factory.createParaRPr();
+		prpr.setSz(m);
+		prpr.setSzCs(m);
+		ppr.setRPr(prpr);
+
+		currentParagraph.setPPr(ppr);
+
+		org.docx4j.wml.Text t = factory.createText();
+		t.setSpace("preserve");
+		t.setValue(text);
+
+		org.docx4j.wml.R run = factory.createR();
+		run.getContent().add(t);
+
+		currentParagraph.getContent().add(run);
+
+		org.docx4j.wml.RPr rpr = factory.createRPr();
+		rpr.setSz(m);
+		rpr.setSzCs(m);
+		run.setRPr(rpr);
+		return rpr;
+	}
+
 	private TblBorders createTableBorders() {
 
 		TblBorders tblborders = wmlObjectFactory.createTblBorders();
@@ -1554,7 +1587,28 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void endSpan() {
-		RPr block = createSpan(characters.toString());
+		RPr block;
+		
+		// Set font size
+		String fontSize = getCssValueForKey(currentAttributes.getCssStyle(), "font-size");
+		if (!fontSize.isEmpty()) {
+			block = createSpanWithFontSize(characters.toString(), fontSize);
+		} else {
+			block = createSpan(characters.toString());
+		}
+		
+		// Set text alignment
+		String textHAlign = getCssValueForKey(currentAttributes.getCssStyle(), "text-align");
+		if (currentParagraph.getPPr()!=null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {
+			Jc align = factory.createJc();
+			if (textHAlign.toLowerCase().equals("right")) {
+				align.setVal(JcEnumeration.RIGHT);
+			} else {
+				align.setVal(JcEnumeration.CENTER);
+			}
+			currentParagraph.getPPr().setJc(align);
+		}
+
 		characters.setLength(0);
 		if (currentSpanType==null) {
 			return;
