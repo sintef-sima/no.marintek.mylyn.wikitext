@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="MARINTEK WikiText 1.2.0" sequenceNumber="0">
+<?pde version="3.8"?><target name="MARINTEK WikiText 1.2.1" sequenceNumber="0">
 <locations>
 <location includeAllPlatforms="true" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
 <unit id="org.apache.commons.io" version="2.0.1.v201105210651"/>
 <unit id="org.apache.log4j" version="1.2.15.v201012070815"/>
 <unit id="org.apache.xalan" version="2.7.1.v201005080400"/>
+<unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
 <unit id="org.apache.xmlgraphics" version="1.4.0.v201301251218"/>
 <unit id="org.apache.commons.lang" version="2.6.0.v201205030909"/>
 <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
+<unit id="org.apache.xml.resolver" version="1.2.0.v201005080400"/>
 <unit id="org.junit" version="4.11.0.v201303080030"/>
+<unit id="javax.xml" version="1.3.4.v201005080400"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/"/>
 </location>
 <location includeAllPlatforms="true" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">

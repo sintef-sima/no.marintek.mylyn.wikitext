@@ -460,7 +460,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 			CTShd shdNormal = createCellStyle(backgroundColor);
 			tcpr.setShd(shdNormal);
-			
 			beginSpan(spanType, currentAttributes);
 			break;
 		case TABLE_CELL_HEADER:
@@ -1605,7 +1604,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void endSpan() {
 		RPr block;
-		
+
 		// Set font size
 		String fontSize = getCssValueForKey(currentAttributes.getCssStyle(), "font-size");
 		if (!fontSize.isEmpty()) {
@@ -1613,7 +1612,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		} else {
 			block = createSpan(characters.toString());
 		}
-		
+
 		// Set text alignment
 		String textHAlign = getCssValueForKey(currentAttributes.getCssStyle(), "text-align");
 		if (currentParagraph.getPPr()!=null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Docx4j
 Bundle-SymbolicName: org.docx4j
-Bundle-Version: 3.0.3.qualifier
+Bundle-Version: 3.0.0
 Bundle-ClassPath: .
 Bundle-Vendor: MARINTEK
 Export-Package: com.topologi.diffx,

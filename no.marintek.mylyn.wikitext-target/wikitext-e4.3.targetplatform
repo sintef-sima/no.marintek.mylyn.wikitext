@@ -1,4 +1,4 @@
-target "MARINTEK WikiText 1.2.0"
+target "MARINTEK WikiText 1.2.1"
 
 // The Orbit repository is plug-in based
 location "http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/" {
@@ -7,10 +7,13 @@ location "http://download.eclipse.org/tools/orbit/downloads/drops/R2013082706493
 	org.apache.commons.io
 	org.apache.log4j
  	org.apache.xalan
+ 	org.apache.xerces
  	org.apache.xmlgraphics
  	org.apache.commons.lang
  	org.apache.xml.serializer
+ 	org.apache.xml.resolver
  	org.junit
+ 	javax.xml
 }
 
 location "http://download.eclipse.org/mylyn/releases/kepler/" {
