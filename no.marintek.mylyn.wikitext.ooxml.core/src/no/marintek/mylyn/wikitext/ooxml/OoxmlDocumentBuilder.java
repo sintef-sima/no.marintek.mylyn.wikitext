@@ -111,6 +111,7 @@ import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
+import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
@@ -462,12 +463,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			beginSpan(spanType, currentAttributes);
 			break;
 		case TABLE_CELL_HEADER:
-			Tc tc = wmlObjectFactory.createTc();
-			JAXBElement<org.docx4j.wml.Tc> tcWrapped = wmlObjectFactory.createTrTc(tc);
-			currentTableRow.getContent().add(tcWrapped);
-			currentParagraph = factory.createP();
-			tc.getContent().add(currentParagraph);
-
+			Tc tc = createTableCell();
 			TcPr tcpr2 = wmlObjectFactory.createTcPr();
 			if (currentAttributes != null && currentAttributes instanceof TableCellAttributes) {
 				TableCellAttributes tableCellAttributes = (TableCellAttributes) currentAttributes;
@@ -489,12 +485,29 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	}
 
 	private Tc createTableCell() {
-		Tc tc = wmlObjectFactory.createTc();
+		Tc tc = factory.createTc();
 		JAXBElement<org.docx4j.wml.Tc> tcWrapped = wmlObjectFactory.createTrTc(tc);
 		currentTableRow.getContent().add(tcWrapped);
 		currentParagraph = factory.createP();
+		PPr ppr = applyKeepLinesTogether(currentParagraph.getPPr());
+		currentParagraph.setPPr(ppr);
 		tc.getContent().add(currentParagraph);
 		return tc;
+	}
+
+	/**
+	 * Prevent splitting across pages. If there's not enough space on page, the table or span is moved to the next page.
+	 * 
+	 * @param ppr
+	 * @return
+	 */
+	private PPr applyKeepLinesTogether(PPr ppr) {
+		if (ppr == null) {
+			ppr = factory.createPPr();
+		}
+		ppr.setKeepLines(new BooleanDefaultTrue());
+		ppr.setKeepNext(new BooleanDefaultTrue());
+		return ppr;
 	}
 
 	private CTShd createCellStyle(String fillColor) {
@@ -1482,6 +1495,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		m.setVal(new BigInteger(fontSize));
 
 		PPr ppr = factory.createPPr();
+
+		if (currentBlockType == BlockType.TABLE_CELL_HEADER || currentBlockType == BlockType.TABLE_CELL_NORMAL) {
+			ppr = applyKeepLinesTogether(ppr);
+		}
+
 		ParaRPr prpr = factory.createParaRPr();
 		prpr.setSz(m);
 		prpr.setSzCs(m);
