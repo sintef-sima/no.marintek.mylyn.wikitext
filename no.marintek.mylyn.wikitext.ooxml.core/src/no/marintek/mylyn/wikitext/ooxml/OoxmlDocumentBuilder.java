@@ -111,7 +111,6 @@ import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
-import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
@@ -497,7 +496,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Prevent splitting across pages. If there's not enough space on page, the table or span is moved to the next page.
-	 * 
+	 *
 	 * @param ppr
 	 * @return
 	 */
