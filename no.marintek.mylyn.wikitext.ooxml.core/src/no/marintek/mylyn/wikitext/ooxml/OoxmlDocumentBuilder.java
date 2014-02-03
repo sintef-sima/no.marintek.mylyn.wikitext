@@ -1389,7 +1389,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 				+ "				</w:rPr>"
 				+ "				<w:drawing>"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">"
-				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />"
+				+ "						<wp:extent cx=\"6486400\" cy=\"3200400\" />"
 				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />"
 				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram "+chartId+"\" />"
 				+ "						<wp:cNvGraphicFramePr />"
