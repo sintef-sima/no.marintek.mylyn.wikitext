@@ -1579,6 +1579,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		case TABLE_CELL_NORMAL:
 			tableColumnCount++;
 			break;
+		case PARAGRAPH:
+			applyStyle(currentParagraph, "BodyText");
 		default:
 			break;
 		}
@@ -1783,9 +1785,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void lineBreak() {
+		endSpan();
 		org.docx4j.wml.Br br = new org.docx4j.wml.Br();
 		br.setType(STBrType.TEXT_WRAPPING);
-		mainDocumentPart.addObject(br);
+		currentParagraph.getContent().add(br);
 	}
 
 	@Override
