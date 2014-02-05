@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
-		<version>1.2.3-SNAPSHOT</version>
+		<version>1.2.4-SNAPSHOT</version>
 		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 	<artifactId>uk.ac.ed.ph.snuggletex</artifactId>
