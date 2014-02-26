@@ -10,9 +10,10 @@
  *******************************************************************************/
 package no.marintek.mylyn.wikitext.ooxml;
 
+
 import javax.xml.bind.JAXBException;
 
-import no.marintek.mylin.wikitext.chart.ChartRenderHint;
+import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -282,23 +283,7 @@ public class ChartFactory {
 		lineser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
 
 	}
-
-	/**
-	 * 
-	 * @param legends
-	 * @param ylabel
-	 * @param xlabel
-	 * @param ySeries
-	 * @param xSeries
-	 * @param dmlchartObjectFactory
-	 * @param valueAxisId
-	 * @param categoryAxisId
-	 * @param dmlObjectFactory
-	 * @param plotarea
-	 * @param linechart
-	 * @param order
-	 * @param index
-	 */
+	
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
 			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index) {
@@ -600,7 +585,6 @@ public class ChartFactory {
 			CTBoolean boolean3 = dmlchartObjectFactory.createCTBoolean();
 			boolean3.setVal(Boolean.TRUE);
 			linechart.setMarker(boolean3);
-	
 			CTDLbls dlbls = createLabels(dmlchartObjectFactory);
 			linechart.setDLbls(dlbls);
 
@@ -630,10 +614,14 @@ public class ChartFactory {
 			linechart.setVaryColors(boolean11);
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory, valueAxisId, categoryAxisId, dmlObjectFactory,
-						plotarea, linechart, series, series, plotSet.getRenderHint());
+				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHint());
 			}
 		} else if (ChartType.BAR.equals(plotSet.getChartType())) {
+
+			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
+			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
+
 			CTBarChart barchart = dmlchartObjectFactory.createCTBarChart();
 			plotarea.getAreaChartOrArea3DChartOrLineChart().add(barchart);
 
@@ -641,6 +629,31 @@ public class ChartFactory {
 			CTBarDir dir = dmlchartObjectFactory.createCTBarDir();
 			dir.setVal(STBarDir.COL);
 			barchart.setBarDir(dir);
+
+			// Position
+			CTTickLblPos tickLblPos = dmlchartObjectFactory.createCTTickLblPos();
+			tickLblPos.setVal(STTickLblPos.LOW);
+			catAx.setTickLblPos(tickLblPos);
+
+			CTAxPos pos = dmlchartObjectFactory.createCTAxPos();
+			pos.setVal(STAxPos.B);
+			catAx.setAxPos(pos);
+
+			// Minimum/maximum major tick marks for the horizontal axis
+			int length = plotSet.getxSeries()[0].length;
+			int skip = length / 10;
+
+			if (length > 10) {
+				CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
+				createCTSkip.setVal(skip);
+				catAx.setTickMarkSkip(createCTSkip);
+				catAx.setTickLblSkip(createCTSkip);
+			}
+
+			// Show X values
+			CTBoolean xValuesHidden = dmlchartObjectFactory.createCTBoolean();
+			xValuesHidden.setVal(false);
+			catAx.setDelete(xValuesHidden);
 
 			// Create labels
 			CTDLbls dlbls = createLabels(dmlchartObjectFactory);
@@ -671,24 +684,6 @@ public class ChartFactory {
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series);
 			}
 		}
-
-		// Create object for catAx
-		CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
-		
-		// Position
-		CTTickLblPos tickLblPos = dmlchartObjectFactory.createCTTickLblPos();
-		tickLblPos.setVal(STTickLblPos.LOW);
-		catAx.setTickLblPos(tickLblPos );
-		
-		CTAxPos pos = dmlchartObjectFactory.createCTAxPos();
-		pos.setVal(STAxPos.B); 
-		catAx.setAxPos(pos);
-		
-		// Show X values
-		CTBoolean xValuesHidden = dmlchartObjectFactory.createCTBoolean();
-		xValuesHidden.setVal(false);
-
-		plotarea.getValAxOrCatAxOrDateAx().add(catAx);
 
 		return chartspace;
 	}

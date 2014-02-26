@@ -1,4 +1,4 @@
-package no.marintek.mylin.wikitext.chart;
+package no.marintek.mylyn.wikitext.chart;
 
 
 public class ChartRenderHint {

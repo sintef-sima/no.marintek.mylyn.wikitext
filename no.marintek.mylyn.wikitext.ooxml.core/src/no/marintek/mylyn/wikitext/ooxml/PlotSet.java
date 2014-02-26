@@ -1,6 +1,6 @@
 package no.marintek.mylyn.wikitext.ooxml;
 
-import no.marintek.mylin.wikitext.chart.ChartRenderHint;
+import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
 import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
 
 /**
