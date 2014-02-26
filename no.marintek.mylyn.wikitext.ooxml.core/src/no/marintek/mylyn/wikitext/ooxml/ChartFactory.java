@@ -10,8 +10,6 @@
  *******************************************************************************/
 package no.marintek.mylyn.wikitext.ooxml;
 
-import java.text.DecimalFormat;
-
 import javax.xml.bind.JAXBException;
 
 import no.marintek.mylin.wikitext.chart.ChartRenderHint;
@@ -65,7 +63,6 @@ import org.docx4j.dml.chart.CTMarkerSize;
 import org.docx4j.dml.chart.CTMarkerStyle;
 import org.docx4j.dml.chart.CTNumData;
 import org.docx4j.dml.chart.CTNumDataSource;
-import org.docx4j.dml.chart.CTNumFmt;
 import org.docx4j.dml.chart.CTNumVal;
 import org.docx4j.dml.chart.CTOrientation;
 import org.docx4j.dml.chart.CTPlotArea;
@@ -74,6 +71,7 @@ import org.docx4j.dml.chart.CTScatterChart;
 import org.docx4j.dml.chart.CTScatterSer;
 import org.docx4j.dml.chart.CTScatterStyle;
 import org.docx4j.dml.chart.CTSerTx;
+import org.docx4j.dml.chart.CTSkip;
 import org.docx4j.dml.chart.CTStyle;
 import org.docx4j.dml.chart.CTTextLanguageID;
 import org.docx4j.dml.chart.CTTickLblPos;
@@ -97,7 +95,23 @@ import org.docx4j.dml.chart.STTickLblPos;
  * @since 1.0
  */
 public class ChartFactory {
-	
+
+	private static class Range {
+		double min;
+		double max;
+		String format;
+
+		public Range(double min, double max, String format) {
+			this.min = min;
+			this.max = max;
+			this.format = format;
+		}
+	}
+
+	public static final String DEFAULT_ENGINEERING_FORMAT = "0.00E+00;0.00E+00;0";
+
+	private static final int ENGINEERING_LIMIT = 4;
+
 	/**
 	 * Type of chart that can be created.
 	 */
@@ -118,30 +132,31 @@ public class ChartFactory {
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
 			CTPlotArea plotarea, CTScatterChart scatterchart, int index) {
-		
+
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
-		
+
 		// Create object for idx
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory.createCTUnsignedInt();
 		scatterser.setIdx(unsignedint2);
 		unsignedint2.setVal(index);
 
 		// Create object for order
-		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		scatterser.setOrder(unsignedint);
-		unsignedint.setVal(index);
+		 CTUnsignedInt unsignedint =
+		 dmlchartObjectFactory.createCTUnsignedInt();
+		 scatterser.setOrder(unsignedint);
+		 unsignedint.setVal(index);
 
-		// Create object for tx
+		// Create object for series text
 		CTSerTx sertx = dmlchartObjectFactory.createCTSerTx();
 		scatterser.setTx(sertx);
 		sertx.setV(legends[index]);
-				
+
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 		scatterser.setSpPr(shapeproperties);
-		
-		// Create object for marker 
+
+		// Create object for data point marker
 		CTMarker marker = dmlchartObjectFactory.createCTMarker();
 		CTMarkerSize size = dmlchartObjectFactory.createCTMarkerSize();
 		size.setVal((short) 3);
@@ -150,20 +165,20 @@ public class ChartFactory {
 		symbol.setVal(org.docx4j.dml.chart.STMarkerStyle.CIRCLE);
 		marker.setSymbol(symbol);
 		scatterser.setMarker(marker);
-		
+
 		// Create object for scatterStyle
 		CTScatterStyle scatterStyle = dmlchartObjectFactory.createCTScatterStyle();
 		scatterStyle.setVal(STScatterStyle.LINE);
-		
+
 		// Create object for smooth line style
 		CTBoolean smooth = dmlchartObjectFactory.createCTBoolean();
-		smooth.setVal(false);
+		smooth.setVal(Boolean.FALSE);
 		scatterser.setSmooth(smooth);
-		 
+
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
 		shapeproperties.setLn(lineproperties);
-		
+
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
@@ -173,20 +188,15 @@ public class ChartFactory {
 		srgbcolor.setVal(COLOUR_SCHEME[index]);
 
 		// Create object for xVal
-		scatterser.setXVal(createCategories(dmlchartObjectFactory, xSeries));
-		
+		scatterser.setXVal(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
+
 		// Create object for yVal
-		scatterser.setYVal(createValues(dmlchartObjectFactory, ySeries));
-	
-		// Create object for smooth
-		CTBoolean boolean12 = dmlchartObjectFactory.createCTBoolean();
-		boolean12.setVal(Boolean.FALSE);
-		scatterser.setSmooth(boolean12);
-		
+		scatterser.setYVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
+
 	}
 
 	/**
-	 * 
+	 *
 	 * @param legends
 	 * @param ylabel
 	 * @param xlabel
@@ -208,23 +218,23 @@ public class ChartFactory {
 		// Create object for dispUnits
 		CTLineSer lineser = dmlchartObjectFactory.createCTLineSer();
 		linechart.getSer().add(lineser);
-		
+
 		// Create object for order
 		CTUnsignedInt unsignedint3 = dmlchartObjectFactory.createCTUnsignedInt();
 		lineser.setOrder(unsignedint3);
 		unsignedint3.setVal(order);
-		
+
 		// Create object for val
-		lineser.setVal(createValues(dmlchartObjectFactory, ySeries));
-		
+		lineser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
+
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 		lineser.setSpPr(shapeproperties);
-		
+
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
 		shapeproperties.setLn(lineproperties);
-		
+
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
@@ -242,9 +252,11 @@ public class ChartFactory {
 		CTSerTx sertx = dmlchartObjectFactory.createCTSerTx();
 		lineser.setTx(sertx);
 		sertx.setV(legends[index]);
-		
+
 		// Create object for marker
 		CTMarker marker = dmlchartObjectFactory.createCTMarker();
+
+		// Create object for symbol
 		CTMarkerStyle markerstyle = dmlchartObjectFactory.createCTMarkerStyle();
 		markerstyle.setVal(org.docx4j.dml.chart.STMarkerStyle.NONE);
 
@@ -267,7 +279,7 @@ public class ChartFactory {
 		boolean12.setVal(Boolean.FALSE);
 		lineser.setSmooth(boolean12);
 
-		lineser.setCat(createCategories(dmlchartObjectFactory, xSeries));
+		lineser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
 
 	}
 
@@ -301,7 +313,7 @@ public class ChartFactory {
 		unsignedint3.setVal(order);
 
 		// Create object for val
-		barser.setVal(createValues(dmlchartObjectFactory, ySeries));
+		barser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
 
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
@@ -348,7 +360,7 @@ public class ChartFactory {
 		// boolean12.setVal(Boolean.FALSE);
 		// barser.setSmooth(boolean12);
 
-		barser.setCat(createCategories(dmlchartObjectFactory, xSeries));
+		barser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
 
 	}
 
@@ -359,21 +371,35 @@ public class ChartFactory {
 	 * @param data
 	 * @return
 	 */
-	private static CTAxDataSource createCategories(ObjectFactory dmlchartObjectFactory, double[] data) {
+	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
 		// Create object for numCache
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
 
+		double max = 0;
+		double min = 0;
+
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
 			numval.setIdx(i);
-			numval.setV(new DecimalFormat("#.##").format(data[i]));
+			if (Double.isNaN(data[i])) {
+				numval.setV(""); // NaN must be represented as empty string
+									// (tested in MS Word 2010 on Windows 7)
+			} else {
+				if (data[i] > max) {
+					max = data[i];
+				}
+				if (data[i] < min) {
+					min = data[i];
+				}
+				numval.setV(Double.toString(data[i]));
+			}
 		}
-
-		numdata.setFormatCode("General");
+		Range range = setRange(max, min);
+		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
@@ -381,6 +407,35 @@ public class ChartFactory {
 		unsignedint.setVal(data.length);
 
 		return datasource;
+	}
+
+	private static Range setRange(double lower, double upper) {
+		double min;
+		double max;
+		String default_decimal_format = "0.0";
+		String formatPattern = default_decimal_format;
+
+		if (Double.isNaN(lower) || Double.isNaN(upper) || Double.isInfinite(lower) || Double.isInfinite(upper) || Double.isInfinite(upper - lower)) {
+			throw new IllegalArgumentException("Illegal range: lower=" + lower + ", upper=" + upper);
+		}
+
+		if (lower == upper) {
+			upper = lower + 1;
+			if (Double.isInfinite(upper))
+				throw new IllegalArgumentException("Illegal range: lower=" + lower + ", upper=" + upper);
+		}
+
+		min = lower;
+		max = upper;
+
+		if (formatPattern.equals(default_decimal_format) || formatPattern.equals(DEFAULT_ENGINEERING_FORMAT)) {
+			if ((max != 0 && Math.abs(Math.log10(Math.abs(max))) >= ENGINEERING_LIMIT)
+					|| (min != 0 && Math.abs(Math.log10(Math.abs(min))) >= ENGINEERING_LIMIT))
+				formatPattern = DEFAULT_ENGINEERING_FORMAT;
+			else
+				formatPattern = default_decimal_format;
+		}
+		return new Range(min, max, formatPattern);
 	}
 
 	/**
@@ -401,8 +456,7 @@ public class ChartFactory {
 	 * @return the chart space instance
 	 * @throws JAXBException
 	 */
-	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel,PlotSet plotSet)
-			throws JAXBException {
+	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, PlotSet plotSet) throws JAXBException {
 
 		if ((plotSet.getxSeries().length > COLOUR_SCHEME.length) || (plotSet.getySeries().length > COLOUR_SCHEME.length)) {
 			throw new IllegalArgumentException("The maximum number of series in one chart is " + COLOUR_SCHEME.length);
@@ -410,6 +464,7 @@ public class ChartFactory {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
+		// Create random numbers for the axis identifiers
 		int valueAxisId = (int) (Math.random() * Integer.MAX_VALUE);
 		int categoryAxisId = (int) (Math.random() * Integer.MAX_VALUE);
 
@@ -437,20 +492,55 @@ public class ChartFactory {
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
 		boolean2.setVal(Boolean.FALSE);
 		chart.setAutoTitleDeleted(boolean2);
-		
+
 		// Create object for plotArea
 		CTPlotArea plotarea = dmlchartObjectFactory.createCTPlotArea();
 		chart.setPlotArea(plotarea);
 
 		// Create object for layout
 		plotarea.setLayout(createLayout());
+
+		// FIXME: Create this properly if we need it
+		// CTScaling createCTScaling = dmlchartObjectFactory.createCTScaling();
+		// CTDouble min = dmlchartObjectFactory.createCTDouble();
+		// min.setVal(4);
+		//
+		// createCTScaling.setMin(min);
+		// CTDouble max = dmlchartObjectFactory.createCTDouble();
+		// min.setVal(10);
+		// createCTScaling.setMin(max);
+		// catAx.setScaling(createCTScaling);
+
+		// Create object for valAx
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId, false));
+
+		// Add a legend
+		if (plotSet.getLabels().length > 1) {
+			chart.setLegend(createLegend());
+		}
+
+		createChartLayout(dmlchartObjectFactory, chartspace, chart, dmlObjectFactory);
+
 		if (ChartType.SCATTER.equals(plotSet.getChartType())) {
+
+			CTValAx catAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true);
+			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
+
+			// Position
+			CTTickLblPos tickLblPos = dmlchartObjectFactory.createCTTickLblPos();
+			tickLblPos.setVal(STTickLblPos.LOW);
+			catAx.setTickLblPos(tickLblPos);
+
+			CTAxPos pos = dmlchartObjectFactory.createCTAxPos();
+			pos.setVal(STAxPos.B);
+			catAx.setAxPos(pos);
+
 			CTScatterChart scatterchart = dmlchartObjectFactory.createCTScatterChart();
 			plotarea.getAreaChartOrArea3DChartOrLineChart().add(scatterchart);
-			
+
 			// Create object for scatter style
 			CTScatterStyle scatterStyle = dmlchartObjectFactory.createCTScatterStyle();
-			scatterStyle.setVal(STScatterStyle.LINE_MARKER);			
+			scatterStyle.setVal(STScatterStyle.LINE_MARKER);
 			scatterchart.setScatterStyle(scatterStyle);
 
 			// Specify X-axis relationships
@@ -467,16 +557,45 @@ public class ChartFactory {
 			CTBoolean boolean11 = dmlchartObjectFactory.createCTBoolean();
 			boolean11.setVal(Boolean.FALSE);
 			scatterchart.setVaryColors(boolean11);
-			
+
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory, valueAxisId, categoryAxisId, dmlObjectFactory,
-						plotarea, scatterchart, series);
+				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series);
 			}
 
 		} else if (ChartType.LINE.equals(plotSet.getChartType())) {
+
+			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
+			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
+
 			CTLineChart linechart = dmlchartObjectFactory.createCTLineChart();
 			plotarea.getAreaChartOrArea3DChartOrLineChart().add(linechart);
-	
+
+			// Position
+			CTTickLblPos tickLblPos = dmlchartObjectFactory.createCTTickLblPos();
+			tickLblPos.setVal(STTickLblPos.LOW);
+			catAx.setTickLblPos(tickLblPos);
+
+			CTAxPos pos = dmlchartObjectFactory.createCTAxPos();
+			pos.setVal(STAxPos.B);
+			catAx.setAxPos(pos);
+
+			// Minimum/maximum major tick marks for the horizontal axis
+			int length = plotSet.getxSeries()[0].length;
+			int skip = length / 10;
+
+			if (length > 10) {
+				CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
+				createCTSkip.setVal(skip);
+				catAx.setTickMarkSkip(createCTSkip);
+				catAx.setTickLblSkip(createCTSkip);
+			}
+
+			// Show X values
+			CTBoolean xValuesHidden = dmlchartObjectFactory.createCTBoolean();
+			xValuesHidden.setVal(false);
+			catAx.setDelete(xValuesHidden);
+
 			// Create object for marker
 			CTBoolean boolean3 = dmlchartObjectFactory.createCTBoolean();
 			boolean3.setVal(Boolean.TRUE);
@@ -565,50 +684,30 @@ public class ChartFactory {
 		pos.setVal(STAxPos.B); 
 		catAx.setAxPos(pos);
 		
-		// Minimum/maximum major tick marks for the horizontal axis
-		int skip = plotSet.getxSeries()[0].length / 10;
-
 		// Show X values
 		CTBoolean xValuesHidden = dmlchartObjectFactory.createCTBoolean();
 		xValuesHidden.setVal(false);
 
-		/*
-		if (skip>0) {
-			// Hide X values if not sufficient space
-			if(skip<4){
-				skip = 4;
-				xValuesHidden.setVal(true);
-			}
-			CTSkip createCTSkip = dmlchartObjectFactory.createCTSkip();
-			createCTSkip.setVal(skip);
-			catAx.setTickMarkSkip(createCTSkip);
-			catAx.setTickLblSkip(createCTSkip);
-		}
-		catAx.setDelete(xValuesHidden);
-		*/		
 		plotarea.getValAxOrCatAxOrDateAx().add(catAx);
 
-		// Create object for valAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId));
+		return chartspace;
+	}
 
-		// Add a legend
-		if (plotSet.getLabels().length>1) {
-			chart.setLegend(createLegend());
-		}
-
+	private static void createChartLayout(org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, CTChartSpace chartspace, CTChart chart,
+			org.docx4j.dml.ObjectFactory dmlObjectFactory) {
 		// Create object for plotVisOnly
 		CTBoolean boolean19 = dmlchartObjectFactory.createCTBoolean();
-		boolean19.setVal(Boolean.TRUE);
+		boolean19.setVal(Boolean.FALSE);
 		chart.setPlotVisOnly(boolean19);
 
 		// Create object for dispBlanksAs
 		CTDispBlanksAs dispblanksas = dmlchartObjectFactory.createCTDispBlanksAs();
 		chart.setDispBlanksAs(dispblanksas);
-		dispblanksas.setVal(org.docx4j.dml.chart.STDispBlanksAs.GAP);
+		dispblanksas.setVal(org.docx4j.dml.chart.STDispBlanksAs.SPAN);
 
 		// Create object for showDLblsOverMax
 		CTBoolean boolean20 = dmlchartObjectFactory.createCTBoolean();
-		boolean20.setVal(Boolean.FALSE);
+		boolean20.setVal(Boolean.TRUE);
 		chart.setShowDLblsOverMax(boolean20);
 
 		// Create object for spPr
@@ -627,38 +726,45 @@ public class ChartFactory {
 		CTBoolean boolean21 = dmlchartObjectFactory.createCTBoolean();
 		boolean21.setVal(Boolean.FALSE);
 		chartspace.setDate1904(boolean21);
+
 		// Create object for roundedCorners
 		CTBoolean boolean22 = dmlchartObjectFactory.createCTBoolean();
 		boolean22.setVal(Boolean.FALSE);
 		chartspace.setRoundedCorners(boolean22);
+
 		// Create object for txPr
 		CTTextBody textbody4 = dmlObjectFactory.createCTTextBody();
 		chartspace.setTxPr(textbody4);
+
 		// Create object for lstStyle
 		CTTextListStyle textliststyle4 = dmlObjectFactory.createCTTextListStyle();
 		textbody4.setLstStyle(textliststyle4);
+
 		// Create object for bodyPr
 		CTTextBodyProperties textbodyproperties4 = dmlObjectFactory.createCTTextBodyProperties();
 		textbody4.setBodyPr(textbodyproperties4);
+
 		// Create object for p
 		CTTextParagraph textparagraph4 = dmlObjectFactory.createCTTextParagraph();
 		textbody4.getP().add(textparagraph4);
+
 		// Create object for pPr
 		CTTextParagraphProperties textparagraphproperties4 = dmlObjectFactory.createCTTextParagraphProperties();
 		textparagraph4.setPPr(textparagraphproperties4);
+
 		// Create object for defRPr
 		CTTextCharacterProperties textcharacterproperties7 = dmlObjectFactory.createCTTextCharacterProperties();
 		textparagraphproperties4.setDefRPr(textcharacterproperties7);
+
 		// Create object for latin
 		TextFont textfont = dmlObjectFactory.createTextFont();
 		textcharacterproperties7.setLatin(textfont);
 		textfont.setTypeface("Arial");
+
 		// Create object for endParaRPr
 		CTTextCharacterProperties textcharacterproperties8 = dmlObjectFactory.createCTTextCharacterProperties();
 		textparagraph4.setEndParaRPr(textcharacterproperties8);
 		textcharacterproperties8.setLang("en-US");
-
-		return chartspace;
 	}
 
 	private static CTTitle createChartTitle(String chartTitle) {
@@ -666,41 +772,41 @@ public class ChartFactory {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTTitle title = dmlchartObjectFactory.createCTTitle();
-		
+
 		// Create object for layout
 		CTLayout layout = dmlchartObjectFactory.createCTLayout();
 		title.setLayout(layout);
-		
+
 		// Create object for tx
 		CTTx tx = dmlchartObjectFactory.createCTTx();
 		title.setTx(tx);
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
-		
+
 		// Create object for rich
 		CTTextBody textbody = dmlObjectFactory.createCTTextBody();
 		tx.setRich(textbody);
-		
+
 		// Create object for lstStyle
 		CTTextListStyle textliststyle = dmlObjectFactory.createCTTextListStyle();
 		textbody.setLstStyle(textliststyle);
-		
+
 		// Create object for bodyPr
 		CTTextBodyProperties textbodyproperties = dmlObjectFactory.createCTTextBodyProperties();
 		textbody.setBodyPr(textbodyproperties);
-		
+
 		// Create object for p
 		CTTextParagraph textparagraph = dmlObjectFactory.createCTTextParagraph();
 		textbody.getP().add(textparagraph);
-		
+
 		// Create object for pPr
 		CTTextParagraphProperties textparagraphproperties = dmlObjectFactory.createCTTextParagraphProperties();
 		textparagraph.setPPr(textparagraphproperties);
-		
+
 		// Create object for defRPr
 		CTTextCharacterProperties textcharacterproperties = dmlObjectFactory.createCTTextCharacterProperties();
 		textparagraphproperties.setDefRPr(textcharacterproperties);
 		textcharacterproperties.setSz(new Integer(1200));
-		
+
 		// Create object for r
 		CTRegularTextRun regulartextrun = dmlObjectFactory.createCTRegularTextRun();
 		textparagraph.getEGTextRun().add(regulartextrun);
@@ -710,9 +816,10 @@ public class ChartFactory {
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("en-US");
 		regulartextrun.setT(chartTitle);
-		
+
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
+		overlay.setVal(Boolean.FALSE);
 		title.setOverlay(overlay);
 
 		return title;
@@ -730,23 +837,19 @@ public class ChartFactory {
 	private static CTCatAx createCTCatAx(String categories, long valueAxisId, long categoryAxisId) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
-		CTCatAx catax = dmlchartObjectFactory.createCTCatAx();
+		CTCatAx axis = dmlchartObjectFactory.createCTCatAx();
 
 		// Create object for title
-		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
-		catax.setTitle(createCTCatAxTitle(categories));
+		axis.setTitle(createCTCatAxTitle(categories));
 
 		// Set the major grid lines
-		catax.setMajorGridlines(createGridLines());
+		axis.setMajorGridlines(createGridLines());
 
-		// Create object for numFmt
-		CTNumFmt numfmt = dmlchartObjectFactory.createCTNumFmt();
-		catax.setNumFmt(numfmt);
-		numfmt.setFormatCode("General");
+		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
-		catax.setSpPr(shapeproperties);
+		axis.setSpPr(shapeproperties);
 
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
@@ -764,11 +867,11 @@ public class ChartFactory {
 		// Create object for axId
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
 		unsignedint.setVal(categoryAxisId);
-		catax.setAxId(unsignedint);
+		axis.setAxId(unsignedint);
 
 		// Create object for scaling
 		CTScaling scaling = dmlchartObjectFactory.createCTScaling();
-		catax.setScaling(scaling);
+		axis.setScaling(scaling);
 
 		// Create object for orientation
 		CTOrientation orientation = dmlchartObjectFactory.createCTOrientation();
@@ -778,73 +881,78 @@ public class ChartFactory {
 		// Create object for delete
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
 		boolean2.setVal(Boolean.FALSE);
-		catax.setDelete(boolean2);
+		axis.setDelete(boolean2);
 
 		// Create object for axPos
 		CTAxPos axpos = dmlchartObjectFactory.createCTAxPos();
-		catax.setAxPos(axpos);
-		axpos.setVal(org.docx4j.dml.chart.STAxPos.B);
+		axis.setAxPos(axpos);
+		axpos.setVal(org.docx4j.dml.chart.STAxPos.T);
 
 		// Create object for majorTickMark
 		CTTickMark tickmark = dmlchartObjectFactory.createCTTickMark();
-		catax.setMajorTickMark(tickmark);
-		tickmark.setVal(org.docx4j.dml.chart.STTickMark.IN);
+		axis.setMajorTickMark(tickmark);
+		tickmark.setVal(org.docx4j.dml.chart.STTickMark.OUT);
 
 		// Create object for minorTickMark
 		CTTickMark tickmark2 = dmlchartObjectFactory.createCTTickMark();
-		catax.setMinorTickMark(tickmark2);
-		tickmark2.setVal(org.docx4j.dml.chart.STTickMark.NONE);
+		axis.setMinorTickMark(tickmark2);
+		tickmark2.setVal(org.docx4j.dml.chart.STTickMark.IN);
 
 		// Create object for tickLblPos
 		CTTickLblPos ticklblpos = dmlchartObjectFactory.createCTTickLblPos();
-		catax.setTickLblPos(ticklblpos);
-		ticklblpos.setVal(org.docx4j.dml.chart.STTickLblPos.NEXT_TO);
+		axis.setTickLblPos(ticklblpos);
+		ticklblpos.setVal(org.docx4j.dml.chart.STTickLblPos.LOW);
 
 		// Create object for crossAx
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory.createCTUnsignedInt();
-		catax.setCrossAx(unsignedint2);
+		axis.setCrossAx(unsignedint2);
 		unsignedint2.setVal(valueAxisId);
 
 		// Create object for crosses
 		CTCrosses crosses = dmlchartObjectFactory.createCTCrosses();
-		catax.setCrosses(crosses);
+		axis.setCrosses(crosses);
 		crosses.setVal(org.docx4j.dml.chart.STCrosses.AUTO_ZERO);
 
-		// Create object for auto
+		// This element specifies that this axis is a date or text axis based
+		// on the data that is used for the axis labels, not a specific choice.
 		CTBoolean boolean3 = dmlchartObjectFactory.createCTBoolean();
-		boolean3.setVal(Boolean.TRUE);
-		catax.setAuto(boolean3);
+		boolean3.setVal(Boolean.FALSE);
+		axis.setAuto(boolean3);
 
 		// Create object for lblOffset
 		CTLblOffset lbloffset = dmlchartObjectFactory.createCTLblOffset();
-		catax.setLblOffset(lbloffset);
+		axis.setLblOffset(lbloffset);
 		lbloffset.setVal(new Integer(100));
 
 		// Create object for lblAlgn
 		CTLblAlgn lblalgn = dmlchartObjectFactory.createCTLblAlgn();
-		catax.setLblAlgn(lblalgn);
+		axis.setLblAlgn(lblalgn);
 		lblalgn.setVal(org.docx4j.dml.chart.STLblAlgn.CTR);
 
 		// Create object for noMultiLvlLbl
 		CTBoolean boolean4 = dmlchartObjectFactory.createCTBoolean();
 		boolean4.setVal(Boolean.FALSE);
-		catax.setNoMultiLvlLbl(boolean4);
+		axis.setNoMultiLvlLbl(boolean4);
 
-		return catax;
+		return axis;
 	}
 
 	/**
 	 * Create the title of the horizontal axis and returns it
 	 *
-	 * @param categories
+	 * @param titleText
 	 *
 	 * @return the horizontal title
 	 */
-	private static CTTitle createCTCatAxTitle(String categories) {
+	private static CTTitle createCTCatAxTitle(String titleText) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTTitle title = dmlchartObjectFactory.createCTTitle();
+
+		// Create object for layout
+		CTLayout layout = dmlchartObjectFactory.createCTLayout();
+		title.setLayout(layout);
 
 		// Create object for tx
 		CTTx tx = dmlchartObjectFactory.createCTTx();
@@ -886,11 +994,7 @@ public class ChartFactory {
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("en-US");
-		regulartextrun.setT(categories);
-
-		// Create object for layout
-		CTLayout layout = dmlchartObjectFactory.createCTLayout();
-		title.setLayout(layout);
+		regulartextrun.setT(titleText);
 
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
@@ -909,26 +1013,22 @@ public class ChartFactory {
 	 *
 	 * @return
 	 */
-	private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId) {
+	private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId, boolean horizontal) {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
-		CTValAx valax = dmlchartObjectFactory.createCTValAx();
+
+		CTValAx axis = dmlchartObjectFactory.createCTValAx();
 
 		// Create object for title
-		valax.setTitle(createCTValAxTitle(values));
+		axis.setTitle(createCTValAxTitle(values, horizontal));
 
 		// Set the major grid lines
-		valax.setMajorGridlines(createGridLines());
+		axis.setMajorGridlines(createGridLines());
 
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 
-		// Create object for numFmt
-		CTNumFmt numfmt = dmlchartObjectFactory.createCTNumFmt();
-		valax.setNumFmt(numfmt);
-		numfmt.setFormatCode("General");
-
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
-		valax.setSpPr(shapeproperties);
+		axis.setSpPr(shapeproperties);
 
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
@@ -946,11 +1046,11 @@ public class ChartFactory {
 		// Create object for axId
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
 		unsignedint.setVal(valueAxisId);
-		valax.setAxId(unsignedint);
+		axis.setAxId(unsignedint);
 
 		// Create object for scaling
 		CTScaling scaling = dmlchartObjectFactory.createCTScaling();
-		valax.setScaling(scaling);
+		axis.setScaling(scaling);
 
 		// Create object for orientation
 		CTOrientation orientation = dmlchartObjectFactory.createCTOrientation();
@@ -960,93 +1060,107 @@ public class ChartFactory {
 		// Create object for delete
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
 		boolean2.setVal(Boolean.FALSE);
-		valax.setDelete(boolean2);
+		axis.setDelete(boolean2);
 
 		// Create object for axPos
 		CTAxPos axpos = dmlchartObjectFactory.createCTAxPos();
-		valax.setAxPos(axpos);
+		axis.setAxPos(axpos);
 		axpos.setVal(org.docx4j.dml.chart.STAxPos.L);
 
 		// Create object for majorTickMark
 		CTTickMark tickmark = dmlchartObjectFactory.createCTTickMark();
-		valax.setMajorTickMark(tickmark);
+		axis.setMajorTickMark(tickmark);
 		tickmark.setVal(org.docx4j.dml.chart.STTickMark.IN);
 
 		// Create object for minorTickMark
 		CTTickMark tickmark2 = dmlchartObjectFactory.createCTTickMark();
-		valax.setMinorTickMark(tickmark2);
+		axis.setMinorTickMark(tickmark2);
 		tickmark2.setVal(org.docx4j.dml.chart.STTickMark.NONE);
 
 		// Create object for tickLblPos
 		CTTickLblPos ticklblpos = dmlchartObjectFactory.createCTTickLblPos();
-		valax.setTickLblPos(ticklblpos);
+		axis.setTickLblPos(ticklblpos);
 		ticklblpos.setVal(org.docx4j.dml.chart.STTickLblPos.NEXT_TO);
 
 		// Create object for crossAx
 		CTUnsignedInt unsignedint2 = dmlchartObjectFactory.createCTUnsignedInt();
-		valax.setCrossAx(unsignedint2);
+		axis.setCrossAx(unsignedint2);
 		unsignedint2.setVal(categoryAxisId);
 
 		// Create object for crosses
 		CTCrosses crosses = dmlchartObjectFactory.createCTCrosses();
-		valax.setCrosses(crosses);
+		axis.setCrosses(crosses);
 		crosses.setVal(org.docx4j.dml.chart.STCrosses.AUTO_ZERO);
 
 		// Create object for dispUnits
 		CTDispUnits dispunits = dmlchartObjectFactory.createCTDispUnits();
 		dispunits.setBuiltInUnit(new CTBuiltInUnit());
-		valax.setDispUnits(dispunits);
+		axis.setDispUnits(dispunits);
 
 		// Create object for crossBetween
 		CTCrossBetween crossbetween = dmlchartObjectFactory.createCTCrossBetween();
-		valax.setCrossBetween(crossbetween);
+		axis.setCrossBetween(crossbetween);
 		crossbetween.setVal(org.docx4j.dml.chart.STCrossBetween.BETWEEN);
 
-		return valax;
+		return axis;
 	}
 
-	private static CTTitle createCTValAxTitle(String values) {
+	private static CTTitle createCTValAxTitle(String titleText, boolean horizontal) {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTTitle title = dmlchartObjectFactory.createCTTitle();
+
 		// Create object for layout
 		CTLayout layout = dmlchartObjectFactory.createCTLayout();
 		title.setLayout(layout);
+
 		// Create object for tx
 		CTTx tx = dmlchartObjectFactory.createCTTx();
 		title.setTx(tx);
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
+
 		// Create object for rich
 		CTTextBody textbody = dmlObjectFactory.createCTTextBody();
 		tx.setRich(textbody);
+
 		// Create object for lstStyle
 		CTTextListStyle textliststyle = dmlObjectFactory.createCTTextListStyle();
 		textbody.setLstStyle(textliststyle);
+
 		// Create object for bodyPr
 		CTTextBodyProperties textbodyproperties = dmlObjectFactory.createCTTextBodyProperties();
 		textbody.setBodyPr(textbodyproperties);
 		textbodyproperties.setVert(org.docx4j.dml.STTextVerticalType.HORZ);
-		textbodyproperties.setRot(new Integer(-5400000));
+
+		// Rotate if the axis is vertical
+		if (!horizontal) {
+			textbodyproperties.setRot(new Integer(-5400000));
+		}
+
 		// Create object for p
 		CTTextParagraph textparagraph = dmlObjectFactory.createCTTextParagraph();
 		textbody.getP().add(textparagraph);
+
 		// Create object for pPr
 		CTTextParagraphProperties textparagraphproperties = dmlObjectFactory.createCTTextParagraphProperties();
 		textparagraph.setPPr(textparagraphproperties);
+
 		// Create object for defRPr
 		CTTextCharacterProperties textcharacterproperties = dmlObjectFactory.createCTTextCharacterProperties();
 		textparagraphproperties.setDefRPr(textcharacterproperties);
 		textcharacterproperties.setB(Boolean.FALSE);
 		textcharacterproperties.setI(Boolean.FALSE);
+
 		// Create object for r
 		CTRegularTextRun regulartextrun = dmlObjectFactory.createCTRegularTextRun();
 		textparagraph.getEGTextRun().add(regulartextrun);
+
 		// Create object for rPr
 		CTTextCharacterProperties textcharacterproperties2 = dmlObjectFactory.createCTTextCharacterProperties();
 		regulartextrun.setRPr(textcharacterproperties2);
 		textcharacterproperties2.setLang("en-US");
-		regulartextrun.setT(values);
+		regulartextrun.setT(titleText);
 
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
@@ -1061,12 +1175,15 @@ public class ChartFactory {
 
 		CTChartLines chartlines = dmlchartObjectFactory.createCTChartLines();
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
+
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 		chartlines.setSpPr(shapeproperties);
+
 		// Create object for ln
 		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
 		shapeproperties.setLn(lineproperties);
+
 		// Create object for prstDash
 		CTPresetLineDashProperties presetlinedashproperties = dmlObjectFactory.createCTPresetLineDashProperties();
 		lineproperties.setPrstDash(presetlinedashproperties);
@@ -1079,7 +1196,7 @@ public class ChartFactory {
 	private static CTDLbls createLabels(org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory) {
 		// Create object for dLbls
 		CTDLbls dlbls = dmlchartObjectFactory.createCTDLbls();
-		
+
 		// Create object for showLegendKey
 		CTBoolean boolean4 = dmlchartObjectFactory.createCTBoolean();
 		boolean4.setVal(Boolean.FALSE);
@@ -1109,7 +1226,7 @@ public class ChartFactory {
 		CTBoolean boolean9 = dmlchartObjectFactory.createCTBoolean();
 		boolean9.setVal(Boolean.FALSE);
 		dlbls.setShowBubbleSize(boolean9);
-		
+
 		return dlbls;
 	}
 
@@ -1207,24 +1324,35 @@ public class ChartFactory {
 	 *            the array to create a data set from
 	 * @return a data set to for use in a chart
 	 */
-	private static CTNumDataSource createValues(ObjectFactory dmlchartObjectFactory, double[] data) {
+	private static CTNumDataSource createValuesDataSource(ObjectFactory dmlchartObjectFactory, double[] data) {
 		CTNumDataSource datasource = dmlchartObjectFactory.createCTNumDataSource();
-		
+
 		// Create object for numCache
-		CTNumData numdata = dmlchartObjectFactory.createCTNumData();	
+		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
+
+		double max = 0;
+		double min = 0;
 
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
 			numval.setIdx(i);
 			if (Double.isNaN(data[i])) {
-				numval.setV(""); // NaN must be represented as empty string (tested in MS Word 2010 on Windows 7)
+				numval.setV(""); // NaN must be represented as empty string
+									// (tested in MS Word 2010 on Windows 7)
 			} else {
+				if (data[i] > max) {
+					max = data[i];
+				}
+				if (data[i] < min) {
+					min = data[i];
+				}
 				numval.setV(Double.toString(data[i]));
 			}
 		}
-		numdata.setFormatCode("General");
+		Range range = setRange(max, min);
+		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();

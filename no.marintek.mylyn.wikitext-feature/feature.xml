@@ -2,7 +2,7 @@
 <feature
       id="no.marintek.mylyn.wikitext"
       label="%featureName"
-      version="1.2.2.qualifier"
+      version="1.2.4.qualifier"
       provider-name="%providerName">
 
    <description>

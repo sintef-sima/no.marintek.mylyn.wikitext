@@ -5,7 +5,7 @@ import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
 
 /**
  * A representation of a data set for plotting
- * 
+ *
  * @author Torkild U. Resheim
  */
 public class PlotSet {
@@ -23,7 +23,7 @@ public class PlotSet {
 		this.ySeries = ySeries;
 		this.chartType = chartType;
 	}
-	
+
 	public String[] getLabels() {
 		return labels;
 	}

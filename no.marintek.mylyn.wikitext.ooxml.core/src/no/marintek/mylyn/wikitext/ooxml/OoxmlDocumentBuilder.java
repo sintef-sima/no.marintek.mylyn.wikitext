@@ -111,7 +111,6 @@ import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
-import org.eclipse.mylyn.wikitext.core.parser.builder.DocumentBuilderExtension;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
@@ -497,7 +496,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Prevent splitting across pages. If there's not enough space on page, the table or span is moved to the next page.
-	 * 
+	 *
 	 * @param ppr
 	 * @return
 	 */
@@ -1390,7 +1389,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 				+ "				</w:rPr>"
 				+ "				<w:drawing>"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">"
-				+ "						<wp:extent cx=\"5486400\" cy=\"3200400\" />"
+				+ "						<wp:extent cx=\"6486400\" cy=\"3200400\" />"
 				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />"
 				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram "+chartId+"\" />"
 				+ "						<wp:cNvGraphicFramePr />"
@@ -1580,6 +1579,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		case TABLE_CELL_NORMAL:
 			tableColumnCount++;
 			break;
+		case PARAGRAPH:
+			applyStyle(currentParagraph, "BodyText");
 		default:
 			break;
 		}
@@ -1784,9 +1785,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void lineBreak() {
+		endSpan();
 		org.docx4j.wml.Br br = new org.docx4j.wml.Br();
 		br.setType(STBrType.TEXT_WRAPPING);
-		mainDocumentPart.addObject(br);
+		currentParagraph.getContent().add(br);
 	}
 
 	@Override
