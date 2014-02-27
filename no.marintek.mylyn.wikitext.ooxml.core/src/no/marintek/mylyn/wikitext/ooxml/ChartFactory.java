@@ -14,6 +14,7 @@ package no.marintek.mylyn.wikitext.ooxml;
 import javax.xml.bind.JAXBException;
 
 import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
+import no.marintek.mylyn.wikitext.chart.ChartRenderHint.AxisNumericFormat;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -132,7 +133,7 @@ public class ChartFactory {
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
-			CTPlotArea plotarea, CTScatterChart scatterchart, int index) {
+			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHint hint) {
 
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
@@ -189,10 +190,10 @@ public class ChartFactory {
 		srgbcolor.setVal(COLOUR_SCHEME[index]);
 
 		// Create object for xVal
-		scatterser.setXVal(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
+		scatterser.setXVal(createCategoriesDataSource(dmlchartObjectFactory, xSeries, hint));
 
 		// Create object for yVal
-		scatterser.setYVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
+		scatterser.setYVal(createValuesDataSource(dmlchartObjectFactory, ySeries, hint));
 
 	}
 
@@ -226,7 +227,7 @@ public class ChartFactory {
 		unsignedint3.setVal(order);
 
 		// Create object for val
-		lineser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
+		lineser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries, hint));
 
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
@@ -280,13 +281,13 @@ public class ChartFactory {
 		boolean12.setVal(Boolean.FALSE);
 		lineser.setSmooth(boolean12);
 
-		lineser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
+		lineser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries, hint));
 
 	}
 	
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
-			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index) {
+			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index, ChartRenderHint hint) {
 
 		// Create object for dispUnits
 		CTBarSer barser = dmlchartObjectFactory.createCTBarSer();
@@ -298,7 +299,7 @@ public class ChartFactory {
 		unsignedint3.setVal(order);
 
 		// Create object for val
-		barser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries));
+		barser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries, hint));
 
 		// Create object for spPr
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
@@ -331,22 +332,7 @@ public class ChartFactory {
 		barser.setTx(sertx);
 		sertx.setV(legends[index]);
 
-		// Create object for marker
-		// CTMarker marker = dmlchartObjectFactory.createCTMarker();
-		// barser.setsetMarker(marker);
-
-		// Create object for symbol
-		// CTMarkerStyle markerstyle = dmlchartObjectFactory.createCTMarkerStyle();
-		// marker.setSymbol(markerstyle);
-		// markerstyle.setVal(org.docx4j.dml.chart.STMarkerStyle.NONE);
-
-		// Create object for smooth
-		// CTBoolean boolean12 = dmlchartObjectFactory.createCTBoolean();
-		// boolean12.setVal(Boolean.FALSE);
-		// barser.setSmooth(boolean12);
-
-		barser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
-
+		barser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries, hint));
 	}
 
 	/**
@@ -356,7 +342,7 @@ public class ChartFactory {
 	 * @param data
 	 * @return
 	 */
-	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data) {
+	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHint hint) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
 		// Create object for numCache
@@ -383,7 +369,8 @@ public class ChartFactory {
 				numval.setV(Double.toString(data[i]));
 			}
 		}
-		Range range = setRange(max, min);
+		AxisNumericFormat numericFormat = hint != null ? hint.getxAxisNumericFormat() : AxisNumericFormat.AUTOFORMAT;
+		Range range = setRange(min, max, numericFormat);
 		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount
@@ -394,7 +381,7 @@ public class ChartFactory {
 		return datasource;
 	}
 
-	private static Range setRange(double lower, double upper) {
+	private static Range setRange(double lower, double upper, AxisNumericFormat numericFormat) {
 		double min;
 		double max;
 		String default_decimal_format = "0.0";
@@ -413,6 +400,15 @@ public class ChartFactory {
 		min = lower;
 		max = upper;
 
+		if (numericFormat == AxisNumericFormat.SCIENTIFIC) {
+			formatPattern = DEFAULT_ENGINEERING_FORMAT;
+			return new Range(min, max, formatPattern);
+		} else if (numericFormat == AxisNumericFormat.GENERAL) {
+			formatPattern = default_decimal_format;
+			return new Range(min, max, formatPattern);
+		}
+
+		// Numeric format is not set or set to AUTOFORMAT
 		if (formatPattern.equals(default_decimal_format) || formatPattern.equals(DEFAULT_ENGINEERING_FORMAT)) {
 			if ((max != 0 && Math.abs(Math.log10(Math.abs(max))) >= ENGINEERING_LIMIT)
 					|| (min != 0 && Math.abs(Math.log10(Math.abs(min))) >= ENGINEERING_LIMIT))
@@ -545,7 +541,7 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
 				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series);
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHint());
 			}
 
 		} else if (ChartType.LINE.equals(plotSet.getChartType())) {
@@ -681,7 +677,7 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
 				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series);
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHint());
 			}
 		}
 
@@ -1319,7 +1315,7 @@ public class ChartFactory {
 	 *            the array to create a data set from
 	 * @return a data set to for use in a chart
 	 */
-	private static CTNumDataSource createValuesDataSource(ObjectFactory dmlchartObjectFactory, double[] data) {
+	private static CTNumDataSource createValuesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHint hint) {
 		CTNumDataSource datasource = dmlchartObjectFactory.createCTNumDataSource();
 
 		// Create object for numCache
@@ -1346,7 +1342,9 @@ public class ChartFactory {
 				numval.setV(Double.toString(data[i]));
 			}
 		}
-		Range range = setRange(max, min);
+
+		AxisNumericFormat numericFormat = hint != null ? hint.getyAxisNumericFormat() : AxisNumericFormat.AUTOFORMAT;
+		Range range = setRange(min, max, numericFormat);
 		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount
