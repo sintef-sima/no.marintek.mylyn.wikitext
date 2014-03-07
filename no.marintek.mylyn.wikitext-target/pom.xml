@@ -12,7 +12,7 @@
 	<parent>
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
-		<version>1.2.4-SNAPSHOT</version>
+		<version>1.2.5-SNAPSHOT</version>
 		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 

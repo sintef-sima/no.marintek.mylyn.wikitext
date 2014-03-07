@@ -1,5 +1,6 @@
 package no.marintek.mylyn.wikitext.ooxml;
 
+import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
 import no.marintek.mylyn.wikitext.ooxml.ChartFactory.ChartType;
 
 /**
@@ -13,6 +14,7 @@ public class PlotSet {
 	double[][] xSeries;
 	double[][] ySeries;
 	private ChartType chartType;
+	private ChartRenderHint renderHint;
 
 	public PlotSet(String[] labels, double[][] xSeries, double[][] ySeries, ChartType chartType) {
 		super();
@@ -54,5 +56,12 @@ public class PlotSet {
 		this.chartType = chartType;
 	}
 
+	public ChartRenderHint getRenderHint() {
+		return renderHint;
+	}
 
+	public void setRenderHint(ChartRenderHint renderHint) {
+		this.renderHint = renderHint;
+	}
+	
 }
