@@ -14,7 +14,7 @@ package no.marintek.mylyn.wikitext.ooxml;
 import javax.xml.bind.JAXBException;
 
 import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
-import no.marintek.mylyn.wikitext.chart.ChartRenderHint.AxisNumericFormat;
+import no.marintek.mylyn.wikitext.chart.ChartRenderHint.AxisNumberFormat;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -369,8 +369,8 @@ public class ChartFactory {
 				numval.setV(Double.toString(data[i]));
 			}
 		}
-		AxisNumericFormat numericFormat = hint != null ? hint.getxAxisNumericFormat() : AxisNumericFormat.AUTOFORMAT;
-		Range range = setRange(min, max, numericFormat);
+		AxisNumberFormat numberFormat = hint != null ? hint.getxAxisNumberFormat() : AxisNumberFormat.AUTOFORMAT;
+		Range range = setRange(min, max, numberFormat);
 		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount
@@ -381,7 +381,7 @@ public class ChartFactory {
 		return datasource;
 	}
 
-	private static Range setRange(double lower, double upper, AxisNumericFormat numericFormat) {
+	private static Range setRange(double lower, double upper, AxisNumberFormat numberFormat) {
 		double min;
 		double max;
 		String default_decimal_format = "0.0";
@@ -400,15 +400,15 @@ public class ChartFactory {
 		min = lower;
 		max = upper;
 
-		if (numericFormat == AxisNumericFormat.SCIENTIFIC) {
+		if (numberFormat == AxisNumberFormat.SCIENTIFIC) {
 			formatPattern = DEFAULT_ENGINEERING_FORMAT;
 			return new Range(min, max, formatPattern);
-		} else if (numericFormat == AxisNumericFormat.GENERAL) {
+		} else if (numberFormat == AxisNumberFormat.GENERAL) {
 			formatPattern = default_decimal_format;
 			return new Range(min, max, formatPattern);
 		}
 
-		// Numeric format is not set or set to AUTOFORMAT
+		// Number format is not set or set to AUTOFORMAT
 		if (formatPattern.equals(default_decimal_format) || formatPattern.equals(DEFAULT_ENGINEERING_FORMAT)) {
 			if ((max != 0 && Math.abs(Math.log10(Math.abs(max))) >= ENGINEERING_LIMIT)
 					|| (min != 0 && Math.abs(Math.log10(Math.abs(min))) >= ENGINEERING_LIMIT))
@@ -1343,8 +1343,8 @@ public class ChartFactory {
 			}
 		}
 
-		AxisNumericFormat numericFormat = hint != null ? hint.getyAxisNumericFormat() : AxisNumericFormat.AUTOFORMAT;
-		Range range = setRange(min, max, numericFormat);
+		AxisNumberFormat numberFormat = hint != null ? hint.getyAxisNumberFormat() : AxisNumberFormat.AUTOFORMAT;
+		Range range = setRange(min, max, numberFormat);
 		numdata.setFormatCode(range.format);
 
 		// Create object for ptCount

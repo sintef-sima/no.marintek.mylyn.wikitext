@@ -3,22 +3,22 @@ package no.marintek.mylyn.wikitext.chart;
 /**
  * Configuration class for plot/chart rendering.
  * 
- * @author havardn
+ * @author Håvard Nesse
  * 
  */
 public class ChartRenderHint {
 	private boolean renderMarkers;
-	private AxisNumericFormat xAxisNumericFormat;
-	private AxisNumericFormat yAxisNumericFormat;
+	private AxisNumberFormat xAxisNumberFormat;
+	private AxisNumberFormat yAxisNumberFormat;
 
-	public enum AxisNumericFormat {
+	public enum AxisNumberFormat {
 		AUTOFORMAT, GENERAL, SCIENTIFIC
 	}
 
 	public ChartRenderHint() {
 		this.renderMarkers = true;
-		this.xAxisNumericFormat = AxisNumericFormat.AUTOFORMAT;
-		this.yAxisNumericFormat = AxisNumericFormat.AUTOFORMAT;
+		this.xAxisNumberFormat = AxisNumberFormat.AUTOFORMAT;
+		this.yAxisNumberFormat = AxisNumberFormat.AUTOFORMAT;
 	}
 
 	public boolean isRenderMarkers() {
@@ -29,20 +29,20 @@ public class ChartRenderHint {
 		this.renderMarkers = renderMarkers;
 	}
 
-	public AxisNumericFormat getxAxisNumericFormat() {
-		return xAxisNumericFormat;
+	public AxisNumberFormat getxAxisNumberFormat() {
+		return xAxisNumberFormat;
 	}
 
-	public void setxAxisNumericFormat(AxisNumericFormat xAxisNumericFormat) {
-		this.xAxisNumericFormat = xAxisNumericFormat;
+	public void setxAxisNumberFormat(AxisNumberFormat xAxisNumberFormat) {
+		this.xAxisNumberFormat = xAxisNumberFormat;
 	}
 
-	public AxisNumericFormat getyAxisNumericFormat() {
-		return yAxisNumericFormat;
+	public AxisNumberFormat getyAxisNumberFormat() {
+		return yAxisNumberFormat;
 	}
 
-	public void setyAxisNumericFormat(AxisNumericFormat yAxisNumericFormat) {
-		this.yAxisNumericFormat = yAxisNumericFormat;
+	public void setyAxisNumberFormat(AxisNumberFormat yAxisNumberFormat) {
+		this.yAxisNumberFormat = yAxisNumberFormat;
 	}
 
 }
