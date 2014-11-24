@@ -108,6 +108,7 @@ import org.docx4j.wml.TcPrInner.GridSpan;
 import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.wikitext.core.parser.Attributes;
 import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
@@ -366,7 +367,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	}
 
 	@Override
-	public void beginBlock(BlockType type, Attributes attributes) {
+	public void beginBlock(BlockType type, Attributes attributes) {		
+		Assert.isNotNull(type, "Block type cannot be NULL");
+		Assert.isNotNull(attributes, "Attributes cannot be NULL");
+		
 		currentBlockType = type;
 		currentAttributes = attributes;
 
@@ -514,9 +518,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		shd.setVal(org.docx4j.wml.STShd.CLEAR);
 		shd.setColor("auto");
 		shd.setFill(fillColor);
-		// Removed due to problems with setting bgColor for scatter diagram tables
-		// shd.setThemeFill(org.docx4j.wml.STThemeColor.BACKGROUND_1);
-		// shd.setThemeFillShade("D9");
 		return shd;
 	}
 
@@ -1345,6 +1346,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 */
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
+		Assert.isNotNull(attributes, "Attributes cannot be NULL");
+		currentAttributes = attributes;
 		currentStyle = "Heading" + level;
 		styleExists();
 	}
@@ -1358,10 +1361,16 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void beginSpan(SpanType type, Attributes attributes) {
+		Assert.isNotNull(type, "Block type cannot be NULL");
+		Assert.isNotNull(attributes, "Attributes cannot be NULL");
+		
+		// Close any existing span if we have one
 		if (characters!=null && characters.length()>0) {
 			endSpan();
 		}
+		
 		currentSpanType = type;
+		currentAttributes = attributes;
 	}
 
 	@Override

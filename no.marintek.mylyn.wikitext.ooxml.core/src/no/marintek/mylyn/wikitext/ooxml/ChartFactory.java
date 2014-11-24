@@ -121,7 +121,8 @@ public class ChartFactory {
 		LINE, SCATTER, BAR
 	};
 
-	private final static byte[][] COLOUR_SCHEME = new byte[][] { { 1, 2, 2 }, // black
+	private final static byte[][] COLOUR_SCHEME = new byte[][] 
+			{ { 1, 2, 2 }, // black
 			{ (byte) 235, 49, 55 }, // red
 			{ 18, (byte) 139, 75 }, // green
 			{ 29, 92, (byte) 167 }, // blue

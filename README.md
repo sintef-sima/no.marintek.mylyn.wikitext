@@ -8,7 +8,7 @@ Please note that Atlassian has [removed the Wiki syntax from the Wiki](http://bl
 
 The EPUB task is a little special. It also supports all features of the Mylyn Docs EPUB task. The syntax is also the same for the EPUB related parts.
 
-Note that version 1.1.0 of Mylyn Docs EPUB is required. This is currently only available in [weekly builds](http://download.eclipse.org/mylyn/snapshots/weekly/). The most recent release (with Eclipse Juno) is 1.0.0.
+Note that version 2.0.0 of Mylyn Docs EPUB is required. This is currently only available in [weekly builds](http://download.eclipse.org/mylyn/snapshots/weekly/). The most recent release (with Eclipse Juno) is 1.0.0.
 
 For more information on usage; check out the [wiki](https://github.com/marintek-sima/no.marintek.mylyn.wikitext/wiki).
 
