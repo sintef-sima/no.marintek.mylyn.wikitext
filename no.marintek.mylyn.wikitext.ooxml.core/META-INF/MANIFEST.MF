@@ -5,7 +5,7 @@ Bundle-SymbolicName: no.marintek.mylyn.wikitext.ooxml.core
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.docx4j;bundle-version="3.0.0",
- org.eclipse.mylyn.wikitext.core;bundle-version="2.2.0",
+ org.eclipse.mylyn.wikitext.core;bundle-version="1.8.0",
  org.apache.commons.logging;bundle-version="1.1.1",
  org.apache.log4j;bundle-version="1.2.13",
  uk.ac.ed.ph.snuggletex;bundle-version="1.2.2",
