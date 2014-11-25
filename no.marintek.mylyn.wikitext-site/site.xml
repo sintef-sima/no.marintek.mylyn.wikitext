@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description>
-      MARINTEK WikiText Update Site
-   </description>
-   <feature url="features/no.marintek.mylyn.wikitext_2.0.0.qualifier.jar" id="no.marintek.mylyn.wikitext" version="2.0.0.qualifier"/>
+	<description>MARINTEK WikiText Update Site</description>
+	<feature url="features/no.marintek.mylyn.wikitext_2.0.0.qualifier.jar" id="no.marintek.mylyn.wikitext" version="2.0.0.qualifier">
+		<category name="Features"/>
+	</feature>
+	<!--
+	<feature url="features/no.marintek.mylyn.wikitext.source_2.0.0.qualifier.jar" id="no.marintek.mylyn.wikitext.source" version="2.0.0.qualifier">
+		<category name="SDK"/>
+	</feature>
+	-->   
+	<category-def name="Features" label="MARINTEK WikiText Features">
+		<description>Mylyn WikiText extras by MARINTEK.</description>
+	</category-def>
+	<category-def name="SDK" label="MARINTEK WikiText SDK and Framework">
+		<description>Source code and documentation for integrators.</description>
+	</category-def>
 </site>

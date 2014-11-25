@@ -1,7 +1,7 @@
 target "MARINTEK WikiText 2.0.0"
 	with source, allEnvironments
 
-location "http://download.eclipse.org/releases/luna/" {
+location "http://download.eclipse.org/releases/kepler/" {
 	org.eclipse.osgi
 	org.eclipse.core.runtime
 	org.eclipse.core.contenttype
