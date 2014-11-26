@@ -1606,6 +1606,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	@Override
 	public void endDocument() {
 		try {
+			Assert.isNotNull(outputFile, "Document output file has not been specified");
 			wordMLPackage.save(outputFile);
 		} catch (Docx4JException e) {
 			e.printStackTrace();
