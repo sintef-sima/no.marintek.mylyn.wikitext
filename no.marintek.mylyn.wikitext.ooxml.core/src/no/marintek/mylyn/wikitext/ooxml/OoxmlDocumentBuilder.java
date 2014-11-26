@@ -1620,8 +1620,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void endSpan() {
+		// There are no characters in the buffer so there is nothing to create a span
+		// for. We just need to reset the span type.
+		if (characters.length()==0){
+			currentSpanType = SpanType.SPAN;
+			return;
+		}
 		RPr block;
-
 		// Set font size
 		String fontSize = getCssValueForKey(currentAttributes, "font-size");
 		if (!fontSize.isEmpty()) {
@@ -1678,7 +1683,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			block.setI(TRUE);
 			break;
 		case SPAN:
-
 			// TODO Auto-generated method stub
 			break;
 		case STRONG:
@@ -1801,7 +1805,14 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void lineBreak() {
+		// Make sure we have a paragraph
+		if (currentParagraph==null){
+			currentParagraph = factory.createP();
+		}
+		// Spans should not be across lines, so we need to end it if there
+		// is one active.
 		endSpan();
+		// Add a line break
 		org.docx4j.wml.Br br = new org.docx4j.wml.Br();
 		br.setType(STBrType.TEXT_WRAPPING);
 		currentParagraph.getContent().add(br);
