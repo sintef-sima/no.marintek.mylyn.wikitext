@@ -451,11 +451,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 			String backgroundColor = "FFFFFF";
 			SpanType spanType = SpanType.SPAN;
-			if (currentAttributes.getCssStyle() != null && !currentAttributes.getCssStyle().isEmpty()) {
-				backgroundColor = getCssValueForKey(currentAttributes.getCssStyle(), "background-color");
+			
+			if (hasCssStyle(currentAttributes)) {
+				backgroundColor = getCssValueForKey(currentAttributes, "background-color");
 				backgroundColor = backgroundColor.replace("#", "");
-
-				String fontWeight = getCssValueForKey(currentAttributes.getCssStyle(), "font-weight");
+				String fontWeight = getCssValueForKey(currentAttributes, "font-weight");
 				if (fontWeight.toLowerCase().equals("bold")) {
 					spanType = SpanType.BOLD;
 				}
@@ -485,6 +485,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			beginSpan(SpanType.SPAN, currentAttributes);
 			break;
 		}
+	}
+
+	private boolean hasCssStyle(Attributes attributes) {
+		return attributes.getCssStyle() != null && !attributes.getCssStyle().isEmpty();
 	}
 
 	private Tc createTableCell() {
@@ -530,9 +534,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		}
 	}
 
-	private String getCssValueForKey(String cssStyle, String key) {
-		Map<String, String> styleMap = getStylesFromCssString(cssStyle);
-		return styleMap.get(key) != null ? styleMap.get(key) : "";
+	private String getCssValueForKey(Attributes attributes, String key) {
+		if (attributes!=null){
+			String cssStyle = attributes.getCssStyle();
+			Map<String, String> styleMap = getStylesFromCssString(cssStyle);
+			return styleMap.get(key) != null ? styleMap.get(key) : "";
+		} else return "";
 	}
 
 	private Map<String, String> getStylesFromCssString(String cssStyle) {
@@ -1616,7 +1623,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		RPr block;
 
 		// Set font size
-		String fontSize = getCssValueForKey(currentAttributes.getCssStyle(), "font-size");
+		String fontSize = getCssValueForKey(currentAttributes, "font-size");
 		if (!fontSize.isEmpty()) {
 			block = createSpanWithFontSize(characters.toString(), fontSize);
 		} else {
@@ -1624,7 +1631,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		}
 
 		// Set text alignment
-		String textHAlign = getCssValueForKey(currentAttributes.getCssStyle(), "text-align");
+		String textHAlign = getCssValueForKey(currentAttributes, "text-align");
 		if (currentParagraph.getPPr()!=null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {
 			Jc align = factory.createJc();
 			if (textHAlign.toLowerCase().equals("right")) {
