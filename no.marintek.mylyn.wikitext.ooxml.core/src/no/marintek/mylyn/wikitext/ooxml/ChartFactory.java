@@ -131,6 +131,52 @@ public class ChartFactory {
 			{ (byte) 160, 31, 38 }, // burgundy
 			{ (byte) 178, 60, (byte) 147 } // pink
 	};
+	
+	private static byte[] getColour(int index) {
+		if (index < COLOUR_SCHEME.length) {
+			return COLOUR_SCHEME[index];
+		}
+		int num = index % COLOUR_SCHEME.length;
+		byte[] fromColor = COLOUR_SCHEME[num];
+		byte[] toColor;
+		if (num >= COLOUR_SCHEME.length - 1) {
+			toColor = COLOUR_SCHEME[0];
+		} else {
+			toColor = COLOUR_SCHEME[num+1];
+		}
+		
+		int fromR = Integer.parseInt(Byte.toString(fromColor[0]));
+		int fromG = Integer.parseInt(Byte.toString(fromColor[1]));
+		int fromB = Integer.parseInt(Byte.toString(fromColor[2]));
+		
+		int toR = Integer.parseInt(Byte.toString(toColor[0]));
+		int toG = Integer.parseInt(Byte.toString(toColor[1]));
+		int toB = Integer.parseInt(Byte.toString(toColor[2]));
+		
+		int newR = (fromR + toR) / 2 + Math.round(index/2);
+		int newG = (fromG + toG) / 2 + Math.round(index/2);
+		int newB = (fromB + toB) / 2 + Math.round(index/2);
+		
+		// Ooops - we reached close to white. Let's go darker from here on
+		if (newR >= 255) {
+			newR = ((fromR + toR) / 2) - num;
+		}
+		if (newG >= 255) {
+			newG = ((fromG + toG) / 2) - num;
+		}
+		if (newB >= 255) {
+			newB = ((fromB + toB) / 2) - num;
+		}
+		
+		return new byte[] {(byte) newR, (byte) newG, (byte) newB};
+	}
+	
+	/**
+	 * Used for testing. Not API. 
+	 */
+	public byte[] getColourTest(int index) {
+		return getColour(index);
+	}
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
@@ -185,10 +231,10 @@ public class ChartFactory {
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
-		lineproperties.setW(new Integer(12700));
+		lineproperties.setW(new Integer(6000));
 		CTSRgbColor srgbcolor = dmlObjectFactory.createCTSRgbColor();
 		solidcolorfillproperties.setSrgbClr(srgbcolor);
-		srgbcolor.setVal(COLOUR_SCHEME[index]);
+		srgbcolor.setVal(getColour(index));
 
 		// Create object for xVal
 		scatterser.setXVal(createCategoriesDataSource(dmlchartObjectFactory, xSeries, hint));
@@ -241,10 +287,10 @@ public class ChartFactory {
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
-		lineproperties.setW(new Integer(12700));
+		lineproperties.setW(new Integer(6000));
 		CTSRgbColor srgbcolor = dmlObjectFactory.createCTSRgbColor();
 		solidcolorfillproperties.setSrgbClr(srgbcolor);
-		srgbcolor.setVal(COLOUR_SCHEME[index]);
+		srgbcolor.setVal(getColour(index));
 
 		// Create object for idx
 		CTUnsignedInt unsignedint5 = dmlchartObjectFactory.createCTUnsignedInt();
@@ -318,10 +364,10 @@ public class ChartFactory {
 		// Create object for solidFill
 		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
 		lineproperties.setSolidFill(solidcolorfillproperties);
-		lineproperties.setW(new Integer(12700));
+		lineproperties.setW(new Integer(6000));
 		CTSRgbColor srgbcolor = dmlObjectFactory.createCTSRgbColor();
 		solidcolorfillproperties.setSrgbClr(srgbcolor);
-		srgbcolor.setVal(COLOUR_SCHEME[index]);
+		srgbcolor.setVal(getColour(index));
 
 		// Create object for idx
 		CTUnsignedInt unsignedint5 = dmlchartObjectFactory.createCTUnsignedInt();
@@ -440,9 +486,9 @@ public class ChartFactory {
 	 */
 	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, PlotSet plotSet) throws JAXBException {
 
-		if ((plotSet.getxSeries().length > COLOUR_SCHEME.length) || (plotSet.getySeries().length > COLOUR_SCHEME.length)) {
-			throw new IllegalArgumentException("The maximum number of series in one chart is " + COLOUR_SCHEME.length);
-		}
+//		if ((plotSet.getxSeries().length > COLOUR_SCHEME.length) || (plotSet.getySeries().length > COLOUR_SCHEME.length)) {
+//			throw new IllegalArgumentException("The maximum number of series in one chart is " + COLOUR_SCHEME.length);
+//		}
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
