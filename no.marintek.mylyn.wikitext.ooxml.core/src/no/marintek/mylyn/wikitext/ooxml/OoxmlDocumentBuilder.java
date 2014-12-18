@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 MARINTEK.
+ * Copyright (c) 2013-2014 MARINTEK.
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -14,7 +14,6 @@ package no.marintek.mylyn.wikitext.ooxml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -22,8 +21,6 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -35,6 +32,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import no.marintek.mylyn.wikitext.elements.ChartDescription;
+import no.marintek.mylyn.wikitext.elements.IChart;
+import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
 
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.chart.CTChartSpace;
@@ -54,7 +55,6 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.PartName;
-import org.docx4j.openpackaging.parts.DrawingML.Chart;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.openpackaging.parts.WordprocessingML.DocumentSettingsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -1430,17 +1430,20 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 
 	/**
 	 * Creates a simple line chart using the given data set.
-	 * <p>
-	 * <b>Implement using {@link DocumentBuilderExtension} when this is read</b>
-	 * </p>
-	 *
-	 * @param xSeries
-	 *            the data set
+	 * 
+	 * @param caption
+	 * @param title
+	 * @param ylabel
+	 * @param xlabel
+	 * @param plotset
+	 * 
+	 * @deprecated use {@link #chart(ChartDescription)}
 	 */
-	public void chart(String caption, String title, String ylabel, String xlabel, PlotSet plotset) {
+	@Deprecated 
+	public void chart(String caption, String title, String ylabel, String xlabel, IChart plotset) {
 		try {
 			String prId = Integer.toString(++chartCounter);
-			Chart chart = new Chart(new PartName("/word/charts/chart" + prId + ".xml"));
+			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));
 
 			CTChartSpace chartSpace = ChartFactory.createChartSpace(title, ylabel, xlabel, plotset);
 			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
@@ -1449,6 +1452,27 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			Relationship part = mainDocumentPart.addTargetPart(chart);
 			mainDocumentPart.addObject(chart(part.getId(), prId));
 			caption(caption, CaptionType.Figure);
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Creates a simple line chart using the given data set.
+	 */
+	public void chart(IChart plotset) {
+		try {
+			String prId = Integer.toString(++chartCounter);
+			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));
+
+			CTChartSpace chartSpace = ChartFactory.createChartSpace(plotset.getTitle(), plotset.getYlabel(), plotset.getYlabel(), plotset);
+			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
+			chart.setJaxbElement(chartSpace);
+
+			Relationship part = mainDocumentPart.addTargetPart(chart);
+			mainDocumentPart.addObject(chart(part.getId(), prId));
+			caption(plotset.getCaption(), CaptionType.Figure);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
@@ -1836,60 +1860,4 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		this.title = text;
 	}
 
-	/**
-	 * Unzip it
-	 *
-	 * @param zipFile
-	 *            input zip file
-	 * @param output
-	 *            zip file output folder
-	 */
-	public void unZipIt(String zipFile, String outputFolder) {
-
-		byte[] buffer = new byte[1024];
-
-		try {
-
-			// create output directory is not exists
-			File folder = new File(outputFolder);
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-
-			// get the zip file content
-			ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-			// get the zipped file list entry
-			ZipEntry ze = zis.getNextEntry();
-
-			while (ze != null) {
-
-				String fileName = ze.getName();
-				File newFile = new File(outputFolder + File.separator + fileName);
-
-				System.out.println("file unzip : " + newFile.getAbsoluteFile());
-
-				// create all non exists folders
-				// else you will hit FileNotFoundException for compressed folder
-				new File(newFile.getParent()).mkdirs();
-
-				FileOutputStream fos = new FileOutputStream(newFile);
-
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-
-				fos.close();
-				ze = zis.getNextEntry();
-			}
-
-			zis.closeEntry();
-			zis.close();
-
-			System.out.println("Done");
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
 }

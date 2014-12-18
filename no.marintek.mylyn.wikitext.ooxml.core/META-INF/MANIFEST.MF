@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OOXML Document Builder
 Bundle-SymbolicName: no.marintek.mylyn.wikitext.ooxml.core
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.docx4j;bundle-version="3.0.0",
  org.eclipse.mylyn.wikitext.core;bundle-version="1.8.0",
@@ -10,5 +10,6 @@ Require-Bundle: org.docx4j;bundle-version="3.0.0",
  org.apache.log4j;bundle-version="1.2.0",
  uk.ac.ed.ph.snuggletex;bundle-version="1.2.0",
  org.eclipse.core.runtime;bundle-version="3.9.0"
-Export-Package: no.marintek.mylyn.wikitext.chart,
- no.marintek.mylyn.wikitext.ooxml
+Export-Package: no.marintek.mylyn.wikitext.elements,
+ no.marintek.mylyn.wikitext.ooxml,
+ no.marintek.mylyn.wikitext.ooxml.internal

@@ -8,13 +8,14 @@
  * Contributors:
  *     Torkild U. Resheim - initial API and implementation
  *******************************************************************************/
-package no.marintek.mylyn.wikitext.ooxml;
+package no.marintek.mylyn.wikitext.ooxml.internal;
 
 
 import javax.xml.bind.JAXBException;
 
-import no.marintek.mylyn.wikitext.chart.ChartRenderHint;
-import no.marintek.mylyn.wikitext.chart.ChartRenderHint.AxisNumberFormat;
+import no.marintek.mylyn.wikitext.elements.ChartRenderHint;
+import no.marintek.mylyn.wikitext.elements.IChart;
+import no.marintek.mylyn.wikitext.elements.ChartRenderHint.AxisNumberFormat;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -113,13 +114,6 @@ public class ChartFactory {
 	public static final String DEFAULT_ENGINEERING_FORMAT = "0.00E+00;0.00E+00;0";
 
 	private static final int ENGINEERING_LIMIT = 4;
-
-	/**
-	 * Type of chart that can be created.
-	 */
-	public static enum ChartType {
-		LINE, SCATTER, BAR
-	};
 
 	private final static byte[][] COLOUR_SCHEME = new byte[][] 
 			{ { 1, 2, 2 }, // black
@@ -484,11 +478,7 @@ public class ChartFactory {
 	 * @return the chart space instance
 	 * @throws JAXBException
 	 */
-	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, PlotSet plotSet) throws JAXBException {
-
-//		if ((plotSet.getxSeries().length > COLOUR_SCHEME.length) || (plotSet.getySeries().length > COLOUR_SCHEME.length)) {
-//			throw new IllegalArgumentException("The maximum number of series in one chart is " + COLOUR_SCHEME.length);
-//		}
+	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, IChart plotSet) throws JAXBException {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -543,13 +533,13 @@ public class ChartFactory {
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId, false));
 
 		// Add a legend
-		if (plotSet.getLabels().length > 1) {
+		if (plotSet.getLegends().length > 1) {
 			chart.setLegend(createLegend());
 		}
 
 		createChartLayout(dmlchartObjectFactory, chartspace, chart, dmlObjectFactory);
 
-		if (ChartType.SCATTER.equals(plotSet.getChartType())) {
+		if (IChart.ChartType.SCATTER.equals(plotSet.getChartType())) {
 
 			CTValAx catAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -587,11 +577,11 @@ public class ChartFactory {
 			scatterchart.setVaryColors(boolean11);
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHint());
 			}
 
-		} else if (ChartType.LINE.equals(plotSet.getChartType())) {
+		} else if (IChart.ChartType.LINE.equals(plotSet.getChartType())) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -657,10 +647,10 @@ public class ChartFactory {
 			linechart.setVaryColors(boolean11);
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHint());
 			}
-		} else if (ChartType.BAR.equals(plotSet.getChartType())) {
+		} else if (IChart.ChartType.BAR.equals(plotSet.getChartType())) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -723,7 +713,7 @@ public class ChartFactory {
 			barchart.setVaryColors(boolean11);
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLabels(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHint());
 			}
 		}

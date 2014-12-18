@@ -1,4 +1,4 @@
-package no.marintek.mylyn.wikitext.chart;
+package no.marintek.mylyn.wikitext.elements;
 
 /**
  * Configuration class for plot/chart rendering.

@@ -1,6 +1,7 @@
 package no.marintek.mylyn.wikitext.ooxml;
 
 import static org.junit.Assert.*;
+import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
 
 import org.junit.Test;
 
