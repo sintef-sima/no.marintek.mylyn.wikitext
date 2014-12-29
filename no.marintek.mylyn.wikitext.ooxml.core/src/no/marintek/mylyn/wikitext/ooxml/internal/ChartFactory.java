@@ -503,8 +503,9 @@ public class ChartFactory {
 		chartspace.setChart(chart);
 
 		// Create object for title
-		chart.setTitle(createChartTitle(title));
-		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
+		if (title!=null){
+			chart.setTitle(createChartTitle(title));
+		}		
 
 		// Create object for autoTitleDeleted
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
@@ -518,6 +519,7 @@ public class ChartFactory {
 		// Create object for layout
 		plotarea.setLayout(createLayout());
 
+		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 		// FIXME: Create this properly if we need it
 		// CTScaling createCTScaling = dmlchartObjectFactory.createCTScaling();
 		// CTDouble min = dmlchartObjectFactory.createCTDouble();
