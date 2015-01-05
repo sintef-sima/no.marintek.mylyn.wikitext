@@ -13,9 +13,9 @@ package no.marintek.mylyn.wikitext.ooxml.internal;
 
 import javax.xml.bind.JAXBException;
 
-import no.marintek.mylyn.wikitext.elements.ChartRenderHint;
-import no.marintek.mylyn.wikitext.elements.IChart;
-import no.marintek.mylyn.wikitext.elements.ChartRenderHint.AxisNumberFormat;
+import no.marintek.mylyn.wikitext.elements.ChartDescription;
+import no.marintek.mylyn.wikitext.elements.ChartRenderHints;
+import no.marintek.mylyn.wikitext.elements.ChartRenderHints.AxisNumberFormat;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -174,7 +174,7 @@ public class ChartFactory {
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
-			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHint hint) {
+			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint) {
 
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
@@ -256,7 +256,7 @@ public class ChartFactory {
 	 */
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
-			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTLineChart linechart, int order, int index, ChartRenderHint hint) {
+			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTLineChart linechart, int order, int index, ChartRenderHints hint) {
 
 		// Create object for dispUnits
 		CTLineSer lineser = dmlchartObjectFactory.createCTLineSer();
@@ -328,7 +328,7 @@ public class ChartFactory {
 	
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
-			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index, ChartRenderHint hint) {
+			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index, ChartRenderHints hint) {
 
 		// Create object for dispUnits
 		CTBarSer barser = dmlchartObjectFactory.createCTBarSer();
@@ -383,7 +383,7 @@ public class ChartFactory {
 	 * @param data
 	 * @return
 	 */
-	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHint hint) {
+	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHints hint) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
 		// Create object for numCache
@@ -478,7 +478,7 @@ public class ChartFactory {
 	 * @return the chart space instance
 	 * @throws JAXBException
 	 */
-	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, IChart plotSet) throws JAXBException {
+	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, ChartDescription plotSet) throws JAXBException {
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -541,7 +541,7 @@ public class ChartFactory {
 
 		createChartLayout(dmlchartObjectFactory, chartspace, chart, dmlObjectFactory);
 
-		if (IChart.ChartType.SCATTER.equals(plotSet.getChartType())) {
+		if (ChartDescription.ChartType.SCATTER.equals(plotSet.getChartType())) {
 
 			CTValAx catAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -580,10 +580,10 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHint());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints());
 			}
 
-		} else if (IChart.ChartType.LINE.equals(plotSet.getChartType())) {
+		} else if (ChartDescription.ChartType.LINE.equals(plotSet.getChartType())) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -650,9 +650,9 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHint());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHints());
 			}
-		} else if (IChart.ChartType.BAR.equals(plotSet.getChartType())) {
+		} else if (ChartDescription.ChartType.BAR.equals(plotSet.getChartType())) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -716,7 +716,7 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getxSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHint());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHints());
 			}
 		}
 
@@ -1354,7 +1354,7 @@ public class ChartFactory {
 	 *            the array to create a data set from
 	 * @return a data set to for use in a chart
 	 */
-	private static CTNumDataSource createValuesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHint hint) {
+	private static CTNumDataSource createValuesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHints hint) {
 		CTNumDataSource datasource = dmlchartObjectFactory.createCTNumDataSource();
 
 		// Create object for numCache

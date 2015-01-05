@@ -34,7 +34,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import no.marintek.mylyn.wikitext.elements.ChartDescription;
-import no.marintek.mylyn.wikitext.elements.IChart;
 import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
 
 import org.docx4j.XmlUtils;
@@ -1437,10 +1436,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	 * @param xlabel
 	 * @param plotset
 	 * 
-	 * @deprecated use {@link #chart(ChartDescription)}
+	 * @deprecated use {@link #chart(DefaultChartDescription)}
 	 */
 	@Deprecated 
-	public void chart(String caption, String title, String ylabel, String xlabel, IChart plotset) {
+	public void chart(String caption, String title, String ylabel, String xlabel, ChartDescription plotset) {
 		try {
 			String prId = Integer.toString(++chartCounter);
 			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));
@@ -1461,7 +1460,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	/**
 	 * Creates a simple line chart using the given data set.
 	 */
-	public void chart(IChart plotset) {
+	public void chart(ChartDescription plotset) {
 		try {
 			String prId = Integer.toString(++chartCounter);
 			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));

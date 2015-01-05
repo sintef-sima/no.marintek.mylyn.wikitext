@@ -6,16 +6,19 @@ package no.marintek.mylyn.wikitext.elements;
  * @author Håvard Nesse
  * 
  */
-public class ChartRenderHint {
+public class ChartRenderHints {
+	
 	private boolean renderMarkers;
+	
 	private AxisNumberFormat xAxisNumberFormat;
+	
 	private AxisNumberFormat yAxisNumberFormat;
 
 	public enum AxisNumberFormat {
 		AUTOFORMAT, GENERAL, SCIENTIFIC
 	}
 
-	public ChartRenderHint() {
+	public ChartRenderHints() {
 		this.renderMarkers = true;
 		this.xAxisNumberFormat = AxisNumberFormat.AUTOFORMAT;
 		this.yAxisNumberFormat = AxisNumberFormat.AUTOFORMAT;
