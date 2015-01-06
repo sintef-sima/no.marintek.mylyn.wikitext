@@ -577,8 +577,8 @@ public class ChartFactory {
 			boolean11.setVal(Boolean.FALSE);
 			scatterchart.setVaryColors(boolean11);
 
-			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+			for (int series = 0; series < plotSet.getXSeries().length; series++) {
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints());
 			}
 
@@ -600,7 +600,7 @@ public class ChartFactory {
 			catAx.setAxPos(pos);
 
 			// Minimum/maximum major tick marks for the horizontal axis
-			int length = plotSet.getxSeries()[0].length;
+			int length = plotSet.getXSeries()[0].length;
 			int skip = length / 10;
 
 			if (length > 10) {
@@ -647,8 +647,8 @@ public class ChartFactory {
 			boolean11.setVal(Boolean.FALSE);
 			linechart.setVaryColors(boolean11);
 
-			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+			for (int series = 0; series < plotSet.getXSeries().length; series++) {
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHints());
 			}
 		} else if (ChartDescription.BAR==plotSet.getChartType()) {
@@ -674,7 +674,7 @@ public class ChartFactory {
 			catAx.setAxPos(pos);
 
 			// Minimum/maximum major tick marks for the horizontal axis
-			int length = plotSet.getxSeries()[0].length;
+			int length = plotSet.getXSeries()[0].length;
 			int skip = length / 10;
 
 			if (length > 10) {
@@ -713,8 +713,8 @@ public class ChartFactory {
 			boolean11.setVal(Boolean.FALSE);
 			barchart.setVaryColors(boolean11);
 
-			for (int series = 0; series < plotSet.getxSeries().length; series++) {
-				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
+			for (int series = 0; series < plotSet.getXSeries().length; series++) {
+				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHints());
 			}
 		}

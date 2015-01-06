@@ -1465,7 +1465,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 			String prId = Integer.toString(++chartCounter);
 			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));
 
-			CTChartSpace chartSpace = ChartFactory.createChartSpace(plotset.getTitle(), plotset.getYlabel(), plotset.getYlabel(), plotset);
+			CTChartSpace chartSpace = ChartFactory.createChartSpace(plotset.getTitle(), plotset.getYLabel(), plotset.getYLabel(), plotset);
 			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			chart.setJaxbElement(chartSpace);
 

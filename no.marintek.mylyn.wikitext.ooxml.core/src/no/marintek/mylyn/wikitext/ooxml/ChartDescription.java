@@ -12,9 +12,9 @@ public interface ChartDescription {
 
 	public abstract String[] getLegends();
 
-	public abstract double[][] getxSeries();
+	public abstract double[][] getXSeries();
 
-	public abstract double[][] getySeries();
+	public abstract double[][] getYSeries();
 
 	public abstract int getChartType();
 
@@ -22,9 +22,9 @@ public interface ChartDescription {
 
 	public abstract String[] getAnnotations();
 
-	public abstract String getYlabel();
+	public abstract String getYLabel();
 
-	public abstract String getXlabel();
+	public abstract String getXLabel();
 
 	public abstract String getTitle();
 
