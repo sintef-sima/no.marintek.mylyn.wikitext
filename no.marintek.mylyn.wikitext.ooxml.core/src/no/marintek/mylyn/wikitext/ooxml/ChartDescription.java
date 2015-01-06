@@ -1,14 +1,14 @@
-package no.marintek.mylyn.wikitext.elements;
+package no.marintek.mylyn.wikitext.ooxml;
 
 
 public interface ChartDescription {
 
-	/**
-	 * Type of chart that can be created. Typically one of <b>LINE</b>, <b>SCATTER</b> or <b>BAR</b>
-	 */
-	public static enum ChartType {
-		LINE, SCATTER, BAR
-	}
+	public static final int LINE = 0;
+	
+	public static final int SCATTER = 1;
+	
+	public static final int BAR = 2;
+	
 
 	public abstract String[] getLegends();
 
@@ -16,7 +16,7 @@ public interface ChartDescription {
 
 	public abstract double[][] getySeries();
 
-	public abstract ChartType getChartType();
+	public abstract int getChartType();
 
 	public abstract ChartRenderHints getRenderHints();
 

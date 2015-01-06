@@ -13,9 +13,8 @@ package no.marintek.mylyn.wikitext.ooxml.internal;
 
 import javax.xml.bind.JAXBException;
 
-import no.marintek.mylyn.wikitext.elements.ChartDescription;
-import no.marintek.mylyn.wikitext.elements.ChartRenderHints;
-import no.marintek.mylyn.wikitext.elements.ChartRenderHints.AxisNumberFormat;
+import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
+import no.marintek.mylyn.wikitext.ooxml.ChartRenderHints;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -410,7 +409,7 @@ public class ChartFactory {
 				numval.setV(Double.toString(data[i]));
 			}
 		}
-		AxisNumberFormat numberFormat = hint != null ? hint.getxAxisNumberFormat() : AxisNumberFormat.AUTOFORMAT;
+		int numberFormat = hint != null ? hint.getxAxisNumberFormat() : ChartRenderHints.AUTOFORMAT;
 		Range range = setRange(min, max, numberFormat);
 		numdata.setFormatCode(range.format);
 
@@ -422,7 +421,7 @@ public class ChartFactory {
 		return datasource;
 	}
 
-	private static Range setRange(double lower, double upper, AxisNumberFormat numberFormat) {
+	private static Range setRange(double lower, double upper, int numberFormat) {
 		double min;
 		double max;
 		String default_decimal_format = "0.0";
@@ -441,10 +440,10 @@ public class ChartFactory {
 		min = lower;
 		max = upper;
 
-		if (numberFormat == AxisNumberFormat.SCIENTIFIC) {
+		if (numberFormat == ChartRenderHints.SCIENTIFIC) {
 			formatPattern = DEFAULT_ENGINEERING_FORMAT;
 			return new Range(min, max, formatPattern);
-		} else if (numberFormat == AxisNumberFormat.GENERAL) {
+		} else if (numberFormat == ChartRenderHints.GENERAL) {
 			formatPattern = default_decimal_format;
 			return new Range(min, max, formatPattern);
 		}
@@ -541,7 +540,7 @@ public class ChartFactory {
 
 		createChartLayout(dmlchartObjectFactory, chartspace, chart, dmlObjectFactory);
 
-		if (ChartDescription.ChartType.SCATTER.equals(plotSet.getChartType())) {
+		if (ChartDescription.SCATTER==plotSet.getChartType()) {
 
 			CTValAx catAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -583,7 +582,7 @@ public class ChartFactory {
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints());
 			}
 
-		} else if (ChartDescription.ChartType.LINE.equals(plotSet.getChartType())) {
+		} else if (ChartDescription.LINE==plotSet.getChartType()) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -652,7 +651,7 @@ public class ChartFactory {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getySeries()[series], plotSet.getxSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, linechart, series, series, plotSet.getRenderHints());
 			}
-		} else if (ChartDescription.ChartType.BAR.equals(plotSet.getChartType())) {
+		} else if (ChartDescription.BAR==plotSet.getChartType()) {
 
 			CTCatAx catAx = createCTCatAx(xlabel, valueAxisId, categoryAxisId);
 			plotarea.getValAxOrCatAxOrDateAx().add(catAx);
@@ -1382,7 +1381,7 @@ public class ChartFactory {
 			}
 		}
 
-		AxisNumberFormat numberFormat = hint != null ? hint.getyAxisNumberFormat() : AxisNumberFormat.AUTOFORMAT;
+		int numberFormat = hint != null ? hint.getyAxisNumberFormat() : ChartRenderHints.AUTOFORMAT;
 		Range range = setRange(min, max, numberFormat);
 		numdata.setFormatCode(range.format);
 

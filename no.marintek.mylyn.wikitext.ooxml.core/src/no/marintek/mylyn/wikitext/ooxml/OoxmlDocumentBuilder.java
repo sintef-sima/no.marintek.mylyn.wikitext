@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2014 MARINTEK.
+ * Copyright (c) 2013, 2014, 2015 MARINTEK.
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -33,7 +33,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import no.marintek.mylyn.wikitext.elements.ChartDescription;
+import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
 import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
 
 import org.docx4j.XmlUtils;
