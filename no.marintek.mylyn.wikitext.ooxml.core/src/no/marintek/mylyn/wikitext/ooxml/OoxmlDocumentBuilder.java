@@ -1460,18 +1460,18 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	/**
 	 * Creates a simple line chart using the given data set.
 	 */
-	public void chart(ChartDescription plotset) {
+	public void chart(ChartDescription cd) {
 		try {
 			String prId = Integer.toString(++chartCounter);
 			org.docx4j.openpackaging.parts.DrawingML.Chart chart = new org.docx4j.openpackaging.parts.DrawingML.Chart(new PartName("/word/charts/chart" + prId + ".xml"));
 
-			CTChartSpace chartSpace = ChartFactory.createChartSpace(plotset.getTitle(), plotset.getYLabel(), plotset.getXLabel(), plotset);
+			CTChartSpace chartSpace = ChartFactory.createChartSpace(cd.getTitle(), cd.getYLabel(), cd.getXLabel(), cd);
 			chart.setContentType(new ContentType(ContentTypes.DRAWINGML_CHART));
 			chart.setJaxbElement(chartSpace);
 
 			Relationship part = mainDocumentPart.addTargetPart(chart);
 			mainDocumentPart.addObject(chart(part.getId(), prId));
-			caption(plotset.getCaption(), CaptionType.Figure);
+			caption(cd.getCaption(), CaptionType.Figure);
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		} catch (JAXBException e) {
