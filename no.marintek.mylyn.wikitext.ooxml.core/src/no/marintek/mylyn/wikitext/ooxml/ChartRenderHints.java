@@ -10,6 +10,8 @@ public class ChartRenderHints {
 	
 	private boolean renderMarkers;
 	
+	private boolean showDataTable = true;
+	
 	private int xAxisNumberFormat;
 	
 	private int yAxisNumberFormat;
@@ -47,6 +49,14 @@ public class ChartRenderHints {
 
 	public void setyAxisNumberFormat(int yAxisNumberFormat) {
 		this.yAxisNumberFormat = yAxisNumberFormat;
+	}
+
+	public boolean showDataTable() {
+		return showDataTable;
+	}
+
+	public void setShowDataTable(boolean showDataTable) {
+		this.showDataTable = showDataTable;
 	}
 
 }
