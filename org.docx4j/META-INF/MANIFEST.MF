@@ -153,4 +153,5 @@ Require-Bundle: org.apache.log4j;bundle-version="1.2.15",
  org.apache.xalan;bundle-version="2.7.1",
  org.apache.xmlgraphics;bundle-version="1.4.0",
  org.apache.commons.lang;bundle-version="2.6.0",
- org.apache.xerces;bundle-version="2.9.0"
+ org.apache.xerces;bundle-version="2.9.0",
+ org.apache.xml.serializer;bundle-version="2.7.1"

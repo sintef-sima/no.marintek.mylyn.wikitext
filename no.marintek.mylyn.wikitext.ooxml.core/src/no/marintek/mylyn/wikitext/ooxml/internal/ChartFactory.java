@@ -90,6 +90,7 @@ import org.docx4j.dml.chart.STAxPos;
 import org.docx4j.dml.chart.STBarDir;
 import org.docx4j.dml.chart.STScatterStyle;
 import org.docx4j.dml.chart.STTickLblPos;
+import org.eclipse.core.runtime.Assert;
 
 /**
  * A factory for creating charts for OOXML documents. It will take a maximum of
@@ -491,7 +492,10 @@ public class ChartFactory {
 	 * @throws JAXBException
 	 */
 	public static CTChartSpace createChartSpace(String title, String ylabel, String xlabel, ChartDescription plotSet) throws JAXBException {
-
+		Assert.isNotNull(ylabel);
+		Assert.isNotNull(xlabel);
+		Assert.isNotNull(plotSet);
+		
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		// Create random numbers for the axis identifiers
@@ -870,6 +874,7 @@ public class ChartFactory {
 	}
 
 	private static CTTitle createChartTitle(String chartTitle) {
+		Assert.isNotNull(chartTitle);
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -937,6 +942,8 @@ public class ChartFactory {
 	 * @return
 	 */
 	private static CTCatAx createCTCatAx(String categories, long valueAxisId, long categoryAxisId) {
+		Assert.isNotNull(categories);
+		
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTCatAx axis = dmlchartObjectFactory.createCTCatAx();
@@ -1047,6 +1054,7 @@ public class ChartFactory {
 	 * @return the horizontal title
 	 */
 	private static CTTitle createCTCatAxTitle(String titleText) {
+		Assert.isNotNull(titleText);
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
@@ -1116,6 +1124,8 @@ public class ChartFactory {
 	 * @return
 	 */
 	private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId, boolean horizontal) {
+		Assert.isNotNull(values);
+		
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTValAx axis = dmlchartObjectFactory.createCTValAx();
@@ -1208,6 +1218,7 @@ public class ChartFactory {
 	}
 
 	private static CTTitle createCTValAxTitle(String titleText, boolean horizontal) {
+		Assert.isNotNull(titleText);
 
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
