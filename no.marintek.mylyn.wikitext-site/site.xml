@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
 	<description>MARINTEK WikiText Update Site</description>
-	<feature url="features/no.marintek.mylyn.wikitext_3.0.0.qualifier.jar" id="no.marintek.mylyn.wikitext" version="3.0.0.qualifier">
+	<feature url="features/no.marintek.mylyn.wikitext_3.0.0.qualifier.jar" id="no.marintek.mylyn.wikitext"
+	version="3.0.1.qualifier">
 		<category name="Features"/>
 	</feature>
 	<category-def name="Features" label="MARINTEK WikiText Features">

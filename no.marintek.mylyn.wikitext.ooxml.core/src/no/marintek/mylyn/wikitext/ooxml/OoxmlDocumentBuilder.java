@@ -308,18 +308,18 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		r8.getContent().add(textWrapped5);
 		text5.setValue(": " + text);
 
-		// Create object for bookmarkStart (wrapped in JAXBElement)
-		CTBookmark bookmark = wmlObjectFactory.createCTBookmark();
-		JAXBElement<org.docx4j.wml.CTBookmark> bookmarkWrapped = wmlObjectFactory.createPBookmarkStart(bookmark);
-		p.getContent().add(bookmarkWrapped);
-		bookmark.setName("_GoBack");
-		bookmark.setId(BigInteger.valueOf(0));
-
-		// Create object for bookmarkEnd (wrapped in JAXBElement)
-		CTMarkupRange markuprange = wmlObjectFactory.createCTMarkupRange();
-		JAXBElement<org.docx4j.wml.CTMarkupRange> markuprangeWrapped = wmlObjectFactory.createPBookmarkEnd(markuprange);
-		p.getContent().add(markuprangeWrapped);
-		markuprange.setId(BigInteger.valueOf(0));
+//		// Create object for bookmarkStart (wrapped in JAXBElement)
+//		CTBookmark bookmark = wmlObjectFactory.createCTBookmark();
+//		JAXBElement<org.docx4j.wml.CTBookmark> bookmarkWrapped = wmlObjectFactory.createPBookmarkStart(bookmark);
+//		p.getContent().add(bookmarkWrapped);
+//		bookmark.setName("_GoBack");
+//		bookmark.setId(BigInteger.valueOf(0));
+//
+//		// Create object for bookmarkEnd (wrapped in JAXBElement)
+//		CTMarkupRange markuprange = wmlObjectFactory.createCTMarkupRange();
+//		JAXBElement<org.docx4j.wml.CTMarkupRange> markuprangeWrapped = wmlObjectFactory.createPBookmarkEnd(markuprange);
+//		p.getContent().add(markuprangeWrapped);
+//		markuprange.setId(BigInteger.valueOf(0));
 
 		mainDocumentPart.addObject(p);
 	}

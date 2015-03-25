@@ -91,6 +91,7 @@ import org.docx4j.dml.chart.STBarDir;
 import org.docx4j.dml.chart.STScatterStyle;
 import org.docx4j.dml.chart.STTickLblPos;
 import org.eclipse.core.runtime.Assert;
+import org.xlsx4j.sml.CTIndex;
 
 /**
  * A factory for creating charts for OOXML documents. It will take a maximum of
@@ -332,30 +333,30 @@ public class ChartFactory {
 	// Bar chart with strings for x-axis
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, String[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
-			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, ChartRenderHints hint) {
-
-		// Create object for dispUnits
+			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, ChartRenderHints hint) {		
+		
 		CTBarSer barser = dmlchartObjectFactory.createCTBarSer();
 		chart.getSer().add(barser);
+		
+	    CTUnsignedInt order = dmlchartObjectFactory.createCTUnsignedInt(); 
+	    barser.setOrder(order); 
+	    order.setVal( 0 );
 
+		// Add categories
+		barser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
 
-		// Create object for val
+		// Add values
 		barser.setVal(createValuesDataSource(dmlchartObjectFactory, ySeries, hint));
 
-		// Create object for spPr
-		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
-		barser.setSpPr(shapeproperties);
-
-		// Invert bars if negative value
-		CTBoolean boolean12 = dmlchartObjectFactory.createCTBoolean();
-		boolean12.setVal(Boolean.FALSE);
-		barser.setInvertIfNegative(boolean12);
-
-		// Create object for ln
-		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
-		shapeproperties.setLn(lineproperties);
+		// Create object for idx
+	    CTUnsignedInt idx = dmlchartObjectFactory.createCTUnsignedInt(); 
+	    barser.setIdx(idx); 
+	    idx.setVal( 0 );
 		
-		barser.setCat(createCategoriesDataSource(dmlchartObjectFactory, xSeries));
+	    // Create object for invertIfNegative
+	    CTBoolean b = dmlchartObjectFactory.createCTBoolean(); 
+	    barser.setInvertIfNegative(b); 
+		
 	}
 
 	/**
@@ -417,20 +418,18 @@ public class ChartFactory {
 	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, String[] data) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
-		// Create object for numCache
-		CTStrData numdata = dmlchartObjectFactory.createCTStrData();
-		datasource.setStrLit(numdata);
+		CTStrData strData = dmlchartObjectFactory.createCTStrData();
+		datasource.setStrLit(strData);
 
 		for (int i = 0; i < data.length; i++) {
-			CTStrVal numval = dmlchartObjectFactory.createCTStrVal();
-			numdata.getPt().add(numval);
-			numval.setIdx(i);
-			numval.setV(data[i]);
+			CTStrVal strVal = dmlchartObjectFactory.createCTStrVal();
+			strData.getPt().add(strVal);
+			strVal.setIdx(i);
+			strVal.setV(data[i]);
 		}
 
-		// Create object for ptCount
 		CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
-		numdata.setPtCount(unsignedint);
+		strData.setPtCount(unsignedint);
 		unsignedint.setVal(data.length);
 
 		return datasource;
@@ -1453,7 +1452,7 @@ public class ChartFactory {
 			numval.setIdx(i);
 			if (Double.isNaN(data[i])) {
 				numval.setV(""); // NaN must be represented as empty string
-									// (tested in MS Word 2010 on Windows 7)
+								 // (tested in MS Word 2010 on Windows 7)
 			} else {
 				if (data[i] > max) {
 					max = data[i];

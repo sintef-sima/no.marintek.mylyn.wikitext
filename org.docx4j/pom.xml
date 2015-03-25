@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.1-SNAPSHOT</version>
 		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 	<artifactId>org.docx4j</artifactId>
