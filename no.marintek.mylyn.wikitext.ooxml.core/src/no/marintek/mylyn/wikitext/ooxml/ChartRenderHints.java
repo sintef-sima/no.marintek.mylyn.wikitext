@@ -12,6 +12,8 @@ public class ChartRenderHints {
 	
 	private boolean showDataTable = true;
 	
+	private boolean showLegend = false;
+	
 	private int xAxisNumberFormat;
 	
 	private int yAxisNumberFormat;
@@ -57,6 +59,18 @@ public class ChartRenderHints {
 
 	public void setShowDataTable(boolean showDataTable) {
 		this.showDataTable = showDataTable;
+	}
+
+	public boolean showLegend() {
+		return showLegend;
+	}
+
+	/**
+	 * 
+	 * @param showLegend
+	 */
+	public void setShowLegend(boolean showLegend) {
+		this.showLegend = showLegend;
 	}
 
 }

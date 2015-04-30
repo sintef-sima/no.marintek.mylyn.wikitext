@@ -91,7 +91,6 @@ import org.docx4j.dml.chart.STBarDir;
 import org.docx4j.dml.chart.STScatterStyle;
 import org.docx4j.dml.chart.STTickLblPos;
 import org.eclipse.core.runtime.Assert;
-import org.xlsx4j.sml.CTIndex;
 
 /**
  * A factory for creating charts for OOXML documents. It will take a maximum of
@@ -366,7 +365,7 @@ public class ChartFactory {
 	 * @param data
 	 * @return
 	 */
-	private static CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHints hint) {
+	private static  CTAxDataSource createCategoriesDataSource(ObjectFactory dmlchartObjectFactory, double[] data, ChartRenderHints hint) {
 		CTAxDataSource datasource = dmlchartObjectFactory.createCTAxDataSource();
 
 		// Create object for numCache
@@ -375,7 +374,6 @@ public class ChartFactory {
 
 		double max = 0;
 		double min = 0;
-
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
@@ -532,15 +530,19 @@ public class ChartFactory {
 		chart.setPlotArea(plotarea);
 
 		// Create object for layout
-		plotarea.setLayout(createLayout());
+		//plotarea.setLayout(createLayout());
 
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 
 		// Create object for valAx
 		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId, false));
 
-		// Add a legend
-		if (plotSet.getLegends().length > 1) {
+		// Add a legend unless we're showing the data table or have more than ten series
+		boolean showlegend = plotSet.getLegends().length > 1 && plotSet.getLegends().length < 10;
+		if (plotSet.getRenderHints() != null && plotSet.getRenderHints().showDataTable()){
+			showlegend = false;
+		}
+		if (showlegend) {
 			chart.setLegend(createLegend());
 		}
 
@@ -679,9 +681,10 @@ public class ChartFactory {
 			pos.setVal(STAxPos.B);
 			catAx.setAxPos(pos);
 
+
 			if (!plotSet.getRenderHints().showDataTable()){
 				// Minimum/maximum major tick marks for the horizontal axis
-				int length = plotSet.getXSeries()[0].length;
+				int length = plotSet.getYSeries()[0].length;
 				int skip = length / 10;
 	
 				if (length > 10) {
@@ -734,12 +737,14 @@ public class ChartFactory {
 			    CTBoolean b4 = dmlchartObjectFactory.createCTBoolean(); 
 			    dtable.setShowKeys(b4);			    
 			    plotarea.setDTable(dtable);
-				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[0], plotSet.getLegends(), dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, plotSet.getRenderHints());
+				for (int index = 0; index < plotSet.getXSeries().length; index++) {
+					addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[index], plotSet.getXSeries()[index], dmlchartObjectFactory,
+							valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, index, index, plotSet.getRenderHints());
+				}
 			} else {
-				for (int series = 0; series < plotSet.getXSeries().length; series++) {
-					addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
-							valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, series, series, plotSet.getRenderHints());
+				for (int index = 0; index < plotSet.getXSeries().length; index++) {
+					addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[index], plotSet.getXSeries()[index], dmlchartObjectFactory,
+							valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, barchart, index, index, plotSet.getRenderHints());
 				}
 			}		    
 		    
@@ -748,7 +753,7 @@ public class ChartFactory {
 		return chartspace;
 	}
 	
-	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
+	private static void addSeries(String[] legends, String ylabel, String xlabel,double[] ySeries,double[] xSeries,
 			org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId,
 			org.docx4j.dml.ObjectFactory dmlObjectFactory, CTPlotArea plotarea, CTBarChart chart, int order, int index, ChartRenderHints hint) {
 
@@ -1391,39 +1396,46 @@ public class ChartFactory {
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
 
 		CTLegend legend = dmlchartObjectFactory.createCTLegend();
+		
 		// Create object for layout
 		CTLayout layout = dmlchartObjectFactory.createCTLayout();
 		legend.setLayout(layout);
+
 		// Create object for overlay
 		CTBoolean overlay = dmlchartObjectFactory.createCTBoolean();
-		overlay.setVal(Boolean.TRUE);
+		overlay.setVal(Boolean.FALSE);
 		legend.setOverlay(overlay);
+		
 		// Create object for legendPos
 		CTLegendPos legendpos = dmlchartObjectFactory.createCTLegendPos();
 		legend.setLegendPos(legendpos);
-		legendpos.setVal(org.docx4j.dml.chart.STLegendPos.R);
+		legendpos.setVal(org.docx4j.dml.chart.STLegendPos.TR);
 
-		// Add formatting to legend.
+		// Add formatting to legend.'
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 		CTShapeProperties shapeproperties = dmlObjectFactory.createCTShapeProperties();
 
-		// Create object for solidFill
-		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
-		shapeproperties.setSolidFill(solidcolorfillproperties);
+//		// Create object for solidFill
+//		CTSolidColorFillProperties solidcolorfillproperties = dmlObjectFactory.createCTSolidColorFillProperties();
+//		shapeproperties.setSolidFill(solidcolorfillproperties);
+//		
+//		// Create object for schemeClr
+//		CTSchemeColor schemecolor = dmlObjectFactory.createCTSchemeColor();
+//		solidcolorfillproperties.setSchemeClr(schemecolor);
+//		schemecolor.setVal(org.docx4j.dml.STSchemeColorVal.BG_1);
+		
+//		// Create object for ln
+//		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
+//		shapeproperties.setLn(lineproperties);
+//		
+//		// Create object for solidFill
+//		CTSolidColorFillProperties solidcolorfillproperties2 = dmlObjectFactory.createCTSolidColorFillProperties();
+//		lineproperties.setSolidFill(solidcolorfillproperties2);
+		
 		// Create object for schemeClr
-		CTSchemeColor schemecolor = dmlObjectFactory.createCTSchemeColor();
-		solidcolorfillproperties.setSchemeClr(schemecolor);
-		schemecolor.setVal(org.docx4j.dml.STSchemeColorVal.BG_1);
-		// Create object for ln
-		CTLineProperties lineproperties = dmlObjectFactory.createCTLineProperties();
-		shapeproperties.setLn(lineproperties);
-		// Create object for solidFill
-		CTSolidColorFillProperties solidcolorfillproperties2 = dmlObjectFactory.createCTSolidColorFillProperties();
-		lineproperties.setSolidFill(solidcolorfillproperties2);
-		// Create object for schemeClr
-		CTSchemeColor schemecolor2 = dmlObjectFactory.createCTSchemeColor();
-		solidcolorfillproperties2.setSchemeClr(schemecolor2);
-		schemecolor2.setVal(org.docx4j.dml.STSchemeColorVal.TX_1);
+//		CTSchemeColor schemecolor2 = dmlObjectFactory.createCTSchemeColor();
+//		solidcolorfillproperties2.setSchemeClr(schemecolor2);
+//		schemecolor2.setVal(org.docx4j.dml.STSchemeColorVal.TX_1);
 		legend.setSpPr(shapeproperties);
 		return legend;
 	}
