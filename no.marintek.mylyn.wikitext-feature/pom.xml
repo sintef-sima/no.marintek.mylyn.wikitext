@@ -7,7 +7,6 @@
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
 		<version>3.0.1-SNAPSHOT</version>
-		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 	<artifactId>no.marintek.mylyn.wikitext</artifactId>
 	<version>3.0.1-SNAPSHOT</version>
@@ -18,7 +17,7 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-plugin</artifactId>
-				<version>${tycho-version}</version>
+				<version>${tycho.version}</version>
 				<executions>
 					<execution>
 						<id>attach-p2-metadata</id>

@@ -7,7 +7,6 @@
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
 		<version>3.0.1-SNAPSHOT</version>
-		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 	<artifactId>no.marintek.mylyn.wikitext.ooxml.core</artifactId>
 	<version>3.0.1-SNAPSHOT</version>

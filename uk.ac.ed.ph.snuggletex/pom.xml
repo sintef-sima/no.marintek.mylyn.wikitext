@@ -7,7 +7,6 @@
 		<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
 		<groupId>no.marintek.mylyn.wikitext</groupId>
 		<version>3.0.1-SNAPSHOT</version>
-		<relativePath>../no.marintek.mylyn.wikitext-parent</relativePath>
 	</parent>
 	<artifactId>uk.ac.ed.ph.snuggletex</artifactId>
 	<version>1.2.2-SNAPSHOT</version>
@@ -21,5 +20,4 @@
 		</plugins>
 	</build>
 	<groupId>no.marintek.mylyn.wikitext</groupId>
-
 </project>
