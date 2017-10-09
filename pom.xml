@@ -6,7 +6,7 @@
 
 	<groupId>no.marintek.mylyn.wikitext</groupId>
 	<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<prerequisites>
@@ -15,14 +15,14 @@
 
 	<properties>
 		<egit-version>2.2.0-SNAPSHOT</egit-version>
-		<tycho.version>0.22.0</tycho.version>
+		<tycho.version>1.0.0</tycho.version>
 		<mockito-version>1.8.4</mockito-version>
 		<junit-version>4.8.1</junit-version>
 		<project.source.sourceEncoding>UTF-8</project.source.sourceEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Repositories -->
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/</orbit-site>
-		<eclipse-site>http://download.eclipse.org/releases/kepler/</eclipse-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository</orbit-site>
+		<eclipse-site>http://download.eclipse.org/releases/oxygen/</eclipse-site>
 		<nexus.host.prefix>https://mooropt2.marintek.sintef.no/nexus/content</nexus.host.prefix>
 		<snapshot.repository.url>${nexus.host.prefix}/repositories/snapshots/</snapshot.repository.url>
 		<release.repository.url>${nexus.host.prefix}/repositories/releases/</release.repository.url>
@@ -30,13 +30,13 @@
 
 	<distributionManagement>
 		<repository>
-			<id>sima-releases</id>
-			<name>SIMA Releases</name>
+			<id>releases</id>
+			<name>Releases</name>
 			<url>${release.repository.url}</url>
 		</repository>
 		<snapshotRepository>
-			<id>sima-snapshots</id>
-			<name>SIMA Snapshots</name>
+			<id>snapshots</id>
+			<name>Snapshots</name>
 			<url>${snapshot.repository.url}</url>
 		</snapshotRepository>
 	</distributionManagement>
@@ -58,13 +58,13 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>maven.eclipse.org</id>
-			<url>http://maven.eclipse.org/nexus/content/repositories/milestone-luna/</url>
+			<url>http://maven.eclipse.org/nexus/content/repositories/milestone-oxygen/</url>
 		</pluginRepository>
 	</pluginRepositories>
 
 	<repositories>
 		<repository>
-			<id>eclipse-luna</id>
+			<id>eclipse-oxygen</id>
 			<layout>p2</layout>
 			<url>${eclipse-site}</url>
 		</repository>
@@ -86,7 +86,6 @@
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tycho.version}</version>
 				<executions>
 					<execution>
 						<id>plugin-source</id>

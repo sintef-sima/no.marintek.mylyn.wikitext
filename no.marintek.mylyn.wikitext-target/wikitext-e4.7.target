@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde?>
+<!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
+<target name="MARINTEK WikiText 3.1.0" sequenceNumber="1507539810">
+  <locations>
+    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
+      <unit id="org.apache.commons.io" version="2.2.0.v201405211200"/>
+      <unit id="org.apache.log4j" version="1.2.15.v201012070815"/>
+      <unit id="org.apache.xalan" version="2.7.1.v201005080400"/>
+      <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
+      <unit id="org.apache.xmlgraphics" version="1.4.0.v201301251218"/>
+      <unit id="org.apache.commons.lang" version="2.6.0.v201404270220"/>
+      <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
+      <unit id="org.apache.xml.resolver" version="1.2.0.v201005080400"/>
+      <unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
+      <unit id="org.junit" version="4.12.0.v201504281640"/>
+      <unit id="javax.xml" version="1.3.4.v201005080400"/>
+      <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository/"/>
+    </location>
+    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.mylyn.wikitext" version="3.0.6.20170311142502"/>
+      <unit id="org.eclipse.osgi" version="3.12.1.v20170821-1548"/>
+      <unit id="org.eclipse.core.runtime" version="3.13.0.v20170207-1030"/>
+      <unit id="org.eclipse.core.contenttype" version="3.6.0.v20170207-1037"/>
+      <unit id="org.eclipse.core.jobs" version="3.9.1.v20170714-0547"/>
+      <unit id="org.eclipse.equinox.preferences" version="3.7.0.v20170126-2132"/>
+      <unit id="org.eclipse.equinox.registry" version="3.7.0.v20170222-1344"/>
+      <unit id="org.eclipse.equinox.common" version="3.9.0.v20170207-1454"/>
+      <unit id="org.eclipse.equinox.app" version="1.3.400.v20150715-1528"/>
+      <unit id="org.eclipse.jdt.annotation" version="2.1.100.v20170511-1408"/>
+      <repository location="http://download.eclipse.org/releases/oxygen/"/>
+    </location>
+  </locations>
+</target>

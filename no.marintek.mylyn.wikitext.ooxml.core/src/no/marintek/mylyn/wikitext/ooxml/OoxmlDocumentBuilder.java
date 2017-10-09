@@ -1,4 +1,5 @@
 /*******************************************************************************
+ * Copyright (c) 2017 SINTEF Ocean
  * Copyright (c) 2013, 2014, 2015 MARINTEK.
  *
  * All rights reserved. This program and the accompanying materials are made
@@ -108,9 +109,9 @@ import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.mylyn.wikitext.core.parser.Attributes;
-import org.eclipse.mylyn.wikitext.core.parser.DocumentBuilder;
-import org.eclipse.mylyn.wikitext.core.parser.TableCellAttributes;
+import org.eclipse.mylyn.wikitext.parser.Attributes;
+import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.parser.TableCellAttributes;
 
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
