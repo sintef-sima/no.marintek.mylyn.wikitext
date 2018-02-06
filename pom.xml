@@ -6,12 +6,28 @@
 
 	<groupId>no.marintek.mylyn.wikitext</groupId>
 	<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+	<version>3.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
+
+	<licenses>
+		<license>
+			<name>Eclipse Public License v1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<distribution>repo</distribution>
+			<comments>
+		All rights reserved.
+
+		This program and the accompanying materials are made
+		available under the terms of the Eclipse Public License v1.0
+		which accompanies this distribution, and is available at
+		http://www.eclipse.org/legal/epl-v10.htm
+      </comments>
+		</license>
+	</licenses>
 
 	<properties>
 		<egit-version>2.2.0-SNAPSHOT</egit-version>
@@ -21,8 +37,6 @@
 		<project.source.sourceEncoding>UTF-8</project.source.sourceEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Repositories -->
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository</orbit-site>
-		<eclipse-site>http://download.eclipse.org/releases/oxygen/</eclipse-site>
 		<nexus.host.prefix>https://mooropt2.marintek.sintef.no/nexus/content</nexus.host.prefix>
 		<snapshot.repository.url>${nexus.host.prefix}/repositories/snapshots/</snapshot.repository.url>
 		<release.repository.url>${nexus.host.prefix}/repositories/releases/</release.repository.url>
@@ -62,19 +76,6 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<repositories>
-		<repository>
-			<id>eclipse-oxygen</id>
-			<layout>p2</layout>
-			<url>${eclipse-site}</url>
-		</repository>
-		<repository>
-			<id>eclipse-orbit</id>
-			<layout>p2</layout>
-			<url>${orbit-site}</url>
-		</repository>
-	</repositories>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -94,6 +95,50 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<target>
+						<artifact>
+							<groupId>no.marintek.mylyn.wikitext</groupId>
+							<artifactId>no.marintek.mylyn.wikitext-parent</artifactId>
+							<version>3.2.0-SNAPSHOT</version>
+							<classifier>default</classifier>
+						</artifact>
+					</target>
+					<resolver>p2</resolver>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+					<pomDependencies>consider</pomDependencies>
+				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>

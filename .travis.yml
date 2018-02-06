@@ -1,0 +1,20 @@
+language: java
+sudo: false
+install: echo "Skipping default dependencies preparation"
+script: "mvn -s .travis-settings.xml clean verify -Pskip-ui-tests" 
+jdk:
+  - oraclejdk8
+cache:
+  directories:
+    - $HOME/.m2
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: UAKAsUbB0H3sCOkarR0gK2WqATpCxXcIqh5T8H8bGtmOxcAoNyhkdf0m/CnKcEEvn2XW/c5mE28Y4Wb7XV7RmVB/SyQtH+JqyQsDpIKLWUKDACfxbSqCxfSyamioMHqbHITzTzogmGEgFOGFhHgOV0RsZ0uJZQuQ+5BhB3KLnEg=
+  file_glob: true
+  file: ${HOME}/build/${TRAVIS_REPO_SLUG}/no.marintek.mylyn.wikitext-site/target/no.marintek.mylyn.wikitext-*.zip
+  on:
+    repo: marintek-sima/no.marintek.mylyn.wikitext
+    tags: true
+    all_branches: true

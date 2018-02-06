@@ -115,6 +115,8 @@ public class ChartFactory {
 	}
 
 	public static final String DEFAULT_ENGINEERING_FORMAT = "0.00E+00;0.00E+00;0";
+	
+	private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
 	private static final int ENGINEERING_LIMIT = 4;
 
@@ -129,9 +131,9 @@ public class ChartFactory {
 			{ (byte) 178, 60, (byte) 147 } // pink
 	};
 	
-	private static byte[] getColour(int index) {
+	private static String getColour(int index) {
 		if (index < COLOUR_SCHEME.length) {
-			return COLOUR_SCHEME[index];
+			return bytesToHex(COLOUR_SCHEME[index]);
 		}
 		int num = index % COLOUR_SCHEME.length;
 		byte[] fromColor = COLOUR_SCHEME[num];
@@ -164,15 +166,17 @@ public class ChartFactory {
 		if (newB >= 255) {
 			newB = ((fromB + toB) / 2) - num;
 		}
-		
-		return new byte[] {(byte) newR, (byte) newG, (byte) newB};
+		return bytesToHex(new byte[] {(byte) newR, (byte) newG, (byte) newB});
 	}
 	
-	/**
-	 * Used for testing. Not API. 
-	 */
-	public byte[] getColourTest(int index) {
-		return getColour(index);
+	private static String bytesToHex(byte[] bytes) {
+	    char[] hexChars = new char[bytes.length * 2];
+	    for ( int j = 0; j < bytes.length; j++ ) {
+	        int v = bytes[j] & 0xFF;
+	        hexChars[j * 2] = hexArray[v >>> 4];
+	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+	    }
+	    return new String(hexChars);
 	}
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,

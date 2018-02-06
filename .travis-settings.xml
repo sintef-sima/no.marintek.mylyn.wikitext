@@ -1,0 +1,9 @@
+<settings>
+    <mirrors>
+        <mirror>
+            <id>local-nexus</id>
+            <mirrorOf>*</mirrorOf>
+            <url>https://mooropt2.marintek.sintef.no/nexus/content/groups/public</url>
+        </mirror>
+    </mirrors>
+</settings>
