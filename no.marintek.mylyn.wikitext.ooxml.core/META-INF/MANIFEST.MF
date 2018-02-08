@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: OOXML Document Builder
 Bundle-SymbolicName: no.marintek.mylyn.wikitext.ooxml.core
-Bundle-Version: 3.1.0.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.docx4j;bundle-version="3.0.0",
  org.apache.commons.logging;bundle-version="1.1.0",
@@ -12,3 +12,4 @@ Require-Bundle: org.docx4j;bundle-version="3.0.0",
  org.eclipse.mylyn.wikitext;bundle-version="3.0.0"
 Export-Package: no.marintek.mylyn.wikitext.ooxml,
  no.marintek.mylyn.wikitext.ooxml.internal
+Bundle-Vendor: SINTEF Ocean

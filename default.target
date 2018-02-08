@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde?>
+<!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
+<target name="SINTEF Ocean WikiText Target Platform" sequenceNumber="1517993762">
+  <locations>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.core.runtime" version="3.13.0.v20170207-1030"/>
+      <unit id="org.eclipse.mylyn.wikitext" version="3.0.19.20171117145831"/>
+      <repository location="http://download.eclipse.org/releases/oxygen/"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.apache.log4j" version="1.2.15.v201012070815"/>
+      <unit id="org.apache.commons.io" version="2.2.0.v201405211200"/>
+      <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
+      <unit id="org.apache.xalan" version="2.7.1.v201005080400"/>
+      <unit id="org.apache.xmlgraphics" version="1.4.0.v201301251218"/>
+      <unit id="org.apache.commons.lang" version="2.6.0.v201404270220"/>
+      <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
+      <unit id="org.apache.xml.serializer" version="2.7.1.v201005080400"/>
+      <unit id="org.slf4j.api" version="1.7.10.v20170428-1633"/>
+      <unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
+      <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository/"/>
+    </location>
+  </locations>
+</target>
