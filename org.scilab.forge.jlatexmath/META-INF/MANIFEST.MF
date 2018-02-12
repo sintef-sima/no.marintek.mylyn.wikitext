@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JLateXMath
+Bundle-SymbolicName: org.scilab.forge.jlatexmath
+Bundle-Version: 1.0.7.qualifier
+Bundle-Vendor: SINTEF Ocean
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: org.scilab.forge.jlatexmath,
+ org.scilab.forge.jlatexmath.cache,
+ org.scilab.forge.jlatexmath.cyrillic,
+ org.scilab.forge.jlatexmath.dynamic,
+ org.scilab.forge.jlatexmath.greek

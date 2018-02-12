@@ -4,7 +4,7 @@ Bundle-Name: Snuggletex
 Bundle-SymbolicName: uk.ac.ed.ph.snuggletex
 Bundle-Version: 1.2.2.qualifier
 Bundle-Vendor: SINTEF Ocean
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: uk.ac.ed.ph.snuggletex,
  uk.ac.ed.ph.snuggletex.definitions,
  uk.ac.ed.ph.snuggletex.dombuilding,
