@@ -15,5 +15,7 @@ location "http://download.eclipse.org/tools/orbit/downloads/drops/R2017091920193
 	org.apache.xerces
 	org.apache.xml.serializer
 	org.slf4j.api
+	org.w3c.dom.svg
+	org.w3c.css.sac
 	com.google.guava	
 }

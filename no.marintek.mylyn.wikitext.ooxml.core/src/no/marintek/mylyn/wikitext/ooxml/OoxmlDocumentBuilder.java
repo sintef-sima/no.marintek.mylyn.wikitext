@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2017 SINTEF Ocean
- * Copyright (c) 2013, 2014, 2015 MARINTEK.
+ * Copyright (c) 2017-2018 SINTEF Ocean
+ * Copyright (c) 2013-2016 MARINTEK
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -12,18 +12,25 @@
  *******************************************************************************/
 package no.marintek.mylyn.wikitext.ooxml;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
+import javax.swing.JLabel;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.Source;
@@ -31,23 +38,26 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
-import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
-
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGeneratorContext;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
-import org.docx4j.jaxb.Context;
 import org.docx4j.math.CTBreakBin;
 import org.docx4j.math.CTBreakBinSub;
 import org.docx4j.math.CTLimLoc;
 import org.docx4j.math.CTMathPr;
-import org.docx4j.math.CTOMath;
 import org.docx4j.math.CTOMathJc;
-import org.docx4j.math.CTOMathPara;
 import org.docx4j.math.CTOnOff;
 import org.docx4j.math.CTString;
 import org.docx4j.openpackaging.contenttype.ContentType;
@@ -65,7 +75,6 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.vml.officedrawing.CTIdMap;
 import org.docx4j.vml.officedrawing.CTShapeLayout;
 import org.docx4j.wml.BooleanDefaultTrue;
-import org.docx4j.wml.CTBookmark;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.CTCharacterSpacing;
 import org.docx4j.wml.CTColorSchemeMapping;
@@ -73,7 +82,6 @@ import org.docx4j.wml.CTCompat;
 import org.docx4j.wml.CTCompatSetting;
 import org.docx4j.wml.CTLanguage;
 import org.docx4j.wml.CTLongHexNumber;
-import org.docx4j.wml.CTMarkupRange;
 import org.docx4j.wml.CTProof;
 import org.docx4j.wml.CTSettings;
 import org.docx4j.wml.CTShapeDefaults;
@@ -113,7 +121,16 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.wikitext.parser.Attributes;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.parser.TableCellAttributes;
+import org.scilab.forge.jlatexmath.DefaultTeXFont;
+import org.scilab.forge.jlatexmath.TeXConstants;
+import org.scilab.forge.jlatexmath.TeXFormula;
+import org.scilab.forge.jlatexmath.TeXIcon;
+import org.scilab.forge.jlatexmath.cyrillic.CyrillicRegistration;
+import org.scilab.forge.jlatexmath.greek.GreekRegistration;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
+import no.marintek.mylyn.wikitext.ooxml.internal.ChartFactory;
 import uk.ac.ed.ph.snuggletex.SerializationMethod;
 import uk.ac.ed.ph.snuggletex.SnuggleEngine;
 import uk.ac.ed.ph.snuggletex.SnuggleInput;
@@ -126,7 +143,7 @@ import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
  *
  * @since 1.9
  */
-public class OoxmlDocumentBuilder extends DocumentBuilder {
+public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDocumentBuilder {
 
 	private StringBuilder characters;
 
@@ -141,8 +158,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 	private org.docx4j.wml.ObjectFactory factory;
 
 	private MainDocumentPart mainDocumentPart;
-
-	private final org.docx4j.math.ObjectFactory mathFactory = new org.docx4j.math.ObjectFactory();
 
 	private final org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
 
@@ -352,6 +367,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		int cNvPrId = 2;
 		Inline inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, false);
 		P paragraph = addInlineImageToParagraph(inline);
+		// TODO: Center image
 		mainDocumentPart.addObject(paragraph);
 	}
 
@@ -1248,9 +1264,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		mathpr.setRMargin(twipsmeasure4);
 		twipsmeasure4.setVal("0");
 		// Create object for defJc
-		CTOMathJc omathjc = mathObjectFactory.createCTOMathJc();
-		mathpr.setDefJc(omathjc);
-		omathjc.setVal(org.docx4j.math.STJc.CENTER_GROUP);
+//		CTOMathJc omathjc = mathObjectFactory.createCTOMathJc();
+//		mathpr.setDefJc(omathjc);
+//		omathjc.setVal(org.docx4j.math.STJc.CENTER_GROUP);
 		// Create object for wrapIndent
 		org.docx4j.math.CTTwipsMeasure twipsmeasure5 = mathObjectFactory.createCTTwipsMeasure();
 		mathpr.setWrapIndent(twipsmeasure5);
@@ -1754,21 +1770,87 @@ public class OoxmlDocumentBuilder extends DocumentBuilder {
 		// TODO: Implement support for image links
 	}
 
-	/**
-	 * Converts <b>LaTeX</b> equations to <b>Office MathML</b> and inserts it into
-	 * the document.
-	 *
-	 * @param latex
-	 *            the LaTeX code
-	 * @throws JAXBException 
-	 */
-	public void latex(String latex, Attributes attributes) {
+	public File saveLaTeX2Png(String latex) throws IOException, TranscoderException {
+		DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+		String svgNS = "http://www.w3.org/2000/svg";
+		Document document = domImpl.createDocument(svgNS, "svg", null);
+		SVGGeneratorContext ctx = SVGGeneratorContext.createDefault(document);
+
+		SVGGraphics2D g2 = new SVGGraphics2D(ctx, true);
+
+		DefaultTeXFont.registerAlphabet(new CyrillicRegistration());
+		DefaultTeXFont.registerAlphabet(new GreekRegistration());
+
+		TeXFormula formula = new TeXFormula(latex);
+		TeXIcon icon = formula.createTeXIcon(TeXConstants.STYLE_DISPLAY, 50);
+		icon.setInsets(new Insets(5, 5, 5, 5));
+		g2.setSVGCanvasSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+		g2.setColor(Color.white);
+		g2.fillRect(0, 0, icon.getIconWidth(), icon.getIconHeight());
+
+		JLabel jl = new JLabel();
+		jl.setForeground(new Color(0, 0, 0));
+		icon.paintIcon(jl, g2, 0, 0);
+
+		// TODO: Use streams instead of temporary files
+		File svgFile = Files.createTempFile("ooxml", ".svg").toFile();
+		FileOutputStream svgs = new FileOutputStream(svgFile);
+		Writer out = new OutputStreamWriter(svgs, "UTF-8");
+		g2.stream(out, true);
+		svgs.flush();
+		svgs.close();
+
+		// convert the SVG to PNG
+		File pngFile = Files.createTempFile("ooxml", ".png").toFile();
+		TranscoderInput ti = new TranscoderInput(new FileInputStream(svgFile));
+		FileOutputStream os = new FileOutputStream(pngFile);
+		TranscoderOutput to = new TranscoderOutput(os);
+		PNGTranscoder pt = new PNGTranscoder();
+		double millimetresPerPixel = (25.4f / 300); 
+		pt.addTranscodingHint(ImageTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, new Float(millimetresPerPixel)); 
+		pt.transcode(ti, to);
+		os.flush();
+		os.close();
+		
+		return pngFile;
+	}    
+    
+	public void latex(String latex, Attributes attributes, boolean editable) {
 		if (!latex.startsWith("$$")) {
 			latex = "$$" + latex;
 		}
 		if (!latex.endsWith("$$")) {
 			latex = latex + "$$";
 		}
+		currentAttributes = attributes;
+		if (editable) {
+			convertLaTeX2OoxmlMath(latex, currentAttributes);
+		} else {
+			convertLaTeX2Png(latex, currentAttributes);
+		}
+	}
+	
+	public void latex(String latex, Attributes attributes) {
+		latex(latex, attributes, false);
+	}
+
+	private void convertLaTeX2Png(String latex, Attributes attributes) {
+		try {
+			// create an SVG file 
+			File svg = saveLaTeX2Png(latex);
+			// keep title and clear it
+			String title = attributes.getTitle();
+			attributes.setTitle(null);
+			// add the image to the document
+			image(attributes, svg.toString());
+			caption(title, CaptionType.Equation);
+		} catch (IOException | TranscoderException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void convertLaTeX2OoxmlMath(String latex, Attributes attributes) throws TransformerFactoryConfigurationError {
 		/* Create vanilla SnuggleEngine and new SnuggleSession */
 		SnuggleEngine engine = new SnuggleEngine();
 		SnuggleSession session = engine.createSession();
