@@ -87,6 +87,7 @@ import org.docx4j.wml.CTSettings;
 import org.docx4j.wml.CTShapeDefaults;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.CTTwipsMeasure;
+import org.docx4j.wml.CTVerticalAlignRun;
 import org.docx4j.wml.CTZoom;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.FldChar;
@@ -1418,7 +1419,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	@Override
 	public void charactersUnescaped(String literal) {
-		// characters = literal;
+		//characters.append(literal);
 	}
 
 	private P chart(String chartRelId, String chartId) throws JAXBException {
@@ -1718,10 +1719,14 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			block.setB(TRUE);
 			break;
 		case SUBSCRIPT:
-			// TODO: Implement support for superscript
+			CTVerticalAlignRun subScript = wmlObjectFactory.createCTVerticalAlignRun();
+			block.setVertAlign(subScript);
+			subScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUBSCRIPT);
 			break;
 		case SUPERSCRIPT:
-			// TODO: Implement support for superscript
+			CTVerticalAlignRun superScript = wmlObjectFactory.createCTVerticalAlignRun();
+			block.setVertAlign(superScript);
+			superScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUPERSCRIPT);
 			break;
 		case UNDERLINED:
 			U underline = new U();
