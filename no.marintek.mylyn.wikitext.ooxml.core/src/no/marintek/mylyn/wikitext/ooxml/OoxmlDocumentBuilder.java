@@ -49,10 +49,12 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.docx4j.UnitsOfMeasurement;
 import org.docx4j.XmlUtils;
 import org.docx4j.dml.Theme;
 import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.model.properties.paragraph.KeepNext;
 import org.docx4j.openpackaging.contenttype.ContentType;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -102,6 +104,7 @@ import org.docx4j.wml.UnderlineEnumeration;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.wikitext.parser.Attributes;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.parser.ImageAttributes;
 import org.eclipse.mylyn.wikitext.parser.TableCellAttributes;
 import org.scilab.forge.jlatexmath.DefaultTeXFont;
 import org.scilab.forge.jlatexmath.TeXConstants;
@@ -155,6 +158,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	private WordprocessingMLPackage wordMLPackage;
 
 	private int chartCounter = 0;
+	private int imageCounter = 0;
 
 	private Tr currentTableRow;
 		
@@ -323,23 +327,45 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	 * Adds an image to the document.
 	 *
 	 * @param bytes
+	 *            the image bytes
 	 * @param file
+	 *            path to the image file
 	 * @param text
 	 *            alternative text
+	 * @param attributes
+	 *            image attributes
 	 * @throws Exception
 	 */
-	private void addImageToPackage(byte[] bytes, File file, String text) throws Exception {
+	private P addImageToPackage(byte[] bytes, File file, String text, Attributes attributes) throws Exception {
 		BinaryPartAbstractImage imagePart = BinaryPartAbstractImage.createImagePart(wordMLPackage, bytes);
-		int docPrId = 1;
-		int cNvPrId = 2;
-		Inline inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, false);
+		imageCounter++;
+		int docPrId = 4096 + imageCounter;
+		int cNvPrId = 8192 + imageCounter;
+		Inline inline = null;
+		if (attributes !=null && attributes instanceof ImageAttributes) {
+			// specify width and automatically scale height
+			ImageAttributes imageAttributes = (ImageAttributes) attributes;
+			if (imageAttributes.getHeight() == 0) {
+				long width = imageAttributes.getWidth();
+				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, width, false);
+			} else {
+				long width = UnitsOfMeasurement.twipToEMU(imageAttributes.getWidth());
+				long height = UnitsOfMeasurement.twipToEMU(imageAttributes.getHeight());
+				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, width, height, false);				
+			}			
+		} else {
+			inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, false);
+		}
 		P paragraph = addInlineImageToParagraph(inline);
 		mainDocumentPart.addObject(paragraph);
+		return paragraph;
 	}
 
 	private P addInlineImageToParagraph(Inline inline) {
 		P paragraph = factory.createP();
 		R run = factory.createR();
+		PPr ppr = factory.createPPr();
+		paragraph.setPPr(ppr);
 		paragraph.getContent().add(run);
 		Drawing drawing = factory.createDrawing();
 		run.getContent().add(drawing);
@@ -1099,16 +1125,35 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		return outputFile;
 	}
 
+	/**
+	 * Includes an image with the given attributes. If the attributes parameter is
+	 * an instance of {@link ImageAttributes} the height will first be checked. If
+	 * set to 0 it is assumed that the width of the image is specified in twips and
+	 * the height will be automatically calculated.
+	 */
 	@Override
 	public void image(Attributes attributes, String url) {
+		image(attributes, url, CaptionType.Figure);
+	}
+	
+	/**
+	 * Includes an image with the given attributes. If the attributes parameter is
+	 * an instance of {@link ImageAttributes} the height will first be checked. If
+	 * set to 0 it is assumed that the width of the image is specified in twips and
+	 * the height will be automatically calculated.
+	 */
+	@Override
+	public void image(Attributes attributes, String url, CaptionType captionType) {
 		byte[] bytes;
 		try {
 			File file = new File(url);
 			bytes = convertImageFileToByteArray(file);
 			String title = attributes.getTitle() == null ? attributes.getTitle() : file.getAbsolutePath();
-			addImageToPackage(bytes, file, title);
+			P paragraph = addImageToPackage(bytes, file, title, attributes);
 			if (attributes.getTitle() != null) {
-				caption(attributes.getTitle(), CaptionType.Figure);
+				// make sure the caption stick to the image
+				paragraph.getPPr().setKeepNext(factory.createBooleanDefaultTrue());
+				caption(attributes.getTitle(), captionType);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1188,12 +1233,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		try {
 			// create an SVG file 
 			File svg = saveLaTeX2Png(latex);
-			// keep title and clear it
-			String title = attributes.getTitle();
-			attributes.setTitle(null);
 			// add the image to the document
 			image(attributes, svg.toString());
-			caption(title, CaptionType.Equation);
 		} catch (IOException | TranscoderException e) {
 			e.printStackTrace();
 		}		
