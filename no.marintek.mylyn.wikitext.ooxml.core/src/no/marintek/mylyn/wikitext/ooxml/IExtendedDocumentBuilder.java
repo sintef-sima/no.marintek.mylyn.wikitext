@@ -5,7 +5,7 @@ import org.eclipse.mylyn.wikitext.parser.Attributes;
 import no.marintek.mylyn.wikitext.ooxml.OoxmlDocumentBuilder.CaptionType;
 
 public interface IExtendedDocumentBuilder {
-
+	
 	public void caption(String text, CaptionType captionType);
 
 	/**

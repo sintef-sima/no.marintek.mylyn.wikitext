@@ -161,6 +161,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	private int chartCounter = 0;
 	private int imageCounter = 0;
+	private int linkCounter = 0;
 
 	private Tr currentTableRow;
 		
@@ -597,6 +598,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				ThemePart themePart = new ThemePart();
 				themePart.setContents(theme);
 				mainDocumentPart.addTargetPart(themePart);
+
 				// set the numbering
 				setCreateNumberingPart();
 				modifyStyles();
@@ -986,6 +988,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			break;
 		case PARAGRAPH:
 			applyStyle(currentParagraph, "BodyText");
+			break;
+			/* XXX: Needs Mylyn Docs version with support
+		case MATH:
+			latex(characters.toString(), new Attributes(), false);
+			characters.setLength(0);
+			break;
+			*/
 		default:
 			break;
 		}
@@ -1042,34 +1051,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		String fontSize = getCssValueForKey(currentAttributes, "font-size");
 		if (!fontSize.isEmpty()) {
 			block = createSpanWithFontSize(characters.toString(), fontSize);
-		} else if (currentSpanType == SpanType.LINK){
-			Hyperlink link = factory.createPHyperlink();
-			String href = ((LinkAttributes)currentAttributes).getHref();
-			// these are links to sections or other type of elements within the document 
-			if (href.startsWith("sima://")) {
-				link.setAnchor(href.substring(7));
-			}
-			// add the link to the paragraph
-			currentParagraph.getContent().add(link);
-			// creat the text for the link
-			org.docx4j.wml.Text t = factory.createText();
-			t.setSpace("preserve");
-			t.setValue(characters.toString());
-			org.docx4j.wml.R run = factory.createR();
-			run.getContent().add(t);
-			// add the run to the link
-			link.getContent().add(run);
-			org.docx4j.wml.RPr rpr = factory.createRPr();
-			// set the style of the link
-			RStyle style = factory.createRStyle();
-			style.setVal("Hyperlink");
-			rpr.setRStyle(style);
-			run.setRPr(rpr);
-			block = rpr;
-		} else {
-			block = createSpan(characters.toString());
 		}
-
 		// Set text alignment
 		String textHAlign = getCssValueForKey(currentAttributes, "text-align");
 		if (currentParagraph.getPPr() != null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {
@@ -1081,67 +1063,125 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			}
 			currentParagraph.getPPr().setJc(align);
 		}
-
-		characters.setLength(0);
-		if (currentSpanType == null) {
-			return;
-		}
 		switch (currentSpanType) {
 		case BOLD:
+			block = createSpan(characters.toString());
 			block.setB(TRUE);
 			break;
 		case CITATION:
+			block = createSpan(characters.toString());
 			block.setI(TRUE);
 			break;
 		case CODE:
 			// TODO: Implement support for code blocks
 			break;
 		case DELETED:
+			block = createSpan(characters.toString());
 			block.setStrike(TRUE);
 			break;
 		case EMPHASIS:
+			block = createSpan(characters.toString());
 			block.setB(TRUE);
 			block.setI(TRUE);
 			break;
 		case INSERTED:
 			break;
 		case ITALIC:
+			block = createSpan(characters.toString());
 			block.setI(TRUE);
 			break;
 		case LINK:
-			// already handled, see above
+			block = createHyperlink();
 			break;
+			/* XXX: Needs Mylyn Docs version with support
+		case MATH:
+			convertLaTeX2OoxmlMath("$$"+characters.toString()+"$$", currentAttributes, true);			
+			break;
+			 */
 		case MONOSPACE:
-			// TODO: Implements support for monospace
+			// TODO: Implement support for monospace
 			break;
 		case QUOTE:
+			block = createSpan(characters.toString());
 			block.setI(TRUE);
 			break;
 		case SPAN:
-			// TODO: Figure out if we need to implement support for spans
+			block = createSpan(characters.toString());
 			break;
 		case STRONG:
+			block = createSpan(characters.toString());
 			block.setB(TRUE);
 			break;
 		case SUBSCRIPT:
 			CTVerticalAlignRun subScript = wmlObjectFactory.createCTVerticalAlignRun();
+			block = createSpan(characters.toString());
 			block.setVertAlign(subScript);
 			subScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUBSCRIPT);
 			break;
 		case SUPERSCRIPT:
 			CTVerticalAlignRun superScript = wmlObjectFactory.createCTVerticalAlignRun();
+			block = createSpan(characters.toString());
 			block.setVertAlign(superScript);
 			superScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUPERSCRIPT);
 			break;
 		case UNDERLINED:
 			U underline = new U();
 			underline.setVal(UnderlineEnumeration.SINGLE);
+			block = createSpan(characters.toString());
 			block.setU(underline);
 			break;
 		default:
+			block = createSpan(characters.toString());
 			break;
 		}
+		characters.setLength(0);
 		currentSpanType = SpanType.SPAN;
+	}
+
+	private RPr createHyperlink() {
+		RPr block;
+		Hyperlink link = factory.createPHyperlink();
+		String href = ((LinkAttributes) currentAttributes).getHref();
+		// these are links to sections or other type of elements within the document
+		if (href.startsWith("sima://")) {
+			link.setAnchor(href.substring(7));
+		} else if (href.startsWith("http")) {
+			String id = "linkId" + (++linkCounter);
+			link.setId(id);
+			Relationship r = new Relationship();
+			r.setId(id);
+			r.setTargetMode("External");
+			r.setTarget(href);
+			r.setType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink");
+			mainDocumentPart.getRelationshipsPart(true).addRelationship(r);
+		} else if (href.startsWith("file://")) {
+			String id = "linkId" + (++linkCounter);
+			link.setId(id);
+			Relationship r = new Relationship();
+			r.setId(id);
+			r.setTargetMode("External");
+			r.setTarget(href.substring(7));
+			r.setType("http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink");
+			mainDocumentPart.getRelationshipsPart(true).addRelationship(r);
+		}
+		// add the link to the paragraph
+		currentParagraph.getContent().add(link);
+		// creat the text for the link
+		org.docx4j.wml.Text t = factory.createText();
+		t.setSpace("preserve");
+		t.setValue(characters.toString());
+		org.docx4j.wml.R run = factory.createR();
+		run.getContent().add(t);
+		// add the run to the link 
+		link.getContent().add(run);
+		org.docx4j.wml.RPr rpr = factory.createRPr();
+		// set the style of the link
+		RStyle style = factory.createRStyle();
+		style.setVal("Hyperlink");
+		rpr.setRStyle(style);
+		run.setRPr(rpr);
+		block = rpr;
+		return block;
 	}
 
 	@Override
@@ -1253,7 +1293,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		}
 		currentAttributes = attributes;
 		if (editable) {
-			convertLaTeX2OoxmlMath(latex, currentAttributes);
+			convertLaTeX2OoxmlMath(latex, currentAttributes, false);
 		} else {
 			convertLaTeX2Png(latex, currentAttributes);
 		}
@@ -1263,6 +1303,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		latex(latex, attributes, false);
 	}
 
+	/**
+	 * Use to convert LaTeX to PNG for those cases where the OOXML math renderer is
+	 * not capable, or the conversion creates some weird artifacts.
+	 */
 	private void convertLaTeX2Png(String latex, Attributes attributes) {
 		try {
 			// create an SVG file 
@@ -1275,28 +1319,29 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void convertLaTeX2OoxmlMath(String latex, Attributes attributes) throws TransformerFactoryConfigurationError {
-		/* Create vanilla SnuggleEngine and new SnuggleSession */
+	private void convertLaTeX2OoxmlMath(String latex, Attributes attributes, boolean inline)
+			throws TransformerFactoryConfigurationError {
+		// create vanilla SnuggleEngine and new SnuggleSession
 		SnuggleEngine engine = new SnuggleEngine();
 		SnuggleSession session = engine.createSession();
 
-		/* Parse some LaTeX input */
+		/// parse some LaTeX input */
 		SnuggleInput input = new SnuggleInput(latex);
 		try {
 			session.parseInput(input);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		/* Specify how we want the resulting XML */
+
+		// specify how we want the resulting XML */
 		XMLStringOutputOptions options = new XMLStringOutputOptions();
 		options.setSerializationMethod(SerializationMethod.XHTML);
 		options.setIndenting(true);
 		options.setEncoding("UTF-8");
 		options.setAddingMathSourceAnnotations(true);
 		options.setUsingNamedEntities(true);
-		
-		// Transform the MathML to OOXML MathML
+
+		// transform the MathML to OOXML MathML
 		StringWriter sw = new StringWriter();
 		TransformerFactory tfactory = TransformerFactory.newInstance();
 		StreamSource xsl = new StreamSource(OoxmlDocumentBuilder.class.getResourceAsStream("xslt/mml2omml.xsl"));
@@ -1306,14 +1351,21 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		try {
 			Transformer transformer = tfactory.newTransformer(xsl);
 			transformer.transform(xml, out);
-			currentParagraph = factory.createP();
-			javax.xml.bind.JAXBElement omathpara = (JAXBElement) XmlUtils.unmarshalString(sw.toString()); 
-			currentParagraph.getContent().add(omathpara);			
-			mainDocumentPart.addObject(currentParagraph);
-			if (attributes.getTitle() != null) {
-				caption(attributes.getTitle(), CaptionType.Equation);
+			// do not create a new paragraph when the math should be presented inline
+			if (!inline) {
+				currentParagraph = factory.createP();
+			}
+			javax.xml.bind.JAXBElement omathpara = (JAXBElement) XmlUtils.unmarshalString(sw.toString());
+			currentParagraph.getContent().add(omathpara);
+			// use the current paragraph and no caption when inline
+			if (!inline) {
+				mainDocumentPart.addObject(currentParagraph);
+				if (attributes.getTitle() != null) {
+					caption(attributes.getTitle(), CaptionType.Equation);
+				}
 			}
 		} catch (TransformerException | JAXBException e) {
+			System.out.println(latex);
 			throw new RuntimeException("Could not convert LateX Math to OOXML Math", e);
 		}
 	}
