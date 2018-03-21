@@ -54,7 +54,6 @@ import org.docx4j.XmlUtils;
 import org.docx4j.dml.Theme;
 import org.docx4j.dml.chart.CTChartSpace;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
-import org.docx4j.model.properties.paragraph.KeepNext;
 import org.docx4j.openpackaging.contenttype.ContentType;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -82,11 +81,13 @@ import org.docx4j.wml.Lvl;
 import org.docx4j.wml.NumFmt;
 import org.docx4j.wml.Numbering;
 import org.docx4j.wml.P;
+import org.docx4j.wml.P.Hyperlink;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
+import org.docx4j.wml.RStyle;
 import org.docx4j.wml.STBrType;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
@@ -105,6 +106,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.mylyn.wikitext.parser.Attributes;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.parser.ImageAttributes;
+import org.eclipse.mylyn.wikitext.parser.LinkAttributes;
 import org.eclipse.mylyn.wikitext.parser.TableCellAttributes;
 import org.scilab.forge.jlatexmath.DefaultTeXFont;
 import org.scilab.forge.jlatexmath.TeXConstants;
@@ -373,19 +375,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		return paragraph;
 	}
 
-	/**
-	 * Adds a page break to the document flow.
-	 */
-	private void addPageBreak() {
-		org.docx4j.wml.P p = new org.docx4j.wml.P();
-		org.docx4j.wml.R r = new org.docx4j.wml.R();
-		org.docx4j.wml.Br br = new org.docx4j.wml.Br();
-		br.setType(STBrType.PAGE);
-		r.getContent().add(br);
-		p.getContent().add(r);
-		mainDocumentPart.addObject(p);
-	}
-
 	@Override
 	public void beginBlock(BlockType type, Attributes attributes) {
 		Assert.isNotNull(type, "Block type cannot be NULL");
@@ -622,7 +611,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			if (subtitle != null) {
 				mainDocumentPart.addStyledParagraphOfText("Subtitle", subtitle);
 			}
-			addPageBreak();
+			pageBreak();
 		} catch (Docx4JException e) {
 			throw new RuntimeException("Could not begin a new document", e);
 		}
@@ -773,7 +762,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	public void beginSpan(SpanType type, Attributes attributes) {
 		Assert.isNotNull(type, "Block type cannot be NULL");
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
-
+		
 		// Close any existing span if we have one
 		if (characters != null && characters.length() > 0) {
 			endSpan();
@@ -1015,7 +1004,28 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	@Override
 	public void endHeading() {
-		mainDocumentPart.addStyledParagraphOfText(currentStyle, characters.toString());
+		String ml = 
+				"<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n" + 
+				"  <w:pPr>\n" + 
+				"    <w:pStyle w:val=\"${currentStyle}\" />\n" + 
+				"  </w:pPr>\n" + 
+				"  <w:bookmarkStart w:id=\"0\" w:name=\"${anchorName}\" />\n" + 
+				"  <w:r>\n" + 
+				"    <w:t>${characters}</w:t>\n" + 
+				"  </w:r>\n" + 
+				"  <w:bookmarkEnd w:id=\"0\"/>\n" +
+				"</w:p>";
+		java.util.HashMap<String, String> mappings = new java.util.HashMap<String, String>();
+		mappings.put("currentStyle", currentStyle);
+		mappings.put("characters", characters.toString());
+		mappings.put("anchorName", currentAttributes.getId());
+		try {
+			mainDocumentPart.addObject(org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings));
+			
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		
 		characters.setLength(0);
 	}
 
@@ -1032,6 +1042,30 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		String fontSize = getCssValueForKey(currentAttributes, "font-size");
 		if (!fontSize.isEmpty()) {
 			block = createSpanWithFontSize(characters.toString(), fontSize);
+		} else if (currentSpanType == SpanType.LINK){
+			Hyperlink link = factory.createPHyperlink();
+			String href = ((LinkAttributes)currentAttributes).getHref();
+			// these are links to sections or other type of elements within the document 
+			if (href.startsWith("sima://")) {
+				link.setAnchor(href.substring(7));
+			}
+			// add the link to the paragraph
+			currentParagraph.getContent().add(link);
+			// creat the text for the link
+			org.docx4j.wml.Text t = factory.createText();
+			t.setSpace("preserve");
+			t.setValue(characters.toString());
+			org.docx4j.wml.R run = factory.createR();
+			run.getContent().add(t);
+			// add the run to the link
+			link.getContent().add(run);
+			org.docx4j.wml.RPr rpr = factory.createRPr();
+			// set the style of the link
+			RStyle style = factory.createRStyle();
+			style.setVal("Hyperlink");
+			rpr.setRStyle(style);
+			run.setRPr(rpr);
+			block = rpr;
 		} else {
 			block = createSpan(characters.toString());
 		}
@@ -1075,7 +1109,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			block.setI(TRUE);
 			break;
 		case LINK:
-			// TODO: Implement support for links
+			// already handled, see above
 			break;
 		case MONOSPACE:
 			// TODO: Implements support for monospace
@@ -1302,6 +1336,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	@Override
 	public void link(Attributes attributes, String hrefOrHashName, String text) {
 		// TODO: Implement support for hyperlinks
+		System.out.println("OoxmlDocumentBuilder.link()"+hrefOrHashName);
 	}
 
 	/**
@@ -1333,6 +1368,17 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	 */
 	public void setTitle(String text) {
 		this.title = text;
+	}
+
+	@Override
+	public void pageBreak() {
+		org.docx4j.wml.P p = new org.docx4j.wml.P();
+		org.docx4j.wml.R r = new org.docx4j.wml.R();
+		org.docx4j.wml.Br br = new org.docx4j.wml.Br();
+		br.setType(STBrType.PAGE);
+		r.getContent().add(br);
+		p.getContent().add(r);
+		mainDocumentPart.addObject(p);
 	}
 
 }
