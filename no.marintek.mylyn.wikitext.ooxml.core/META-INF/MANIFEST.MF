@@ -20,3 +20,4 @@ Bundle-Vendor: SINTEF Ocean
 Bundle-ClassPath: .,
  lib/batik-all-1.9.jar,
  lib/xmlgraphics-commons-2.2.jar
+Automatic-Module-Name: no.marintek.mylyn.wikitext.ooxml.core

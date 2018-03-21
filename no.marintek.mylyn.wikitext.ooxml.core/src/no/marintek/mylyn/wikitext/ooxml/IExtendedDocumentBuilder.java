@@ -9,6 +9,26 @@ public interface IExtendedDocumentBuilder {
 	public void caption(String text, CaptionType captionType);
 
 	/**
+	 * Inserts a chart at the current location
+	 * 
+	 * @param cd
+	 *            the chart description
+	 */
+	public void chart(ChartDescription cd);
+	
+	/**
+	 * Inserts an image with a caption at the current location
+	 * 
+	 * @param attributes
+	 *            the image attributes
+	 * @param url
+	 *            image location
+	 * @param captionType
+	 *            the type of caption to use with the image
+	 */
+	public void image(Attributes attributes, String url, CaptionType captionType);
+
+	/**
 	 * Converts the given LaTeX math for inclusion into the OOXML Document. The
 	 * resulting object will be an image.
 	 * 
@@ -35,8 +55,9 @@ public interface IExtendedDocumentBuilder {
 	 */
 	public void latex(String latex, Attributes attributes, boolean editable);
 
-	public void chart(ChartDescription cd);
-
-	public void image(Attributes attributes, String url, CaptionType captionType);
+	/**
+	 * Inserts a page break at the current location.
+	 */
+	public void pageBreak();
 
 }
