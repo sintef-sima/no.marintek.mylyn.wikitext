@@ -66,6 +66,7 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.NumberingDefinitionsPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.relationships.Relationship;
+import org.docx4j.wml.Body;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.CTLongHexNumber;
@@ -89,6 +90,10 @@ import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RStyle;
 import org.docx4j.wml.STBrType;
+import org.docx4j.wml.STPageOrientation;
+import org.docx4j.wml.SectPr;
+import org.docx4j.wml.SectPr.PgMar;
+import org.docx4j.wml.SectPr.PgSz;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
@@ -132,12 +137,18 @@ import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
  */
 public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDocumentBuilder {
 
+	private static final int PAGE_WIDTH = 11907;
+
+	private static final int PAGE_HEIGHT = 16840;
+
 	/** Current set of characters, collected to be added after a block or span has ended */
 	private StringBuilder characters;
 
 	private BlockType currentBlockType;
 
 	private P currentParagraph;
+	
+	private Attributes currentHeadingAttributes;
 
 	private SpanType currentSpanType;
 
@@ -748,7 +759,33 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
+		// see if the previous heading had the landscape/portrait page setting specified - if so we need to
+		// handle this as the last thing before creating a new heading.
+		if (currentHeadingAttributes instanceof ExtendedHeadingAttributes) {
+				SectPr sectPr = factory.createSectPr();
+				PgSz pgSz = factory.createSectPrPgSz();
+				if (((ExtendedHeadingAttributes) currentHeadingAttributes).isLandscapeMode()) {
+					pgSz.setW(BigInteger.valueOf(PAGE_HEIGHT));
+					pgSz.setH(BigInteger.valueOf(PAGE_WIDTH));
+					pgSz.setOrient(STPageOrientation.LANDSCAPE);
+				} else {
+					pgSz.setH(BigInteger.valueOf(PAGE_HEIGHT));
+					pgSz.setW(BigInteger.valueOf(PAGE_WIDTH));
+					pgSz.setOrient(STPageOrientation.PORTRAIT);
+				}
+				sectPr.setPgSz(pgSz);
+				P p = factory.createP();
+				p.setPPr(factory.createPPr());
+				p.getPPr().setSectPr(sectPr);
+				mainDocumentPart.addObject(p);
+		}
 		currentAttributes = attributes;
+		currentHeadingAttributes = attributes;
+		if (currentHeadingAttributes instanceof ExtendedHeadingAttributes) {
+			if (((ExtendedHeadingAttributes) currentHeadingAttributes).isPageBreakBefore()) {
+				pageBreak();
+			}
+		}
 		currentStyle = "Heading" + level;
 		styleExists();
 	}
@@ -1004,6 +1041,30 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	@Override
 	public void endDocument() {
 		try {
+			if (currentHeadingAttributes instanceof ExtendedHeadingAttributes) {
+				SectPr sectPr = factory.createSectPr();
+				PgSz pgSz = factory.createSectPrPgSz();
+				if (((ExtendedHeadingAttributes) currentHeadingAttributes).isLandscapeMode()) {
+					pgSz.setW(BigInteger.valueOf(PAGE_HEIGHT));
+					pgSz.setH(BigInteger.valueOf(PAGE_WIDTH));
+					pgSz.setOrient(STPageOrientation.LANDSCAPE);
+				} else {
+					pgSz.setH(BigInteger.valueOf(PAGE_HEIGHT));
+					pgSz.setW(BigInteger.valueOf(PAGE_WIDTH));
+					pgSz.setOrient(STPageOrientation.PORTRAIT);
+				}
+				pgSz.setCode(new BigInteger("1"));
+				sectPr.setPgSz(pgSz);
+				// set the margins
+				PgMar pgMar = factory.createSectPrPgMar();
+				pgMar.setTop(new BigInteger("1440"));
+				pgMar.setBottom(new BigInteger("1440"));
+				pgMar.setLeft(new BigInteger("1440"));
+				pgMar.setRight(new BigInteger("1440"));
+				sectPr.setPgMar(pgMar);
+				Body body = mainDocumentPart.getContents().getBody();
+				body.setSectPr(sectPr);
+			}
 			Assert.isNotNull(outputFile, "Document output file has not been specified");
 			wordMLPackage.save(outputFile);
 		} catch (Docx4JException e) {
@@ -1014,22 +1075,23 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	@Override
 	public void endHeading() {
 		String ml = 
-				"<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n" + 
-				"  <w:pPr>\n" + 
-				"    <w:pStyle w:val=\"${currentStyle}\" />\n" + 
-				"  </w:pPr>\n" + 
-				"  <w:bookmarkStart w:id=\"0\" w:name=\"${anchorName}\" />\n" + 
-				"  <w:r>\n" + 
-				"    <w:t>${characters}</w:t>\n" + 
-				"  </w:r>\n" + 
-				"  <w:bookmarkEnd w:id=\"0\"/>\n" +
+				"<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">" + 
+				"  <w:pPr>" + 
+				"    <w:pStyle w:val=\"${currentStyle}\" />" + 
+				"  </w:pPr>" + 
+				"  <w:bookmarkStart w:id=\"0\" w:name=\"${anchorName}\" />" + 
+				"  <w:r>" + 
+				"    <w:t>${characters}</w:t>" + 
+				"  </w:r>" + 
+				"  <w:bookmarkEnd w:id=\"0\"/>" +
 				"</w:p>";
 		java.util.HashMap<String, String> mappings = new java.util.HashMap<String, String>();
 		mappings.put("currentStyle", currentStyle);
 		mappings.put("characters", characters.toString());
 		mappings.put("anchorName", currentAttributes.getId());
 		try {
-			mainDocumentPart.addObject(org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings));
+			P p = (P)org.docx4j.XmlUtils.unmarshallFromTemplate(ml, mappings);
+			mainDocumentPart.addObject(p);
 			
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -1422,8 +1484,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		this.title = text;
 	}
 
-	@Override
-	public void pageBreak() {
+	private void pageBreak() {
 		org.docx4j.wml.P p = new org.docx4j.wml.P();
 		org.docx4j.wml.R r = new org.docx4j.wml.R();
 		org.docx4j.wml.Br br = new org.docx4j.wml.Br();

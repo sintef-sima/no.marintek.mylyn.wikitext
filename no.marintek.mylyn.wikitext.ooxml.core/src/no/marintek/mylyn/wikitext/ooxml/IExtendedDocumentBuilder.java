@@ -55,9 +55,4 @@ public interface IExtendedDocumentBuilder {
 	 */
 	public void latex(String latex, Attributes attributes, boolean editable);
 
-	/**
-	 * Inserts a page break at the current location.
-	 */
-	public void pageBreak();
-
 }
