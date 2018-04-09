@@ -3,7 +3,8 @@
       id="no.marintek.mylyn.wikitext"
       label="%featureName"
       version="3.2.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="no.marintek.mylyn.wikitext.ooxml.core">
 
    <description>
       %description
@@ -13,7 +14,7 @@
       %copyright
    </copyright>
 
-   <license url="epl-v10.html">
+   <license url="https://www.eclipse.org/legal/epl-v20.html">
       %license
    </license>
 

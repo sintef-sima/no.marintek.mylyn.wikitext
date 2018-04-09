@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature id="no.marintek.mylyn.wikitext" />
+   <feature id="no.marintek.mylyn.wikitext"/>
+   <bundle id="org.apache.xmlgraphics" version="1.4.0.v201301251218"/>
+   <bundle id="org.slf4j.api" version="1.7.10.v20170428-1633"/>
+   <bundle id="org.apache.log4j" version="1.2.15.v201012070815"/>
 </site>
