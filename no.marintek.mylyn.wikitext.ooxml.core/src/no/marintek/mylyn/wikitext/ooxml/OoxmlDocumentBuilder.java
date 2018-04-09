@@ -513,7 +513,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			beginSpan(SpanType.BOLD, new Attributes());
 			break;
 		default:
-			beginSpan(SpanType.SPAN, currentAttributes);
+			if (!(currentAttributes instanceof MathAttributes)) {
+				beginSpan(SpanType.SPAN, new Attributes());
+			}
 			break;
 		}
 	}
@@ -1026,12 +1028,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		case PARAGRAPH:
 			applyStyle(currentParagraph, "BodyText");
 			break;
-			/* XXX: Needs Mylyn Docs version with support
-		case MATH:
-			latex(characters.toString(), new Attributes(), false);
-			characters.setLength(0);
+		case DIV:
+			if (currentAttributes instanceof MathAttributes) {
+				latex(characters.toString(), currentAttributes, false);
+				characters.setLength(0);
+			}
 			break;
-			*/
 		default:
 			break;
 		}
@@ -1155,11 +1157,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		case LINK:
 			block = createHyperlink();
 			break;
-			/* XXX: Needs Mylyn Docs version with support
-		case MATH:
-			convertLaTeX2OoxmlMath("$$"+characters.toString()+"$$", currentAttributes, true);			
-			break;
-			 */
 		case MONOSPACE:
 			// TODO: Implement support for monospace
 			break;
@@ -1168,7 +1165,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			block.setI(TRUE);
 			break;
 		case SPAN:
-			block = createSpan(characters.toString());
+			if (currentAttributes instanceof MathAttributes) {
+				convertLaTeX2OoxmlMath("$$" + characters.toString() + "$$", currentAttributes, true);
+				currentAttributes = new Attributes();
+			} else {
+				block = createSpan(characters.toString());
+			}
 			break;
 		case STRONG:
 			block = createSpan(characters.toString());
@@ -1205,8 +1207,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		Hyperlink link = factory.createPHyperlink();
 		String href = ((LinkAttributes) currentAttributes).getHref();
 		// these are links to sections or other type of elements within the document
-		if (href.startsWith("sima://")) {
-			link.setAnchor(href.substring(7));
+		if (href.startsWith("section://")) {
+			link.setAnchor(href.substring("section://".length()));
 		} else if (href.startsWith("http")) {
 			String id = "linkId" + (++linkCounter);
 			link.setId(id);

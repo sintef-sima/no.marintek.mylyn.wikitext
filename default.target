@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="SINTEF Ocean WikiText Target Platform" sequenceNumber="1518446577">
+<target name="SINTEF Ocean WikiText Target Platform" sequenceNumber="1523273467">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.core.runtime" version="3.13.0.v20170207-1030"/>
       <unit id="org.eclipse.mylyn.wikitext" version="3.0.19.20171117145831"/>
+      <unit id="org.eclipse.mylyn.wikitext.textile" version="3.0.19.20171117145831"/>
+      <unit id="org.eclipse.mylyn.wikitext.asciidoc" version="3.0.19.20171117145831"/>
       <repository location="http://download.eclipse.org/releases/oxygen/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">

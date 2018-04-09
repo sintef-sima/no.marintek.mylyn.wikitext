@@ -15,16 +15,16 @@
 
 	<licenses>
 		<license>
-			<name>Eclipse Public License v1.0</name>
-			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<name>Eclipse Public License v2.0</name>
+			<url>https://www.eclipse.org/legal/epl-v20.html</url>
 			<distribution>repo</distribution>
 			<comments>
 		All rights reserved.
 
 		This program and the accompanying materials are made
-		available under the terms of the Eclipse Public License v1.0
+		available under the terms of the Eclipse Public License v2.0
 		which accompanies this distribution, and is available at
-		http://www.eclipse.org/legal/epl-v10.htm
+		https://www.eclipse.org/legal/epl-v20.html
       </comments>
 		</license>
 	</licenses>
@@ -36,10 +36,6 @@
 		<junit-version>4.8.1</junit-version>
 		<project.source.sourceEncoding>UTF-8</project.source.sourceEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Repositories -->
-		<nexus.host.prefix>https://mooropt2.marintek.sintef.no/nexus/content</nexus.host.prefix>
-		<snapshot.repository.url>${nexus.host.prefix}/repositories/snapshots/</snapshot.repository.url>
-		<release.repository.url>${nexus.host.prefix}/repositories/releases/</release.repository.url>
 	</properties>
 
 	<distributionManagement>

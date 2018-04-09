@@ -3,6 +3,8 @@ target "SINTEF Ocean WikiText Target Platform" with source requirements
 location "http://download.eclipse.org/releases/oxygen/" {
 	org.eclipse.core.runtime
 	org.eclipse.mylyn.wikitext
+	org.eclipse.mylyn.wikitext.textile
+	org.eclipse.mylyn.wikitext.asciidoc
 }
 
 location "http://download.eclipse.org/tools/orbit/downloads/drops/R20170919201930/repository/" {
