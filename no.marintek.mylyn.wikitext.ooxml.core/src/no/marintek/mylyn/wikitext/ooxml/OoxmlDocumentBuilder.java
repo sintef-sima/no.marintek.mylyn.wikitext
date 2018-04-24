@@ -359,13 +359,15 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		if (attributes !=null && attributes instanceof ImageAttributes) {
 			// specify width and automatically scale height
 			ImageAttributes imageAttributes = (ImageAttributes) attributes;
-			if (imageAttributes.getHeight() == 0) {
+			if (imageAttributes.getHeight() > 0 && imageAttributes.getWidth() > 0) {
+				long width = UnitsOfMeasurement.twipToEMU(imageAttributes.getWidth());
+				long height = UnitsOfMeasurement.twipToEMU(imageAttributes.getHeight());
+				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, width, height, false);								
+			} else if (imageAttributes.getWidth() > 0) {
 				long width = imageAttributes.getWidth();
 				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, width, false);
 			} else {
-				long width = UnitsOfMeasurement.twipToEMU(imageAttributes.getWidth());
-				long height = UnitsOfMeasurement.twipToEMU(imageAttributes.getHeight());
-				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, width, height, false);				
+				inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, false);
 			}			
 		} else {
 			inline = imagePart.createImageInline(file.getAbsolutePath(), text, docPrId, cNvPrId, false);
