@@ -148,7 +148,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	private P currentParagraph;
 	
-	private Attributes currentHeadingAttributes;
+	private ExtendedHeadingAttributes currentHeadingAttributes;
 
 	private SpanType currentSpanType;
 
@@ -628,6 +628,8 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			if (subtitle != null) {
 				mainDocumentPart.addStyledParagraphOfText("Subtitle", subtitle);
 			}
+			// create an initial set of attributes
+			currentHeadingAttributes = new ExtendedHeadingAttributes();
 			pageBreak();
 		} catch (Docx4JException e) {
 			throw new RuntimeException("Could not begin a new document", e);
@@ -763,12 +765,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
+		
 		// see if the previous heading had the landscape/portrait page setting specified - if so we need to
 		// handle this as the last thing before creating a new heading.
-		if (currentHeadingAttributes instanceof ExtendedHeadingAttributes) {
+		if (currentHeadingAttributes.isLandscapeMode() != ((ExtendedHeadingAttributes)attributes).isLandscapeMode()) {
 				SectPr sectPr = factory.createSectPr();
 				PgSz pgSz = factory.createSectPrPgSz();
-				if (((ExtendedHeadingAttributes) currentHeadingAttributes).isLandscapeMode()) {
+				if (currentHeadingAttributes.isLandscapeMode()) {
 					pgSz.setW(BigInteger.valueOf(PAGE_HEIGHT));
 					pgSz.setH(BigInteger.valueOf(PAGE_WIDTH));
 					pgSz.setOrient(STPageOrientation.LANDSCAPE);
@@ -784,11 +787,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				mainDocumentPart.addObject(p);
 		}
 		currentAttributes = attributes;
-		currentHeadingAttributes = attributes;
-		if (currentHeadingAttributes instanceof ExtendedHeadingAttributes) {
-			if (((ExtendedHeadingAttributes) currentHeadingAttributes).isPageBreakBefore()) {
-				pageBreak();
-			}
+		currentHeadingAttributes = (ExtendedHeadingAttributes)attributes;
+		// add a page break before
+		if (currentHeadingAttributes.isPageBreakBefore()) {
+			pageBreak();
 		}
 		currentStyle = "Heading" + level;
 		styleExists();
