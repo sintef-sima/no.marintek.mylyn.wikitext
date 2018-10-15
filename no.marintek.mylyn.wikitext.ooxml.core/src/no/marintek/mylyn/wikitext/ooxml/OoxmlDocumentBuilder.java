@@ -824,7 +824,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	@Override
 	public void charactersUnescaped(String literal) {
-		//characters.append(literal);
+		beginBlock(BlockType.PARAGRAPH, new Attributes());
+		characters.append(literal);
+		endBlock();
 	}
 
 	private P chart(String chartRelId, String chartId) throws JAXBException {
