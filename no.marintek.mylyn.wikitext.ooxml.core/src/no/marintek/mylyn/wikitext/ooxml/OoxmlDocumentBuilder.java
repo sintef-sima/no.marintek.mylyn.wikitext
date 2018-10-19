@@ -95,6 +95,7 @@ import org.docx4j.wml.SectPr;
 import org.docx4j.wml.SectPr.PgMar;
 import org.docx4j.wml.SectPr.PgSz;
 import org.docx4j.wml.Style;
+import org.docx4j.wml.Styles;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.TblGrid;
@@ -137,8 +138,10 @@ import uk.ac.ed.ph.snuggletex.XMLStringOutputOptions;
  */
 public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDocumentBuilder {
 
+	/** A4 page width */
 	private static final int PAGE_WIDTH = 11907;
 
+	/** A4 page height */
 	private static final int PAGE_HEIGHT = 16840;
 
 	/** Current set of characters, collected to be added after a block or span has ended */
@@ -424,6 +427,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			beginSpan(SpanType.SPAN, currentAttributes);
 			mainDocumentPart.addObject(currentParagraph);
 			break;
+		case PREFORMATTED:
+			currentParagraph = factory.createP();
+			applyStyle(currentParagraph, "Preformatted");
+		    beginSpan(SpanType.SPAN, currentAttributes);
+			mainDocumentPart.addObject(currentParagraph);
+			break;
 		case PARAGRAPH:
 			currentParagraph = factory.createP();
 			beginSpan(SpanType.SPAN, currentAttributes);
@@ -613,6 +622,12 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				ThemePart themePart = new ThemePart();
 				themePart.setContents(theme);
 				mainDocumentPart.addTargetPart(themePart);
+				
+				// load the character styles
+				Styles styles = (Styles)XmlUtils.unmarshal(OoxmlDocumentBuilder.class.getResourceAsStream("templates/default/styles.xml"));
+				StyleDefinitionsPart stylePart = new StyleDefinitionsPart();
+				stylePart.setContents(styles);
+				mainDocumentPart.addTargetPart(stylePart);
 
 				// set the numbering
 				setCreateNumberingPart();
@@ -640,6 +655,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	 * Rearranges the Heading&lt;n&gt; styles so that we get proper numbering on each.
 	 */
 	private void modifyStyles() {
+		// Rearranges the Heading<n> styles so that we get proper numbering on each.
 		for (int i = 1; i < 10; i++) {
 			Style style = mainDocumentPart.getPropertyResolver().getStyle("Heading"+i);
 			if (style != null) {
@@ -824,9 +840,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	@Override
 	public void charactersUnescaped(String literal) {
-		beginBlock(BlockType.PARAGRAPH, new Attributes());
+//		beginBlock(BlockType.PARAGRAPH, new Attributes());
 		characters.append(literal);
-		endBlock();
+//		endBlock();
 	}
 
 	private P chart(String chartRelId, String chartId) throws JAXBException {
@@ -1435,7 +1451,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				}
 			}
 		} catch (TransformerException | JAXBException e) {
-			System.out.println(latex);
 			throw new RuntimeException("Could not convert LateX Math to OOXML Math", e);
 		}
 	}
