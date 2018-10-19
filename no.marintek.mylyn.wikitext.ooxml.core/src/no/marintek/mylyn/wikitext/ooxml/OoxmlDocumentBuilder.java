@@ -782,6 +782,9 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 	public void beginHeading(int level, Attributes attributes) {
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
 		
+		if (!(attributes instanceof ExtendedHeadingAttributes)) {
+			attributes = new ExtendedHeadingAttributes(attributes);
+		}
 		// see if the previous heading had the landscape/portrait page setting specified - if so we need to
 		// handle this as the last thing before creating a new heading.
 		if (currentHeadingAttributes.isLandscapeMode() != ((ExtendedHeadingAttributes)attributes).isLandscapeMode()) {
