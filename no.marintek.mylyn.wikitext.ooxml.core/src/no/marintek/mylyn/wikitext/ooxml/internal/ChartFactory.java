@@ -11,6 +11,8 @@
 package no.marintek.mylyn.wikitext.ooxml.internal;
 
 
+import java.util.Arrays;
+
 import javax.xml.bind.JAXBException;
 
 import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
@@ -376,8 +378,8 @@ public class ChartFactory {
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
 
-		double max = 0;
-		double min = 0;
+		double max = Arrays.stream(data).max().getAsDouble();
+		double min = Arrays.stream(data).min().getAsDouble();
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
@@ -386,12 +388,6 @@ public class ChartFactory {
 				numval.setV(""); // NaN must be represented as empty string
 									// (tested in MS Word 2010 on Windows 7)
 			} else {
-				if (data[i] > max) {
-					max = data[i];
-				}
-				if (data[i] < min) {
-					min = data[i];
-				}
 				numval.setV(Double.toString(data[i]));
 			}
 		}
@@ -539,11 +535,13 @@ public class ChartFactory {
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
 
 		// Create object for valAx
-		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId, false));
+		plotarea.getValAxOrCatAxOrDateAx().add(createCTValAx(ylabel, valueAxisId, categoryAxisId, false, 0, 0));
 
 		// Add a legend unless we're showing the data table or have more than ten series
 		boolean showlegend = plotSet.getLegends().length > 1 && plotSet.getLegends().length < 10;
-		if (plotSet.getRenderHints() != null && plotSet.getRenderHints().showDataTable()){
+		
+		if ((plotSet.getRenderHints() != null && plotSet.getRenderHints().showDataTable()) 
+				&& ChartDescription.SCATTER != plotSet.getChartType()){
 			showlegend = false;
 		}
 		if (showlegend) {
@@ -554,7 +552,18 @@ public class ChartFactory {
 
 		if (ChartDescription.SCATTER==plotSet.getChartType()) {
 
-			CTValAx valAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true);
+			// Finding plot X-axis size
+			double[] maxXAxis = new double[plotSet.getXSeries().length];
+			double[] minXAxis = new double[plotSet.getXSeries().length];
+			for (int series = 0; series < plotSet.getXSeries().length; series++) {
+				double[] xSeries = plotSet.getXSeries()[series];
+				maxXAxis[series] = Arrays.stream(xSeries).max().getAsDouble();
+				minXAxis[series] = Arrays.stream(xSeries).min().getAsDouble();
+			}
+
+			CTValAx valAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true, 
+					Arrays.stream(maxXAxis).max().getAsDouble(), 
+					Arrays.stream(minXAxis).min().getAsDouble());
 			plotarea.getValAxOrCatAxOrDateAx().add(valAx);
 
 			// Position
@@ -573,7 +582,7 @@ public class ChartFactory {
 			CTScatterStyle scatterStyle = dmlchartObjectFactory.createCTScatterStyle();
 			scatterStyle.setVal(STScatterStyle.LINE_MARKER);
 			scatterchart.setScatterStyle(scatterStyle);
-
+			
 			// Specify X-axis relationships
 			CTUnsignedInt unsignedint = dmlchartObjectFactory.createCTUnsignedInt();
 			unsignedint.setVal(categoryAxisId);
@@ -873,7 +882,7 @@ public class ChartFactory {
 		// Create object for latin
 		TextFont textfont = dmlObjectFactory.createTextFont();
 		textcharacterproperties7.setLatin(textfont);
-		textfont.setTypeface("Arial");
+		textfont.setTypeface("Calibri");
 
 		// Create object for endParaRPr
 		CTTextCharacterProperties textcharacterproperties8 = dmlObjectFactory.createCTTextCharacterProperties();
@@ -1131,7 +1140,7 @@ public class ChartFactory {
 	 *
 	 * @return
 	 */
-	private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId, boolean horizontal) {
+	private static CTValAx createCTValAx(String values, long valueAxisId, long categoryAxisId, boolean horizontal, double maxAxisValue, double minAxisValue) {
 		Assert.isNotNull(values);
 		
 		org.docx4j.dml.chart.ObjectFactory dmlchartObjectFactory = new org.docx4j.dml.chart.ObjectFactory();
@@ -1176,6 +1185,20 @@ public class ChartFactory {
 		CTOrientation orientation = dmlchartObjectFactory.createCTOrientation();
 		scaling.setOrientation(orientation);
 		orientation.setVal(org.docx4j.dml.chart.STOrientation.MIN_MAX);
+		
+		if (horizontal && maxAxisValue > 0) {
+			// Create object for max
+		    CTDouble double1 = dmlchartObjectFactory.createCTDouble(); 
+		    scaling.setMax(double1);
+		    double1.setVal(maxAxisValue);
+		}
+		
+		if (horizontal && maxAxisValue > 0) {
+			// Create object for min
+		    CTDouble double1 = dmlchartObjectFactory.createCTDouble(); 
+		    scaling.setMin(double1);;
+		    double1.setVal(minAxisValue);
+		}
 
 		// Create object for delete
 		CTBoolean boolean2 = dmlchartObjectFactory.createCTBoolean();
@@ -1413,7 +1436,7 @@ public class ChartFactory {
 		// Create object for legendPos
 		CTLegendPos legendpos = dmlchartObjectFactory.createCTLegendPos();
 		legend.setLegendPos(legendpos);
-		legendpos.setVal(org.docx4j.dml.chart.STLegendPos.TR);
+		legendpos.setVal(org.docx4j.dml.chart.STLegendPos.B);
 
 		// Add formatting to legend.'
 		org.docx4j.dml.ObjectFactory dmlObjectFactory = new org.docx4j.dml.ObjectFactory();
@@ -1459,8 +1482,8 @@ public class ChartFactory {
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
 
-		double max = 0;
-		double min = 0;
+		double max = Arrays.stream(data).max().getAsDouble();
+		double min = Arrays.stream(data).min().getAsDouble();
 
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
@@ -1470,12 +1493,6 @@ public class ChartFactory {
 				numval.setV(""); // NaN must be represented as empty string
 								 // (tested in MS Word 2010 on Windows 7)
 			} else {
-				if (data[i] > max) {
-					max = data[i];
-				}
-				if (data[i] < min) {
-					min = data[i];
-				}
 				numval.setV(Double.toString(data[i]));
 			}
 		}
