@@ -183,7 +183,7 @@ public class ChartFactory {
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
-			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint) {
+			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint, boolean addLegendInfo) {
 
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
@@ -198,6 +198,10 @@ public class ChartFactory {
 		 dmlchartObjectFactory.createCTUnsignedInt();
 		 scatterser.setOrder(unsignedint);
 		 unsignedint.setVal(index);
+		 
+		 // Add data to legends
+		 if (addLegendInfo) 
+			 legends[index] = getAddedLegendData(legends[index], ySeries);
 
 		// Create object for series text
 		CTSerTx sertx = dmlchartObjectFactory.createCTSerTx();
@@ -378,8 +382,8 @@ public class ChartFactory {
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
 
-		double max = Arrays.stream(data).max().getAsDouble();
-		double min = Arrays.stream(data).min().getAsDouble();
+		double max = Arrays.stream(data).max().orElse(0.0);
+		double min = Arrays.stream(data).min().orElse(0.0);
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
 			numdata.getPt().add(numval);
@@ -557,13 +561,13 @@ public class ChartFactory {
 			double[] minXAxis = new double[plotSet.getXSeries().length];
 			for (int series = 0; series < plotSet.getXSeries().length; series++) {
 				double[] xSeries = plotSet.getXSeries()[series];
-				maxXAxis[series] = Arrays.stream(xSeries).max().getAsDouble();
-				minXAxis[series] = Arrays.stream(xSeries).min().getAsDouble();
+				maxXAxis[series] = Arrays.stream(xSeries).max().orElse(0.0);
+				minXAxis[series] = Arrays.stream(xSeries).min().orElse(0.0);
 			}
 
 			CTValAx valAx = createCTValAx(xlabel, categoryAxisId, valueAxisId, true, 
-					Arrays.stream(maxXAxis).max().getAsDouble(), 
-					Arrays.stream(minXAxis).min().getAsDouble());
+					Arrays.stream(maxXAxis).max().orElse(0.0), 
+					Arrays.stream(minXAxis).min().orElse(0.0));
 			plotarea.getValAxOrCatAxOrDateAx().add(valAx);
 
 			// Position
@@ -600,7 +604,7 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getXSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints(), plotSet.getRenderHints().richLegend());
 			}
 
 		} else if (ChartDescription.LINE==plotSet.getChartType()) {
@@ -1482,8 +1486,8 @@ public class ChartFactory {
 		CTNumData numdata = dmlchartObjectFactory.createCTNumData();
 		datasource.setNumLit(numdata);
 
-		double max = Arrays.stream(data).max().getAsDouble();
-		double min = Arrays.stream(data).min().getAsDouble();
+		double max = Arrays.stream(data).max().orElse(0.0);
+		double min = Arrays.stream(data).min().orElse(0.0);
 
 		for (int i = 0; i < data.length; i++) {
 			CTNumVal numval = dmlchartObjectFactory.createCTNumVal();
@@ -1507,4 +1511,38 @@ public class ChartFactory {
 		unsignedint.setVal(data.length);
 		return datasource;
 	}
+	
+	/**
+	 * Add enhanced data to Legend Text for DataSeries
+	 * @param legendText
+	 * @param dataSeries
+	 * @return
+	 */
+	private static String getAddedLegendData(String legendText, double[] dataSeries) {
+		legendText += String.format(" (max= %4.3f, min= %4.3f, mean= %4.3f, dev= %4.3f)",
+				 Arrays.stream(dataSeries).max().orElse(0.0),
+				 Arrays.stream(dataSeries).min().orElse(0.0),
+				 Arrays.stream(dataSeries).sum() / dataSeries.length,
+				 calculateStandardDeviation(dataSeries));
+		 return legendText;
+	}
+	
+	/**
+	 * Calculates StandardDeviation for data series
+	 * @param numArray
+	 * @return
+	 */
+	private static double calculateStandardDeviation(double[] dataSeries)
+    {
+        double sum = Arrays.stream(dataSeries).sum();
+        double standardDeviation = 0.0;
+        int length = dataSeries.length;
+
+        double mean = sum/length;
+
+        for(double num: dataSeries) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+        return Math.sqrt(standardDeviation/length);
+    }
 }
