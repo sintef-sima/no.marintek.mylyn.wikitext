@@ -79,6 +79,10 @@ public class ChartRenderHints {
 		return richLegend;
 	}
 	
+	/**
+	 * Adds Max, Min, Mean and StdDev to legend text for dataseries
+	 * @param richLegend
+	 */
 	public void setRichLegend(boolean richLegend) {
 		this.richLegend = richLegend;
 	}
