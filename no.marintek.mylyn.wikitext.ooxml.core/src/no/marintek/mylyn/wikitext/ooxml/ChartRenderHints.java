@@ -14,6 +14,8 @@ public class ChartRenderHints {
 	
 	private boolean showLegend = false;
 	
+	private boolean richLegend = true;
+	
 	private int xAxisNumberFormat;
 	
 	private int yAxisNumberFormat;
@@ -71,6 +73,18 @@ public class ChartRenderHints {
 	 */
 	public void setShowLegend(boolean showLegend) {
 		this.showLegend = showLegend;
+	}
+	
+	public boolean richLegend() {
+		return richLegend;
+	}
+	
+	/**
+	 * Adds Max, Min, Mean and StdDev to legend text for dataseries
+	 * @param richLegend
+	 */
+	public void setRichLegend(boolean richLegend) {
+		this.richLegend = richLegend;
 	}
 
 }
