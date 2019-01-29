@@ -11,7 +11,9 @@
 package no.marintek.mylyn.wikitext.ooxml.internal;
 
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.xml.bind.JAXBException;
 
@@ -215,7 +217,7 @@ public class ChartFactory {
 		// Create object for data point marker
 		CTMarker marker = dmlchartObjectFactory.createCTMarker();
 		CTMarkerSize size = dmlchartObjectFactory.createCTMarkerSize();
-		size.setVal((short) 3);
+		size.setVal((short) 2);
 		marker.setSize(size);
 		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
 		symbol.setVal(org.docx4j.dml.chart.STMarkerStyle.CIRCLE);
@@ -319,7 +321,7 @@ public class ChartFactory {
 		if (hint != null && hint.isRenderMarkers()) {
 			// Set marker size
 			CTMarkerSize size = dmlchartObjectFactory.createCTMarkerSize();
-			size.setVal((short) 3);
+			size.setVal((short) 2);
 			marker.setSize(size);
 
 			// Set marker style
@@ -1192,16 +1194,13 @@ public class ChartFactory {
 		
 		if (horizontal && maxAxisValue > 0) {
 			// Create object for max
-		    CTDouble double1 = dmlchartObjectFactory.createCTDouble(); 
-		    scaling.setMax(double1);
-		    double1.setVal(maxAxisValue);
-		}
-		
-		if (horizontal && maxAxisValue > 0) {
+		    CTDouble doubleMax = dmlchartObjectFactory.createCTDouble(); 
+		    scaling.setMax(doubleMax);
+		    doubleMax.setVal(maxAxisValue);
 			// Create object for min
-		    CTDouble double1 = dmlchartObjectFactory.createCTDouble(); 
-		    scaling.setMin(double1);;
-		    double1.setVal(minAxisValue);
+		    CTDouble doubleMin = dmlchartObjectFactory.createCTDouble(); 
+		    scaling.setMin(doubleMin);;
+		    doubleMin.setVal(minAxisValue);
 		}
 
 		// Create object for delete
@@ -1299,6 +1298,7 @@ public class ChartFactory {
 		textparagraphproperties.setDefRPr(textcharacterproperties);
 		textcharacterproperties.setB(Boolean.FALSE);
 		textcharacterproperties.setI(Boolean.FALSE);
+		textcharacterproperties.setLang("en-US");
 
 		// Create object for r
 		CTRegularTextRun regulartextrun = dmlObjectFactory.createCTRegularTextRun();
@@ -1519,11 +1519,12 @@ public class ChartFactory {
 	 * @return
 	 */
 	private static String getAddedLegendData(String legendText, double[] dataSeries) {
-		legendText += String.format(" (max= %4.3f, min= %4.3f, mean= %4.3f, dev= %4.3f)",
-				 Arrays.stream(dataSeries).max().orElse(0.0),
-				 Arrays.stream(dataSeries).min().orElse(0.0),
-				 Arrays.stream(dataSeries).sum() / dataSeries.length,
-				 calculateStandardDeviation(dataSeries));
+		DecimalFormat df = new DecimalFormat("0.0##");
+		legendText += String.format(Locale.US, " (max= %s, min= %s, mean= %s, dev= %s)",
+				 df.format(Arrays.stream(dataSeries).max().orElse(0.0)),
+				 df.format(Arrays.stream(dataSeries).min().orElse(0.0)),
+				 df.format(Arrays.stream(dataSeries).sum() / dataSeries.length),
+				 df.format(calculateStandardDeviation(dataSeries)));
 		 return legendText;
 	}
 	
