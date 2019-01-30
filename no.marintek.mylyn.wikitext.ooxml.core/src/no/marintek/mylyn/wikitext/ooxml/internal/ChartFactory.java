@@ -619,7 +619,7 @@ public class ChartFactory {
 			for (int series = 0; series < plotSet.getXSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
 						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints(), 
-						plotSet.getStyleHints().getLineStyles()[series], plotSet.getStyleHints().getPointStyles()[series], plotSet.getRenderHints().richLegend());
+						plotSet.getRenderHints().getLineStyles()[series], plotSet.getRenderHints().getPointStyles()[series], plotSet.getRenderHints().richLegend());
 			}
 
 		} else if (ChartDescription.LINE==plotSet.getChartType()) {
