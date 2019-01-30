@@ -58,18 +58,12 @@ public interface ChartDescription {
 	 * @return the chart type
 	 */
 	public abstract int getChartType();
-	
+		
 	/**
-	 * The line style indicates the line styles of the current chart.
+	 * The line style indicates the point and line styles of the individual plots.
 	 * @return
 	 */
-	public abstract LineStyle[] getLineStyles();
-	
-	/**
-	 * The line style indicates the point styles of the current chart.
-	 * @return
-	 */
-	public abstract PointStyle[] getPointStyles(); 
+	public abstract PlotStyleHints getStyleHints();
 
 	public abstract ChartRenderHints getRenderHints();
 
