@@ -19,6 +19,8 @@ import javax.xml.bind.JAXBException;
 
 import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
 import no.marintek.mylyn.wikitext.ooxml.ChartRenderHints;
+import no.marintek.mylyn.wikitext.ooxml.LineStyle;
+import no.marintek.mylyn.wikitext.ooxml.PointStyle;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -185,7 +187,8 @@ public class ChartFactory {
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
-			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint, boolean addLegendInfo) {
+			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint, LineStyle lineStyle, 
+			PointStyle pointStyle, boolean addLegendInfo) {
 
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
@@ -220,7 +223,16 @@ public class ChartFactory {
 		size.setVal((short) 2);
 		marker.setSize(size);
 		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
-		symbol.setVal(org.docx4j.dml.chart.STMarkerStyle.CIRCLE);
+		org.docx4j.dml.chart.STMarkerStyle markerStyle = org.docx4j.dml.chart.STMarkerStyle.NONE;
+		if (lineStyle == LineStyle.DASH) {
+			if (pointStyle == PointStyle.CIRCLE)
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.CIRCLE;
+			else if (pointStyle == PointStyle.SQUARE)
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.SQUARE;
+			else if (pointStyle == PointStyle.POINT)
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.DOT;
+		}
+		symbol.setVal(markerStyle);
 		marker.setSymbol(symbol);
 		scatterser.setMarker(marker);
 
@@ -606,7 +618,8 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getXSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints(), plotSet.getRenderHints().richLegend());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints(), 
+						plotSet.getLineStyles()[series], plotSet.getPointStyles()[series], plotSet.getRenderHints().richLegend());
 			}
 
 		} else if (ChartDescription.LINE==plotSet.getChartType()) {
