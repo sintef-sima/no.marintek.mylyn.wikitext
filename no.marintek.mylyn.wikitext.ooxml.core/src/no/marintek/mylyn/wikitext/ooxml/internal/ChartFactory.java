@@ -19,6 +19,8 @@ import javax.xml.bind.JAXBException;
 
 import no.marintek.mylyn.wikitext.ooxml.ChartDescription;
 import no.marintek.mylyn.wikitext.ooxml.ChartRenderHints;
+import no.marintek.mylyn.wikitext.ooxml.LineStyle;
+import no.marintek.mylyn.wikitext.ooxml.PointStyle;
 
 import org.docx4j.dml.CTLineProperties;
 import org.docx4j.dml.CTNoFillProperties;
@@ -220,7 +222,23 @@ public class ChartFactory {
 		size.setVal((short) 2);
 		marker.setSize(size);
 		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
-		symbol.setVal(org.docx4j.dml.chart.STMarkerStyle.CIRCLE);
+		org.docx4j.dml.chart.STMarkerStyle markerStyle = org.docx4j.dml.chart.STMarkerStyle.NONE;
+		if (hint.getLineStyles()[index] == LineStyle.DASH) {
+			switch(hint.getPointStyles()[index]) {
+			case CIRCLE:
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.CIRCLE;
+				break;
+			case SQUARE:
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.SQUARE;
+				break;
+			case POINT:
+				markerStyle = org.docx4j.dml.chart.STMarkerStyle.DOT;
+				break;
+			default:
+				break;
+			}
+		}
+		symbol.setVal(markerStyle);
 		marker.setSymbol(symbol);
 		scatterser.setMarker(marker);
 
