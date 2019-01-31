@@ -224,12 +224,19 @@ public class ChartFactory {
 		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
 		org.docx4j.dml.chart.STMarkerStyle markerStyle = org.docx4j.dml.chart.STMarkerStyle.NONE;
 		if (hint.getLineStyles()[index] == LineStyle.DASH) {
-			if (hint.getPointStyles()[index] == PointStyle.CIRCLE)
+			switch(hint.getPointStyles()[index]) {
+			case CIRCLE:
 				markerStyle = org.docx4j.dml.chart.STMarkerStyle.CIRCLE;
-			else if (hint.getPointStyles()[index] == PointStyle.SQUARE)
+				break;
+			case SQUARE:
 				markerStyle = org.docx4j.dml.chart.STMarkerStyle.SQUARE;
-			else if (hint.getPointStyles()[index] == PointStyle.POINT)
+				break;
+			case POINT:
 				markerStyle = org.docx4j.dml.chart.STMarkerStyle.DOT;
+				break;
+			default:
+				break;
+			}
 		}
 		symbol.setVal(markerStyle);
 		marker.setSymbol(symbol);
