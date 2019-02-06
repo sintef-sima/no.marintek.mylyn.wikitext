@@ -32,6 +32,9 @@
         <w:name w:val="Normal"/>
         <w:qFormat/>
         <w:rsid w:val="004A3277"/>
+        <w:rPr>
+            <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
+        </w:rPr>
     </w:style>
     <w:style w:type="paragraph" w:styleId="Appendix1" w:customStyle="true">
         <w:name w:val="Appendix 1"/>
@@ -48,7 +51,6 @@
             <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-            <w:smallCaps/>
             <w:spacing w:val="5"/>
             <w:sz w:val="32"/>
             <w:szCs w:val="32"/>
@@ -70,7 +72,6 @@
             <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-            <w:smallCaps/>
             <w:spacing w:val="5"/>
             <w:sz w:val="28"/>
             <w:szCs w:val="28"/>
@@ -93,7 +94,6 @@
             <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-            <w:smallCaps/>
             <w:spacing w:val="5"/>
             <w:sz w:val="32"/>
             <w:szCs w:val="32"/>
@@ -118,7 +118,6 @@
             <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-            <w:smallCaps/>
             <w:spacing w:val="5"/>
             <w:sz w:val="28"/>
             <w:szCs w:val="28"/>
@@ -143,7 +142,6 @@
             <w:outlineLvl w:val="0"/>
         </w:pPr>
         <w:rPr>
-            <w:smallCaps/>
             <w:spacing w:val="5"/>
             <w:sz w:val="24"/>
             <w:szCs w:val="24"/>
@@ -209,7 +207,7 @@
         <w:link w:val="Appendix1"/>
         <w:rsid w:val="00B45E03"/>
         <w:rPr>
-            <w:smallCaps/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
             <w:spacing w:val="5"/>
             <w:sz w:val="32"/>
             <w:szCs w:val="32"/>
@@ -221,7 +219,7 @@
         <w:link w:val="Appendix2"/>
         <w:rsid w:val="00B935C5"/>
         <w:rPr>
-            <w:smallCaps/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
             <w:spacing w:val="5"/>
             <w:sz w:val="28"/>
             <w:szCs w:val="28"/>
@@ -234,7 +232,7 @@
         <w:uiPriority w:val="9"/>
         <w:rsid w:val="00841CD9"/>
         <w:rPr>
-            <w:smallCaps/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
             <w:spacing w:val="5"/>
             <w:sz w:val="32"/>
             <w:szCs w:val="32"/>
@@ -247,7 +245,7 @@
         <w:uiPriority w:val="9"/>
         <w:rsid w:val="00841CD9"/>
         <w:rPr>
-            <w:smallCaps/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
             <w:spacing w:val="5"/>
             <w:sz w:val="28"/>
             <w:szCs w:val="28"/>
@@ -260,7 +258,7 @@
         <w:uiPriority w:val="9"/>
         <w:rsid w:val="00841CD9"/>
         <w:rPr>
-            <w:smallCaps/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
             <w:spacing w:val="5"/>
             <w:sz w:val="24"/>
             <w:szCs w:val="24"/>
@@ -306,7 +304,7 @@
             <w:ind w:left="86"/>
         </w:pPr>
         <w:rPr>
-            <w:rFonts w:asciiTheme="majorHAnsi" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
+            <w:rFonts w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
             <w:i/>
             <w:iCs/>
             <w:color w:val="4F81BD" w:themeColor="accent1"/>
@@ -322,7 +320,7 @@
         <w:uiPriority w:val="11"/>
         <w:rsid w:val="00841CD9"/>
         <w:rPr>
-            <w:rFonts w:asciiTheme="majorHAnsi" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
             <w:i/>
             <w:iCs/>
             <w:color w:val="4F81BD" w:themeColor="accent1"/>
@@ -347,7 +345,7 @@
             <w:contextualSpacing/>
         </w:pPr>
         <w:rPr>
-            <w:rFonts w:asciiTheme="majorHAnsi" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
+            <w:rFonts w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
             <w:color w:val="17365D" w:themeColor="text2" w:themeShade="BF"/>
             <w:spacing w:val="5"/>
             <w:kern w:val="28"/>
@@ -362,7 +360,7 @@
         <w:uiPriority w:val="10"/>
         <w:rsid w:val="00841CD9"/>
         <w:rPr>
-            <w:rFonts w:asciiTheme="majorHAnsi" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
+        	<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"/>
             <w:color w:val="17365D" w:themeColor="text2" w:themeShade="BF"/>
             <w:spacing w:val="5"/>
             <w:kern w:val="28"/>
@@ -461,7 +459,7 @@
 			<w:spacing w:after="0" />
 		</w:pPr>
 		<w:rPr>
-			<w:rFonts w:ascii="Courier" w:hAnsi="Courier" />
+			<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri"/>
 			<w:sz w:val="18" />
 		</w:rPr>
 	</w:style>    
