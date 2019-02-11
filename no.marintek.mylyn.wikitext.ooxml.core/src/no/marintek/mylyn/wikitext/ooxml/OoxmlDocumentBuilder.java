@@ -637,10 +637,10 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			}
 									
 			if (title != null) {
-				mainDocumentPart.addStyledParagraphOfText("Title", title);
+				mainDocumentPart.addStyledParagraphOfText(TemplateStyle.TITLE.getTemplateStyle(), title);
 			}
 			if (subtitle != null) {
-				mainDocumentPart.addStyledParagraphOfText("Subtitle", subtitle);
+				mainDocumentPart.addStyledParagraphOfText(TemplateStyle.SUBTITLE.getTemplateStyle(), subtitle);
 			}
 			// create an initial set of attributes
 			currentHeadingAttributes = new ExtendedHeadingAttributes();
@@ -652,11 +652,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
-		beginStyle("Heading", level, attributes);
+		beginStyle(TemplateStyle.HEADING, level, attributes);
 	}
 	
 	@Override
-	public void beginStyle(String style, int level, Attributes attributes) {
+	public void beginStyle(TemplateStyle style, int level, Attributes attributes) {
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
 		
 		if (!(attributes instanceof ExtendedHeadingAttributes)) {
@@ -688,19 +688,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		if (currentHeadingAttributes.isPageBreakBefore()) {
 			pageBreak();
 		}
-		currentStyle = style + level;
+		currentStyle = style.getTemplateStyle() + level;
 		styleExists();
 	}
 
 	private void styleExists() {
 		Map<String, Style> knownStyles = StyleDefinitionsPart.getKnownStyles();
-		for (String name: knownStyles.keySet()){
-
-            String key =name.toString(); 
-            if (key.contains("App"))
-            	System.out.println(key);  
-        }
-		if ((!knownStyles.containsKey(currentStyle)) && (!currentStyle.contains("Appendix"))) {
+		if ((!knownStyles.containsKey(currentStyle)) && (!currentStyle.contains(TemplateStyle.APPENDIX.getTemplateStyle()))) {
 			throw new IllegalArgumentException("Unknown style!");
 		}
 	}

@@ -66,7 +66,7 @@ public interface IExtendedDocumentBuilder {
 	 *            the attributes to apply to the style
 	 * @see #endStyle()
 	 */
-	public abstract void beginStyle(String style, int level, Attributes attributes);
+	public abstract void beginStyle(TemplateStyle style, int level, Attributes attributes);
 
 	/**
 	 * End a span that was {@link #beginStyle(String, int, Attributes) started}.
