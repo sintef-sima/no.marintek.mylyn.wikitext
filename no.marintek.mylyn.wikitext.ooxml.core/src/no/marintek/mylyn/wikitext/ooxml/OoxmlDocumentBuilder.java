@@ -1020,9 +1020,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		RPr block;
 		// Set font size
 		String fontSize = getCssValueForKey(currentAttributes, "font-size");
-		if (!fontSize.isEmpty()) {
-			block = createSpanWithFontSize(characters.toString(), fontSize);
-		}
 		// Set text alignment
 		String textHAlign = getCssValueForKey(currentAttributes, "text-align");
 		if (currentParagraph.getPPr() != null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {
@@ -1036,29 +1033,29 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		}
 		switch (currentSpanType) {
 		case BOLD:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			break;
 		case CITATION:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case CODE:
 			// TODO: Implement support for code blocks
 			break;
 		case DELETED:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setStrike(TRUE);
 			break;
 		case EMPHASIS:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			block.setI(TRUE);
 			break;
 		case INSERTED:
 			break;
 		case ITALIC:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case LINK:
@@ -1068,7 +1065,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			// TODO: Implement support for monospace
 			break;
 		case QUOTE:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case SPAN:
@@ -1076,33 +1073,33 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				convertLaTeX2OoxmlMath("$$" + characters.toString() + "$$", currentAttributes, true);
 				currentAttributes = new Attributes();
 			} else {
-				block = createSpan(characters.toString());
+				block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			}
 			break;
 		case STRONG:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			break;
 		case SUBSCRIPT:
 			CTVerticalAlignRun subScript = wmlObjectFactory.createCTVerticalAlignRun();
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setVertAlign(subScript);
 			subScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUBSCRIPT);
 			break;
 		case SUPERSCRIPT:
 			CTVerticalAlignRun superScript = wmlObjectFactory.createCTVerticalAlignRun();
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setVertAlign(superScript);
 			superScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUPERSCRIPT);
 			break;
 		case UNDERLINED:
 			U underline = new U();
 			underline.setVal(UnderlineEnumeration.SINGLE);
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setU(underline);
 			break;
 		default:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			break;
 		}
 		characters.setLength(0);
