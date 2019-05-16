@@ -187,7 +187,7 @@ public class ChartFactory {
 
 	private static void addSeries(String[] legends, String ylabel, String xlabel, double[] ySeries, double[] xSeries,
 			ObjectFactory dmlchartObjectFactory, int valueAxisId, int categoryAxisId, org.docx4j.dml.ObjectFactory dmlObjectFactory,
-			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint, boolean addLegendInfo) {
+			CTPlotArea plotarea, CTScatterChart scatterchart, int index, ChartRenderHints hint) {
 
 		CTScatterSer scatterser = dmlchartObjectFactory.createCTScatterSer();
 		scatterchart.getSer().add(scatterser);
@@ -204,7 +204,7 @@ public class ChartFactory {
 		 unsignedint.setVal(index);
 		 
 		 // Add data to legends
-		 if (addLegendInfo) 
+		 if (hint != null && hint.richLegend()) 
 			 legends[index] = getAddedLegendData(legends[index], ySeries);
 
 		// Create object for series text
@@ -223,19 +223,23 @@ public class ChartFactory {
 		marker.setSize(size);
 		CTMarkerStyle symbol = dmlchartObjectFactory.createCTMarkerStyle();
 		org.docx4j.dml.chart.STMarkerStyle markerStyle = org.docx4j.dml.chart.STMarkerStyle.NONE;
-		if (hint.getLineStyles()[index] == LineStyle.DASH) {
-			switch(hint.getPointStyles()[index]) {
-			case CIRCLE:
-				markerStyle = org.docx4j.dml.chart.STMarkerStyle.CIRCLE;
-				break;
-			case SQUARE:
-				markerStyle = org.docx4j.dml.chart.STMarkerStyle.SQUARE;
-				break;
-			case POINT:
-				markerStyle = org.docx4j.dml.chart.STMarkerStyle.DOT;
-				break;
-			default:
-				break;
+		if (hint != null && hint.getLineStyles() != null && hint.getPointStyles() != null) {
+			if (hint.getLineStyles().length > index && hint.getPointStyles().length > index) {
+				if (hint.getLineStyles()[index] == LineStyle.DASH) {
+					switch(hint.getPointStyles()[index]) {
+					case CIRCLE:
+						markerStyle = org.docx4j.dml.chart.STMarkerStyle.CIRCLE;
+						break;
+					case SQUARE:
+						markerStyle = org.docx4j.dml.chart.STMarkerStyle.SQUARE;
+						break;
+					case POINT:
+						markerStyle = org.docx4j.dml.chart.STMarkerStyle.DOT;
+						break;
+					default:
+						break;
+					}
+				}
 			}
 		}
 		symbol.setVal(markerStyle);
@@ -624,7 +628,7 @@ public class ChartFactory {
 
 			for (int series = 0; series < plotSet.getXSeries().length; series++) {
 				addSeries(plotSet.getLegends(), ylabel, xlabel, plotSet.getYSeries()[series], plotSet.getXSeries()[series], dmlchartObjectFactory,
-						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints(), plotSet.getRenderHints().richLegend());
+						valueAxisId, categoryAxisId, dmlObjectFactory, plotarea, scatterchart, series, plotSet.getRenderHints());
 			}
 
 		} else if (ChartDescription.LINE==plotSet.getChartType()) {
