@@ -54,5 +54,25 @@ public interface IExtendedDocumentBuilder {
 	 *            whether or not the resulting object should be editable
 	 */
 	public void latex(String latex, Attributes attributes, boolean editable);
+	
+	/**
+	 * Begin a heading of the specified level (usually 1-6). Builder implementations may do a best-effort application of
+	 * the provided attributes. Each call to this method must be matched by a corresponding call to
+	 * {@link #endStyle()}.
+	 *
+	 * @param level
+	 *            the level of the style, usually 1-6
+	 * @param attributes
+	 *            the attributes to apply to the style
+	 * @see #endStyle()
+	 */
+	public abstract void beginStyle(TemplateStyle style, int level, Attributes attributes);
+
+	/**
+	 * End a span that was {@link #beginStyle(String, int, Attributes) started}.
+	 *
+	 * @see #beginStyle(int, Attributes)
+	 */
+	public abstract void endStyle();
 
 }

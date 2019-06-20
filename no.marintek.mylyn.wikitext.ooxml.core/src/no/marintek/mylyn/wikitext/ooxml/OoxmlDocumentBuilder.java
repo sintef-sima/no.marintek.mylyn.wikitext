@@ -69,7 +69,6 @@ import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.Body;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBorder;
-import org.docx4j.wml.CTLongHexNumber;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.CTTblPrBase.TblStyle;
 import org.docx4j.wml.CTVerticalAlignRun;
@@ -78,8 +77,6 @@ import org.docx4j.wml.FldChar;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
-import org.docx4j.wml.Lvl;
-import org.docx4j.wml.NumFmt;
 import org.docx4j.wml.Numbering;
 import org.docx4j.wml.P;
 import org.docx4j.wml.P.Hyperlink;
@@ -628,20 +625,22 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				StyleDefinitionsPart stylePart = new StyleDefinitionsPart();
 				stylePart.setContents(styles);
 				mainDocumentPart.addTargetPart(stylePart);
-
-				// set the numbering
-				setCreateNumberingPart();
-				modifyStyles();
+				
+				// Load the numbering
+				Numbering numbering = (Numbering)XmlUtils.unmarshal(OoxmlDocumentBuilder.class.getResourceAsStream("templates/default/numbering.xml"));
+				NumberingDefinitionsPart numberingPart = new NumberingDefinitionsPart();
+				numberingPart.setContents(numbering);
+				mainDocumentPart.addTargetPart(numberingPart);
 
 			} catch (JAXBException e) {
 				e.printStackTrace();
 			}
 									
 			if (title != null) {
-				mainDocumentPart.addStyledParagraphOfText("Title", title);
+				mainDocumentPart.addStyledParagraphOfText(TemplateStyle.TITLE.getTemplateStyle(), title);
 			}
 			if (subtitle != null) {
-				mainDocumentPart.addStyledParagraphOfText("Subtitle", subtitle);
+				mainDocumentPart.addStyledParagraphOfText(TemplateStyle.SUBTITLE.getTemplateStyle(), subtitle);
 			}
 			// create an initial set of attributes
 			currentHeadingAttributes = new ExtendedHeadingAttributes();
@@ -650,138 +649,19 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			throw new RuntimeException("Could not begin a new document", e);
 		}
 	}
-	
-	/**
-	 * Rearranges the Heading&lt;n&gt; styles so that we get proper numbering on each.
-	 */
-	private void modifyStyles() {
-		// Rearranges the Heading<n> styles so that we get proper numbering on each.
-		for (int i = 1; i < 10; i++) {
-			Style style = mainDocumentPart.getPropertyResolver().getStyle("Heading"+i);
-			if (style != null) {
-				// PPr pPr = style.getPPr();
-				PPr ppr = wmlObjectFactory.createPPr();
-				// Create object for numPr
-				PPrBase.NumPr pprbasenumpr = wmlObjectFactory.createPPrBaseNumPr();
-				ppr.setNumPr(pprbasenumpr);
-				// Create object for numId
-				PPrBase.NumPr.NumId pprbasenumprnumid = wmlObjectFactory.createPPrBaseNumPrNumId();
-				pprbasenumpr.setNumId(pprbasenumprnumid);
-				pprbasenumprnumid.setVal(BigInteger.valueOf(1));
-				// Create object for ilvl
-				if (i > 1) {
-					PPrBase.NumPr.Ilvl pprbasenumprilvl = wmlObjectFactory.createPPrBaseNumPrIlvl();
-					pprbasenumpr.setIlvl(pprbasenumprilvl);
-					pprbasenumprilvl.setVal(BigInteger.valueOf(i - 1));
-				}
-	            // Create object for spacing
-				PPrBase.Spacing pprbasespacing = wmlObjectFactory.createPPrBaseSpacing();
-				ppr.setSpacing(pprbasespacing);
-				pprbasespacing.setBefore(BigInteger.valueOf(300));
-				pprbasespacing.setAfter(BigInteger.valueOf(40));
-				// Create object for jc
-				Jc jc = wmlObjectFactory.createJc();
-				ppr.setJc(jc);
-				jc.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-				// Create object for outlineLvl
-				PPrBase.OutlineLvl pprbaseoutlinelvl = wmlObjectFactory.createPPrBaseOutlineLvl();
-				ppr.setOutlineLvl(pprbaseoutlinelvl);
-				pprbaseoutlinelvl.setVal(BigInteger.valueOf(0));
-				style.setPPr(ppr);
-			}
-		}
-	}
-
-	private void setCreateNumberingPart() throws InvalidFormatException {
-		NumberingDefinitionsPart ndp = new NumberingDefinitionsPart();
-		Numbering numbering = factory.createNumbering();
-		mainDocumentPart.addTargetPart(ndp);
-		// Create object for abstractNum
-		Numbering.Num numberingnum = wmlObjectFactory.createNumberingNum();
-		numbering.getNum().add(numberingnum);
-		numberingnum.setNumId(BigInteger.valueOf(1));
-		// Create object for abstractNumId
-		Numbering.Num.AbstractNumId numberingnumabstractnumid = wmlObjectFactory
-				.createNumberingNumAbstractNumId();
-		numberingnum.setAbstractNumId(numberingnumabstractnumid);
-		numberingnumabstractnumid.setVal(BigInteger.valueOf(0));
-		// Create object for abstractNum
-		Numbering.AbstractNum numberingabstractnum = wmlObjectFactory.createNumberingAbstractNum();
-		numbering.getAbstractNum().add(numberingabstractnum);
-		numberingabstractnum.setAbstractNumId(BigInteger.valueOf(0));
-		for (int i = 0; i < 9; i++) {
-			Lvl lvl = getCreateNumbering(i);
-			numberingabstractnum.getLvl().add( lvl);
-		}
-		CTLongHexNumber longhexnumber = wmlObjectFactory.createCTLongHexNumber();
-		numberingabstractnum.setNsid(longhexnumber);
-		longhexnumber.setVal("31D04254");
-		// Create object for multiLevelType
-		Numbering.AbstractNum.MultiLevelType numberingabstractnummultileveltype = wmlObjectFactory
-				.createNumberingAbstractNumMultiLevelType();
-		numberingabstractnum.setMultiLevelType(numberingabstractnummultileveltype);
-		numberingabstractnummultileveltype.setVal("multilevel");
-		CTLongHexNumber longhexnumber2 = wmlObjectFactory.createCTLongHexNumber();
-		numberingabstractnum.setTmpl(longhexnumber2);
-		longhexnumber2.setVal("270694BC");
-		ndp.setContents(numbering);
-	}
-	
-	/**
-	 * Create numbering formatting for the header at the given level.
-	 * 
-	 * @param level
-	 *            the header level (0-8)
-	 * @return the new numbering setting
-	 */
-	private Lvl getCreateNumbering(int level) {
-		org.docx4j.wml.ObjectFactory wmlObjectFactory = new org.docx4j.wml.ObjectFactory();
-		Lvl lvl = wmlObjectFactory.createLvl();
-		// Create object for pPr
-		PPr ppr = wmlObjectFactory.createPPr();
-		lvl.setPPr(ppr);
-		// Create object for ind
-		PPrBase.Ind pprbaseind = wmlObjectFactory.createPPrBaseInd();
-		ppr.setInd(pprbaseind);
-		// add 144 points per level		
-		pprbaseind.setLeft(BigInteger.valueOf(432 + (level * 144)));
-		pprbaseind.setHanging(BigInteger.valueOf(432 + (level * 144)));
-		lvl.setIlvl(BigInteger.valueOf(level));
-		// Create object for pStyle
-		Lvl.PStyle lvlpstyle = wmlObjectFactory.createLvlPStyle();
-		lvl.setPStyle(lvlpstyle);
-		lvlpstyle.setVal("Heading"+(level+1));
-		// Create object for numFmt
-		NumFmt numfmt = wmlObjectFactory.createNumFmt();
-		lvl.setNumFmt(numfmt);
-		numfmt.setVal(org.docx4j.wml.NumberFormat.DECIMAL);
-		// Create object for lvlText
-		Lvl.LvlText lvllvltext = wmlObjectFactory.createLvlLvlText();
-		lvl.setLvlText(lvllvltext);
-		StringBuilder sb = new StringBuilder();
-		for (int i = 1; i < level + 2; i++) {
-			sb.append('%');
-			sb.append(String.valueOf(i));
-			if (i < level+1) {
-				sb.append('.');
-			}
-		}
-		lvllvltext.setVal(sb.toString());
-		// Create object for lvlJcs
-		Jc jc = wmlObjectFactory.createJc();
-		lvl.setLvlJc(jc);
-		jc.setVal(org.docx4j.wml.JcEnumeration.LEFT);
-		// Create object for start
-		Lvl.Start lvlstart = wmlObjectFactory.createLvlStart();
-		lvl.setStart(lvlstart);
-		lvlstart.setVal(BigInteger.valueOf(1));
-		return lvl;
-	}
 		
 	@Override
 	public void beginHeading(int level, Attributes attributes) {
+		beginStyle(TemplateStyle.HEADING, level, attributes);
+	}
+	
+	@Override
+	public void beginStyle(TemplateStyle style, int level, Attributes attributes) {
 		Assert.isNotNull(attributes, "Attributes cannot be NULL");
 		
+		if (!(attributes instanceof ExtendedHeadingAttributes)) {
+			attributes = new ExtendedHeadingAttributes(attributes);
+		}
 		// see if the previous heading had the landscape/portrait page setting specified - if so we need to
 		// handle this as the last thing before creating a new heading.
 		if (currentHeadingAttributes.isLandscapeMode() != ((ExtendedHeadingAttributes)attributes).isLandscapeMode()) {
@@ -808,13 +688,13 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		if (currentHeadingAttributes.isPageBreakBefore()) {
 			pageBreak();
 		}
-		currentStyle = "Heading" + level;
+		currentStyle = style.getTemplateStyle() + level;
 		styleExists();
 	}
 
 	private void styleExists() {
 		Map<String, Style> knownStyles = StyleDefinitionsPart.getKnownStyles();
-		if (!knownStyles.containsKey(currentStyle)) {
+		if ((!knownStyles.containsKey(currentStyle)) && (!currentStyle.contains(TemplateStyle.APPENDIX.getTemplateStyle()))) {
 			throw new IllegalArgumentException("Unknown style!");
 		}
 	}
@@ -854,7 +734,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				+ "				</w:rPr>" 
 				+ "				<w:drawing>"
 				+ "					<wp:inline distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\">"
-				+ "						<wp:extent cx=\"6486400\" cy=\"3200400\" />"
+				+ "						<wp:extent cx=\"5730000\" cy=\"3200000\" />"
 				+ "						<wp:effectExtent l=\"0\" t=\"0\" r=\"25400\" b=\"25400\" />"
 				+ "						<wp:docPr id=\"${docPr}\" name=\"Diagram " + chartId + "\" />"
 				+ "						<wp:cNvGraphicFramePr />"
@@ -1098,6 +978,11 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 
 	@Override
 	public void endHeading() {
+		endStyle();
+	}
+	
+	@Override
+	public void endStyle() {
 		String ml = 
 				"<w:p xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">" + 
 				"  <w:pPr>" + 
@@ -1135,9 +1020,6 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		RPr block;
 		// Set font size
 		String fontSize = getCssValueForKey(currentAttributes, "font-size");
-		if (!fontSize.isEmpty()) {
-			block = createSpanWithFontSize(characters.toString(), fontSize);
-		}
 		// Set text alignment
 		String textHAlign = getCssValueForKey(currentAttributes, "text-align");
 		if (currentParagraph.getPPr() != null && !textHAlign.isEmpty() && !textHAlign.toLowerCase().equals("left")) {
@@ -1151,29 +1033,29 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 		}
 		switch (currentSpanType) {
 		case BOLD:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			break;
 		case CITATION:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case CODE:
 			// TODO: Implement support for code blocks
 			break;
 		case DELETED:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setStrike(TRUE);
 			break;
 		case EMPHASIS:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			block.setI(TRUE);
 			break;
 		case INSERTED:
 			break;
 		case ITALIC:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case LINK:
@@ -1183,7 +1065,7 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 			// TODO: Implement support for monospace
 			break;
 		case QUOTE:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setI(TRUE);
 			break;
 		case SPAN:
@@ -1191,33 +1073,33 @@ public class OoxmlDocumentBuilder extends DocumentBuilder implements IExtendedDo
 				convertLaTeX2OoxmlMath("$$" + characters.toString() + "$$", currentAttributes, true);
 				currentAttributes = new Attributes();
 			} else {
-				block = createSpan(characters.toString());
+				block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			}
 			break;
 		case STRONG:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setB(TRUE);
 			break;
 		case SUBSCRIPT:
 			CTVerticalAlignRun subScript = wmlObjectFactory.createCTVerticalAlignRun();
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setVertAlign(subScript);
 			subScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUBSCRIPT);
 			break;
 		case SUPERSCRIPT:
 			CTVerticalAlignRun superScript = wmlObjectFactory.createCTVerticalAlignRun();
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setVertAlign(superScript);
 			superScript.setVal(org.docx4j.wml.STVerticalAlignRun.SUPERSCRIPT);
 			break;
 		case UNDERLINED:
 			U underline = new U();
 			underline.setVal(UnderlineEnumeration.SINGLE);
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			block.setU(underline);
 			break;
 		default:
-			block = createSpan(characters.toString());
+			block = (fontSize.isEmpty()) ? createSpan(characters.toString()) : createSpanWithFontSize(characters.toString(), fontSize);
 			break;
 		}
 		characters.setLength(0);
