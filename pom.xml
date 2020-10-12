@@ -33,7 +33,7 @@
 		<egit-version>2.2.0-SNAPSHOT</egit-version>
 		<tycho.version>1.0.0</tycho.version>
 		<mockito-version>1.8.4</mockito-version>
-		<junit-version>4.8.1</junit-version>
+		<junit-version>4.13.1</junit-version>
 		<project.source.sourceEncoding>UTF-8</project.source.sourceEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
